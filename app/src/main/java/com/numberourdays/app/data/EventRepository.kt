@@ -42,41 +42,9 @@ class EventRepository(private val context: Context) {
         }
     }
 
-    private fun migrate(obj: JSONObject?): DayEvent? {
-        if (obj == null) return null
-        val id = obj.optString("id")
-        val date = obj.optString("date")
-        if (id.isEmpty() || date.isEmpty()) return null
-        val unit = RepeatUnit.from(obj.optString("repeatUnit", "none"))
-        val interval = obj.optInt("repeatInterval", 1).coerceAtLeast(1)
-        return DayEvent(
-            id = id,
-            title = obj.optString("title", ""),
-            date = date,
-            note = if (obj.isNull("note")) null else obj.optString("note").ifEmpty { null },
-            starred = obj.optBoolean("starred", false),
-            starRank = if (obj.has("starRank") && !obj.isNull("starRank")) obj.optInt("starRank") else null,
-            repeatUnit = unit,
-            repeatInterval = interval,
-            remindEnabled = obj.optBoolean("remindEnabled", false),
-            createdAt = obj.optLong("createdAt", System.currentTimeMillis()),
-            updatedAt = obj.optLong("updatedAt", System.currentTimeMillis()),
-        )
-    }
+    private fun migrate(obj: JSONObject?): DayEvent? = DayEventCodec.migrate(obj)
 
-    private fun toJson(e: DayEvent): JSONObject = JSONObject().apply {
-        put("id", e.id)
-        put("title", e.title)
-        put("date", e.date)
-        if (e.note != null) put("note", e.note) else put("note", JSONObject.NULL)
-        put("starred", e.starred)
-        if (e.starRank != null) put("starRank", e.starRank) else put("starRank", JSONObject.NULL)
-        put("repeatUnit", e.repeatUnit.name.lowercase())
-        put("repeatInterval", e.repeatInterval)
-        put("remindEnabled", e.remindEnabled)
-        put("createdAt", e.createdAt)
-        put("updatedAt", e.updatedAt)
-    }
+    private fun toJson(e: DayEvent): JSONObject = DayEventCodec.toJson(e)
 
     fun getEvent(id: String): DayEvent? = _events.value.find { it.id == id }
 
@@ -128,45 +96,12 @@ class EventRepository(private val context: Context) {
         persist(events)
     }
 
-    fun serialize(events: List<DayEvent>): String {
-        val payload = JSONObject().apply {
-            put("app", "NumberOurDays")
-            put("schemaVersion", 1)
-            put("exportedAt", System.currentTimeMillis())
-            put("events", JSONArray().also { arr -> events.forEach { arr.put(toJson(it)) } })
-        }
-        return payload.toString(2)
-    }
+    fun serialize(events: List<DayEvent>): String = DayEventCodec.serialize(events)
 
-    fun parseBackup(text: String): Pair<List<DayEvent>, String?> {
-        val trimmed = text.trim()
-        if (trimmed.isEmpty()) return emptyList<DayEvent>() to "内容为空"
-        return try {
-            val data = JSONObject(trimmed)
-            val arr = data.optJSONArray("events") ?: return emptyList<DayEvent>() to "缺少 events 数组"
-            val events = mutableListOf<DayEvent>()
-            var skipped = 0
-            for (i in 0 until arr.length()) {
-                val e = migrate(arr.optJSONObject(i))
-                if (e != null && e.title.isNotBlank() && DateCalculator.isValidDate(e.date)) events.add(e)
-                else skipped++
-            }
-            val note = if (skipped > 0) "跳过 $skipped 条无效" else null
-            events to note
-        } catch (_: Exception) {
-            emptyList<DayEvent>() to "不是合法 JSON"
-        }
-    }
+    fun parseBackup(text: String): Pair<List<DayEvent>, String?> = DayEventCodec.parseBackup(text)
 
-    fun merge(local: List<DayEvent>, incoming: List<DayEvent>): List<DayEvent> {
-        val map = LinkedHashMap<String, DayEvent>()
-        local.forEach { map[it.id] = it }
-        incoming.forEach { r ->
-            val l = map[r.id]
-            if (l == null || r.updatedAt >= l.updatedAt) map[r.id] = r
-        }
-        return map.values.toList()
-    }
+    fun merge(local: List<DayEvent>, incoming: List<DayEvent>): List<DayEvent> =
+        DayEventCodec.merge(local, incoming)
 
     fun createId(): String =
         "e_${System.currentTimeMillis().toString(36)}_${UUID.randomUUID().toString().take(6)}"
