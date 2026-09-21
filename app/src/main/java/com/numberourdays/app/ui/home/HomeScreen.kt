@@ -173,7 +173,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 96.dp),
+            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 20.dp, bottom = 96.dp),
         ) {
             item(key = "carousel") {
                 val pagerState = rememberPagerState(pageCount = { slides.size.coerceAtLeast(1) })
