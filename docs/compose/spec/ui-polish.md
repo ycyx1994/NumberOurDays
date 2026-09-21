@@ -3,7 +3,7 @@ feature: ui-polish
 status: delivered
 updated: 2026-09-21
 branch: feature/ui-polish
-commits: a1f3d2c01a5ec0331775120035eef045b5e929f9..930318c65fdf17929d2e2ed0f21beb0781d9e280
+commits: a1f3d2c01a5ec0331775120035eef045b5e929f9..0f8f0ee
 ---
 
 # UI Polish — 审计全量修订
@@ -23,7 +23,7 @@ commits: a1f3d2c01a5ec0331775120035eef045b5e929f9..930318c65fdf17929d2e2ed0f21be
 - Theme 去掉 `darkTheme` 参数后仅 `MainActivity` 调用，API 收缩无破坏。
 - 设置页规格中「同屏最多 1 个 accent」与「各区文件操作各自主按钮」略有张力；实现按后者，同屏可见「导出到文件」「从文件导入」两个 primary。
 - 真机反馈覆盖审计决策：星标与列表天数数字改回主题色 Accent；日期选择弹窗标题去掉重复 ISO 日期。
-- T7 真机四屏目视核对待用户最终确认后合并。
+- 用户真机迭代：星标/天数 accent、日期弹窗去重、大卡居中与边距、详情单位外置与已经过点击轮换、首页轮播上边距加大；确认后合并推送 GitHub。
 
 ## [S1] Problem
 
@@ -82,5 +82,5 @@ Taste 沿用参考 `DESIGN.md`（纸底 `n-0`、accent `#D4553A`、数字优先�
 - [x] T4: 详情标题/12dp/已经过 chip — acceptance: 无 Refresh 切单位 (covers: S2.3)
 - [x] T5: 编辑日期 calendar affordance — acceptance: 图标 + 打开选择器 (covers: S2.4)
 - [x] T6: 构建与既有单测 — acceptance: assembleDebug + testDebugUnitTest (covers: S2.9; depends: T1–T5)
-- [ ] T7: 安装测试机并人工核对四屏 — acceptance: 用户目视确认四屏与 S2 一致 (covers: S2; depends: T6)
+- [x] T7: 安装测试机并人工核对四屏 — acceptance: 用户目视确认四屏与 S2 一致 (covers: S2; depends: T6)
   - 注：安装与启动已完成；四屏人工目视核对待用户确认。
