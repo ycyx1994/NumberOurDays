@@ -2,6 +2,11 @@ package com.numberourdays.app.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +25,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DragHandle
@@ -61,6 +67,7 @@ import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.N0
+import com.numberourdays.app.ui.theme.N100
 import com.numberourdays.app.ui.theme.N300
 import com.numberourdays.app.ui.theme.N50
 import com.numberourdays.app.ui.theme.N500
@@ -169,18 +176,21 @@ fun HomeScreen(
                 )
             }
             items(displays, key = { it.id }) { item ->
+                val isDraggingItem = draggingId == item.id
                 EventRow(
                     item = item,
                     onOpen = { onOpenDetail(item.id) },
                     onToggleStar = { repo.toggleStar(item.id) },
                     dragEnabled = item.starred,
-                    dragging = draggingId == item.id,
-                    dragOffsetPx = if (draggingId == item.id) dragDeltaPx else 0f,
+                    dragging = isDraggingItem,
+                    dragOffsetPx = if (isDraggingItem) dragDeltaPx else 0f,
                     onDragStart = { onDragStart(item.id) },
                     onDrag = { dy -> onDragMove(dy) },
                     onDragEnd = { onDragEnd() },
                 )
-                HorizontalDivider(color = N50, thickness = 1.dp)
+                if (!isDraggingItem) {
+                    HorizontalDivider(color = N50, thickness = 1.dp)
+                }
             }
         }
     }
@@ -329,19 +339,41 @@ private fun EventRow(
         EventKind.TODAY -> "今天"
         EventKind.REPEAT -> "重复"
     }
+    // Paper-card lift: warm N50 surface + hairline border, restrained scale/shadow.
+    val dragShape = RoundedCornerShape(12.dp)
+    val liftScale by animateFloatAsState(
+        targetValue = if (dragging) 1.015f else 1f,
+        animationSpec = tween(durationMillis = 160),
+        label = "dragLiftScale",
+    )
+    val liftElevation by animateFloatAsState(
+        targetValue = if (dragging) 10f else 0f,
+        animationSpec = tween(durationMillis = 160),
+        label = "dragLiftElevation",
+    )
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
+            .padding(horizontal = if (dragging) 2.dp else 0.dp)
             .graphicsLayer {
                 translationY = dragOffsetPx
-                if (dragging) {
-                    alpha = 0.92f
-                    shadowElevation = 8f
-                }
+                scaleX = liftScale
+                scaleY = liftScale
+                shadowElevation = liftElevation
+                shape = dragShape
+                clip = dragging
             }
+            .background(
+                color = if (dragging) N50 else Color.Transparent,
+                shape = dragShape,
+            )
+            .then(
+                if (dragging) Modifier.border(1.dp, N100, dragShape)
+                else Modifier
+            )
             .clickable(onClick = onOpen)
-            .padding(vertical = 12.dp),
+            .padding(horizontal = if (dragging) 10.dp else 0.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(onClick = onToggleStar, modifier = Modifier.size(40.dp)) {
@@ -385,7 +417,13 @@ private fun EventRow(
             // so click/ripple handling cannot steal the drag gesture.
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .padding(start = 4.dp)
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(
+                        color = if (dragging) Accent.copy(alpha = 0.12f) else N50,
+                        shape = RoundedCornerShape(10.dp),
+                    )
                     .pointerInput(item.id) {
                         detectDragGestures(
                             onDragStart = { onDragStart() },
@@ -402,7 +440,8 @@ private fun EventRow(
                 Icon(
                     imageVector = Icons.Default.DragHandle,
                     contentDescription = stringResource(R.string.reorder_star),
-                    tint = if (dragging) Accent else N500,
+                    tint = if (dragging) Accent else N300,
+                    modifier = Modifier.size(18.dp),
                 )
             }
         } else {
