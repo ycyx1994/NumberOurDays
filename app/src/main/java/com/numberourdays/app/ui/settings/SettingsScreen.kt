@@ -4,7 +4,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -36,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.numberourdays.app.App
 import com.numberourdays.app.R
+import com.numberourdays.app.data.BackupTransfer
+import com.numberourdays.app.data.DayEvent
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.ErrorRed
@@ -57,9 +63,50 @@ fun SettingsScreen(onBack: () -> Unit) {
     var message by rememberSaveable { mutableStateOf<String?>(null) }
     var confirmReplace by rememberSaveable { mutableStateOf(false) }
     var confirmClear by rememberSaveable { mutableStateOf(false) }
+    var pendingFileImport by remember { mutableStateOf<List<DayEvent>?>(null) }
+    var pendingFileImportNote by remember { mutableStateOf<String?>(null) }
+    var showFileImportConfirm by remember { mutableStateOf(false) }
 
     fun showMessage(text: String) {
         message = text
+    }
+
+    val exportFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val snapshot = repo.loadEvents()
+        if (snapshot.isEmpty()) {
+            Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
+            return@rememberLauncherForActivityResult
+        }
+        val text = repo.serialize(snapshot)
+        if (BackupTransfer.writeText(context, uri, text)) {
+            val msg = context.getString(R.string.exported_to_file, snapshot.size)
+            showMessage(msg)
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        } else {
+            showMessage(context.getString(R.string.export_failed))
+        }
+    }
+
+    val importFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val text = BackupTransfer.readText(context, uri)
+        if (text == null) {
+            showMessage(context.getString(R.string.read_file_failed))
+            return@rememberLauncherForActivityResult
+        }
+        val (evts, note) = repo.parseBackup(text)
+        if (evts.isEmpty()) {
+            showMessage(note ?: context.getString(R.string.import_file_empty))
+            return@rememberLauncherForActivityResult
+        }
+        pendingFileImport = evts
+        pendingFileImportNote = note
+        showFileImportConfirm = true
     }
 
     Scaffold(
@@ -119,10 +166,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
                         return@OutlinedButton
                     }
-                    val text = repo.serialize(events)
-                    val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    cm.setPrimaryClip(ClipData.newPlainText("NumberOurDays-backup", text))
-                    showMessage("备份内容已复制，可粘贴到文件管理器保存为 .json")
+                    exportFileLauncher.launch(BackupTransfer.defaultBackupFileName())
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -133,6 +177,18 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             Spacer(Modifier.height(24.dp))
             Text(stringResource(R.string.import_section), color = N500, fontSize = 12.sp)
+            Spacer(Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    importFileLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Accent, contentColor = N0),
+                shape = NodButtonShape,
+            ) { Text(stringResource(R.string.import_from_file), fontSize = 14.sp) }
+
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(
                 value = importText,
@@ -203,6 +259,48 @@ fun SettingsScreen(onBack: () -> Unit) {
             )
             Spacer(Modifier.height(24.dp))
         }
+    }
+
+    if (showFileImportConfirm) {
+        val incoming = pendingFileImport.orEmpty()
+        val noteSuffix = pendingFileImportNote?.let { "，$it" } ?: ""
+        AlertDialog(
+            onDismissRequest = {
+                showFileImportConfirm = false
+                pendingFileImport = null
+                pendingFileImportNote = null
+            },
+            title = { Text(stringResource(R.string.import_file_title)) },
+            text = {
+                Text(stringResource(R.string.import_file_message, incoming.size, noteSuffix))
+            },
+            confirmButton = {
+                Row {
+                    TextButton(onClick = {
+                        val next = repo.merge(repo.loadEvents(), incoming)
+                        repo.saveAll(next)
+                        showMessage(context.getString(R.string.import_file_merged, next.size, noteSuffix))
+                        showFileImportConfirm = false
+                        pendingFileImport = null
+                        pendingFileImportNote = null
+                    }) { Text(stringResource(R.string.import_file_merge), color = Accent) }
+                    TextButton(onClick = {
+                        repo.saveAll(incoming)
+                        showMessage(context.getString(R.string.import_file_replaced, incoming.size, noteSuffix))
+                        showFileImportConfirm = false
+                        pendingFileImport = null
+                        pendingFileImportNote = null
+                    }) { Text(stringResource(R.string.import_file_replace), color = ErrorRed) }
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showFileImportConfirm = false
+                    pendingFileImport = null
+                    pendingFileImportNote = null
+                }) { Text(stringResource(R.string.import_file_cancel)) }
+            },
+        )
     }
 
     if (confirmReplace) {
