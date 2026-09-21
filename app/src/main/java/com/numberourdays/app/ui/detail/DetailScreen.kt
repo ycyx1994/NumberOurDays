@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Button
@@ -55,6 +54,8 @@ import com.numberourdays.app.ui.theme.N500
 import com.numberourdays.app.ui.theme.N700
 import com.numberourdays.app.ui.theme.N900
 import com.numberourdays.app.ui.theme.NodButtonShape
+import com.numberourdays.app.ui.theme.NodCardShape
+import com.numberourdays.app.ui.theme.NodDisplayNumber
 
 @Composable
 fun DetailScreen(
@@ -74,7 +75,10 @@ fun DetailScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            NodTopBar(title = stringResource(R.string.detail), onBack = onBack)
+            NodTopBar(
+                title = event?.title?.takeIf { it.isNotBlank() } ?: stringResource(R.string.detail),
+                onBack = onBack,
+            )
         },
     ) { padding ->
         if (event == null) {
@@ -107,7 +111,7 @@ fun DetailScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(N50, RoundedCornerShape(16.dp))
+                    .background(N50, NodCardShape)
                     .padding(16.dp),
             ) {
                 Text(tag, color = N500, fontSize = 11.sp)
@@ -126,8 +130,7 @@ fun DetailScreen(
                     Text(
                         text = shown.value.toString(),
                         color = Accent,
-                        fontSize = 64.sp,
-                        fontWeight = FontWeight.Bold,
+                        style = NodDisplayNumber,
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
@@ -149,7 +152,7 @@ fun DetailScreen(
                 Spacer(Modifier.height(8.dp))
                 Text(d.label, color = N500, fontSize = 12.sp)
                 Spacer(Modifier.height(14.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     UnitChip(stringResource(R.string.unit_day), unitEnum == DurationUnit.DAY) {
                         unit = DurationUnit.DAY.name
                     }
@@ -179,20 +182,24 @@ fun DetailScreen(
             MetaRow(
                 label = stringResource(R.string.label_elapsed),
                 value = elapsedText,
-                trailing = {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "切换单位",
-                        tint = N500,
-                        modifier = Modifier
-                            .padding(start = 8.dp)
-                            .clickable {
-                                val order = listOf(DurationUnit.DAY, DurationUnit.MONTH, DurationUnit.YEAR)
-                                elapsedUnit = order[(order.indexOf(elapsedEnum) + 1) % order.size].name
-                            },
-                    )
-                },
             )
+            // Elapsed unit — same chip language as the hero unit switch
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                UnitChip(stringResource(R.string.unit_day), elapsedEnum == DurationUnit.DAY) {
+                    elapsedUnit = DurationUnit.DAY.name
+                }
+                UnitChip(stringResource(R.string.unit_month), elapsedEnum == DurationUnit.MONTH) {
+                    elapsedUnit = DurationUnit.MONTH.name
+                }
+                UnitChip(stringResource(R.string.unit_year), elapsedEnum == DurationUnit.YEAR) {
+                    elapsedUnit = DurationUnit.YEAR.name
+                }
+            }
             MetaRow(stringResource(R.string.label_status), d.label)
             MetaRow(
                 stringResource(R.string.label_remind),
@@ -238,7 +245,7 @@ fun DetailScreen(
                     Icon(
                         imageVector = if (d.starred) Icons.Rounded.Star else Icons.Outlined.StarOutline,
                         contentDescription = null,
-                        tint = if (d.starred) Accent else N300,
+                        tint = if (d.starred) N700 else N300,
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(

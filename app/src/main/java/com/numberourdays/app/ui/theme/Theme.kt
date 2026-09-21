@@ -1,22 +1,27 @@
 package com.numberourdays.app.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/** 与旧版 XML 按钮一致：统一 8dp 圆角 */
+/** Controls: inputs, buttons — 8dp */
 val NodButtonShape = RoundedCornerShape(8.dp)
 val NodFieldShape = RoundedCornerShape(8.dp)
+
+/** Cards: home hero, detail hero, drag-lift — 12dp */
+val NodCardShape = RoundedCornerShape(12.dp)
+
+/** FAB locked shape (do not rely on ROM defaults) */
+val NodFabShape = RoundedCornerShape(16.dp)
 
 val N0 = Color(0xFFFAF7F2)
 val N50 = Color(0xFFF3EEE6)
@@ -49,21 +54,20 @@ private val LightColors = lightColorScheme(
     onError = N0,
 )
 
-private val DarkColors = darkColorScheme(
-    primary = Accent,
-    onPrimary = N0,
-    background = N900,
-    onBackground = N0,
-    surface = N900,
-    onSurface = N0,
-    surfaceVariant = N700,
-    onSurfaceVariant = N300,
-    outline = N500,
-    error = ErrorRed,
+/**
+ * Brand-display number style shared by home carousel + detail hero.
+ * v1: system sans with tightened tracking; swap fontFamily when a licensed
+ * condensed/numeric face ships — only this TextStyle needs to change.
+ */
+val NodDisplayNumber = TextStyle(
+    fontFamily = FontFamily.SansSerif,
+    fontSize = 64.sp,
+    fontWeight = FontWeight.Bold,
+    letterSpacing = (-1).sp,
 )
 
 private val NodTypography = Typography(
-    displayLarge = TextStyle(fontSize = 64.sp, fontWeight = FontWeight.Bold),
+    displayLarge = NodDisplayNumber,
     titleLarge = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),
     titleMedium = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold),
     bodyLarge = TextStyle(fontSize = 15.sp),
@@ -78,17 +82,20 @@ private val NodShapes = Shapes(
     extraSmall = RoundedCornerShape(4.dp),
     small = RoundedCornerShape(8.dp),
     medium = RoundedCornerShape(8.dp),
-    large = RoundedCornerShape(12.dp),
+    large = NodCardShape,
     extraLarge = RoundedCornerShape(16.dp),
 )
 
+/**
+ * v1 locks the paper light theme. Brand DESIGN.md has no dark system;
+ * a half-applied M3 dark scheme loses the paper identity.
+ */
 @Composable
 fun NumberOurDaysTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
+        colorScheme = LightColors,
         typography = NodTypography,
         shapes = NodShapes,
         content = content,
