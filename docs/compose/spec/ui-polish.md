@@ -22,7 +22,8 @@ commits: a1f3d2c01a5ec0331775120035eef045b5e929f9..930318c65fdf17929d2e2ed0f21be
 - 审计全量范围含品牌偏离项（设置 IA、accent 预算、形状系统、浅色锁定），信息架构优先于像素微调。
 - Theme 去掉 `darkTheme` 参数后仅 `MainActivity` 调用，API 收缩无破坏。
 - 设置页规格中「同屏最多 1 个 accent」与「各区文件操作各自主按钮」略有张力；实现按后者，同屏可见「导出到文件」「从文件导入」两个 primary。
-- T7 真机四屏目视核对仍待用户完成；review 记录了 TopBar ellipsis 等非 critical 项并已在 finalize 前补上。
+- 真机反馈覆盖审计决策：星标与列表天数数字改回主题色 Accent；日期选择弹窗标题去掉重复 ISO 日期。
+- T7 真机四屏目视核对待用户最终确认后合并。
 
 ## [S1] Problem
 
