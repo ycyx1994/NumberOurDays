@@ -2,8 +2,10 @@ package com.numberourdays.app.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -339,41 +341,50 @@ private fun EventRow(
         EventKind.TODAY -> "今天"
         EventKind.REPEAT -> "重复"
     }
-    // Paper-card lift: warm N50 surface + hairline border, restrained scale/shadow.
+    // Paper-card lift: warm surface + hairline border only.
+    // No platform shadowElevation — on settle it left a dark frame when bg faded out.
     val dragShape = RoundedCornerShape(12.dp)
     val liftScale by animateFloatAsState(
         targetValue = if (dragging) 1.015f else 1f,
         animationSpec = tween(durationMillis = 160),
         label = "dragLiftScale",
     )
-    val liftElevation by animateFloatAsState(
-        targetValue = if (dragging) 10f else 0f,
+    val liftSurface by animateColorAsState(
+        targetValue = if (dragging) N50 else Color.Transparent,
         animationSpec = tween(durationMillis = 160),
-        label = "dragLiftElevation",
+        label = "dragLiftSurface",
+    )
+    val liftBorder by animateColorAsState(
+        targetValue = if (dragging) N100 else Color.Transparent,
+        animationSpec = tween(durationMillis = 160),
+        label = "dragLiftBorder",
+    )
+    val liftInset by animateDpAsState(
+        targetValue = if (dragging) 2.dp else 0.dp,
+        animationSpec = tween(durationMillis = 160),
+        label = "dragLiftInset",
+    )
+    val liftPad by animateDpAsState(
+        targetValue = if (dragging) 10.dp else 0.dp,
+        animationSpec = tween(durationMillis = 160),
+        label = "dragLiftPad",
     )
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .padding(horizontal = if (dragging) 2.dp else 0.dp)
+            .padding(horizontal = liftInset)
             .graphicsLayer {
                 translationY = dragOffsetPx
                 scaleX = liftScale
                 scaleY = liftScale
-                shadowElevation = liftElevation
                 shape = dragShape
                 clip = dragging
             }
-            .background(
-                color = if (dragging) N50 else Color.Transparent,
-                shape = dragShape,
-            )
-            .then(
-                if (dragging) Modifier.border(1.dp, N100, dragShape)
-                else Modifier
-            )
+            .background(color = liftSurface, shape = dragShape)
+            .border(1.dp, liftBorder, dragShape)
             .clickable(onClick = onOpen)
-            .padding(horizontal = if (dragging) 10.dp else 0.dp, vertical = 12.dp),
+            .padding(horizontal = liftPad, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(onClick = onToggleStar, modifier = Modifier.size(40.dp)) {
