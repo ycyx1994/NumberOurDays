@@ -353,7 +353,7 @@ private fun EventRow(
     }
     // Paper-card lift: warm surface + hairline border only.
     // No platform shadowElevation — on settle it left a dark frame when bg faded out.
-    val dragShape = RoundedCornerShape(12.dp)
+    val dragShape = NodCardShape
     val liftScale by animateFloatAsState(
         targetValue = if (dragging) 1.015f else 1f,
         animationSpec = tween(durationMillis = 160),
