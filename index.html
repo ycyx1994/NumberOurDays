@@ -1,0 +1,2722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#FAF7F2" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>数日子</title>
+  <style>
+    :root {
+      --n-0: #faf7f2;
+      --n-50: #f3eee6;
+      --n-100: #e8e1d6;
+      --n-300: #c9c0b2;
+      --n-500: #8a8175;
+      --n-700: #4a453e;
+      --n-900: #1c1916;
+      --accent: #d4553a;
+      --success: #5b7a5a;
+      --warning: #b8893a;
+      --error: #b33a3a;
+      --font-display: "DIN Alternate", "Avenir Next Condensed", "SF Pro Display", "PingFang SC", "Helvetica Neue", sans-serif;
+      --font-body: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+      --nav-h: 48px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --pad: 16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--n-0);
+      color: var(--n-900);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      overflow: hidden;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+      color: inherit;
+      border: none;
+      background: none;
+      outline: none;
+    }
+
+    button { cursor: pointer; }
+    img, svg { display: block; }
+
+    /* ── App shell ── */
+    #app {
+      height: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+      background: var(--n-0);
+      overflow: hidden;
+      box-shadow: 0 0 0 1px var(--n-100);
+    }
+
+    .status-bar {
+      height: max(0px, var(--safe-top));
+      background: var(--n-0);
+      flex-shrink: 0;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--n-0);
+      z-index: 1;
+    }
+
+    .screen.is-active {
+      display: flex;
+      z-index: 2;
+    }
+
+    .screen.is-entering {
+      animation: slideIn 180ms ease-out;
+    }
+
+    .screen.is-entering-back {
+      animation: slideBack 180ms ease-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(28px); opacity: 0.4; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideBack {
+      from { transform: translateX(-20px); opacity: 0.5; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .screen.is-entering,
+      .screen.is-entering-back { animation: none; }
+      * { transition: none !important; }
+    }
+
+    /* ── Nav ── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: var(--nav-h);
+      padding: 8px var(--pad) 12px;
+      padding-top: calc(8px + max(0px, var(--safe-top)));
+      background: var(--n-0);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 5;
+    }
+
+    .nav__brand {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--n-900);
+      letter-spacing: 0.02em;
+    }
+
+    .nav__title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--n-900);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .nav__left,
+    .nav__right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .nav__right { justify-content: flex-end; }
+
+    .nav__back {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 44px;
+      min-width: 44px;
+      padding-right: 8px;
+      color: var(--n-700);
+      font-size: 15px;
+    }
+
+    .nav__icon-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--n-700);
+      margin-right: -8px;
+    }
+
+    .nav__icon-btn:active,
+    .nav__back:active { opacity: 0.55; }
+
+    /* ── Scroll body ── */
+    .scroll {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 var(--pad);
+      padding-bottom: calc(88px + var(--safe-bottom));
+    }
+
+    .scroll--plain {
+      padding-bottom: calc(32px + var(--safe-bottom));
+    }
+
+    /* ── Home ── */
+    .home-swiper {
+      position: relative;
+      width: 100%;
+      min-height: 220px;
+      margin-bottom: 4px;
+    }
+
+    .home-swiper__track {
+      display: flex;
+      transition: transform 220ms ease-out;
+      will-change: transform;
+    }
+
+    .home-swiper__slide {
+      flex: 0 0 100%;
+      width: 100%;
+      padding-right: 0;
+    }
+
+    .home-swiper__dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      height: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .home-swiper__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(138, 129, 117, 0.35);
+      transition: background 150ms ease-out;
+    }
+
+    .home-swiper__dot.is-active {
+      background: var(--accent);
+    }
+
+    .section-title {
+      font-size: 13px;
+      color: var(--n-500);
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+
+    .event-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .event-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 100%;
+      min-height: 72px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--n-100);
+      background: var(--n-0);
+      transition: background 150ms ease-out;
+    }
+
+    .event-row.is-dragging {
+      opacity: 0.85;
+      background: var(--n-50);
+      position: relative;
+      z-index: 2;
+    }
+
+    .event-row:active { background: var(--n-50); }
+
+    .event-row__star {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-right: 4px;
+      font-size: 18px;
+      line-height: 1;
+      color: var(--n-300);
+      user-select: none;
+    }
+
+    .event-row__star.is-on { color: var(--accent); }
+
+    .event-row__main {
+      flex: 1;
+      min-width: 0;
+      padding-right: 8px;
+    }
+
+    .event-row__title {
+      font-size: 15px;
+      color: var(--n-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-row__meta {
+      font-size: 12px;
+      color: var(--n-500);
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-row__days {
+      font-size: 14px;
+      color: var(--n-700);
+      margin-right: 6px;
+      flex-shrink: 0;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .event-row__grip {
+      width: 28px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--n-500);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .event-row__grip:active { cursor: grabbing; }
+
+    /* Day number card */
+    .day-number {
+      background: var(--n-50);
+      border-radius: 8px;
+      padding: 16px;
+      width: 100%;
+      text-align: left;
+      display: block;
+      transition: opacity 150ms ease-out;
+    }
+
+    .day-number:active { opacity: 0.88; }
+
+    .day-number__tag {
+      font-size: 12px;
+      color: var(--n-500);
+      display: block;
+    }
+
+    .day-number__title {
+      font-size: 16px;
+      color: var(--n-900);
+      font-weight: 500;
+      margin-top: 4px;
+      display: block;
+    }
+
+    .day-number__row {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      margin-top: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .day-number__value {
+      font-family: var(--font-display);
+      font-size: 64px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      animation: fadeIn 180ms ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0.35; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .day-number__unit {
+      font-size: 16px;
+      color: var(--n-700);
+      margin-left: 8px;
+      margin-bottom: 10px;
+    }
+
+    .day-number__sub {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--n-500);
+      display: block;
+    }
+
+    /* FAB */
+    .fab {
+      position: absolute;
+      right: 16px;
+      bottom: calc(24px + var(--safe-bottom));
+      width: 48px;
+      height: 48px;
+      border-radius: 24px;
+      background: var(--accent);
+      color: var(--n-0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      box-shadow: 0 4px 14px rgba(212, 85, 58, 0.28);
+      transition: transform 150ms ease-out, opacity 150ms ease-out;
+    }
+
+    .fab:active { transform: scale(0.94); opacity: 0.9; }
+
+    /* Empty */
+    .empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 72px;
+      padding-bottom: 60px;
+      text-align: center;
+    }
+
+    .empty__title {
+      font-size: 16px;
+      color: var(--n-900);
+      font-weight: 500;
+    }
+
+    .empty__desc {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--n-500);
+    }
+
+    .empty__action {
+      margin-top: 24px;
+      width: 100%;
+      max-width: 240px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--n-900);
+      transition: opacity 150ms ease-out;
+      width: 100%;
+      user-select: none;
+    }
+
+    .btn:active { opacity: 0.72; }
+
+    .btn--primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--n-0);
+    }
+
+    .btn--ghost {
+      background: transparent;
+      border-color: var(--n-300);
+      color: var(--n-700);
+    }
+
+    .btn--danger {
+      background: transparent;
+      border-color: var(--error);
+      color: var(--error);
+    }
+
+    .btn.is-disabled { opacity: 0.45; pointer-events: none; }
+
+    /* ── Form ── */
+    .form-field { margin-bottom: 16px; }
+
+    .form-field__label {
+      font-size: 12px;
+      color: var(--n-500);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-field__control {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      background: var(--n-50);
+      border-radius: 6px;
+      font-size: 15px;
+      color: var(--n-900);
+      border: 1px solid transparent;
+      appearance: none;
+      -webkit-appearance: none;
+      display: block;
+      line-height: 1.4;
+    }
+
+    .form-field__control:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .form-field__control::placeholder { color: var(--n-300); }
+
+    .form-field__control--placeholder { color: var(--n-300); }
+
+    .form-field__control--area {
+      min-height: 88px;
+      resize: vertical;
+      font-family: var(--font-body);
+    }
+
+    .form-field__error {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--error);
+      display: block;
+    }
+
+    input[type="date"].form-field__control {
+      min-height: 44px;
+      color: var(--n-900);
+    }
+
+    .form-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 44px;
+      width: 100%;
+      text-align: left;
+    }
+
+    .form-row__label {
+      font-size: 15px;
+      color: var(--n-900);
+    }
+
+    .form-hint {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--n-500);
+      display: block;
+    }
+
+    .nod-switch {
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--n-300);
+      position: relative;
+      flex-shrink: 0;
+      transition: background 150ms ease-out;
+      vertical-align: middle;
+      overflow: hidden;
+    }
+
+    .nod-switch.is-on { background: var(--accent); }
+
+    .nod-switch__thumb {
+      display: block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      transition: transform 150ms ease-out;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+    }
+
+    .nod-switch.is-on .nod-switch__thumb {
+      transform: translateX(20px);
+    }
+
+    .repeat-panel {
+      margin-top: 8px;
+      padding: 12px;
+      background: var(--n-50);
+      border-radius: 6px;
+    }
+
+    .repeat-panel__line {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+
+    .repeat-panel__prefix {
+      font-size: 14px;
+      color: var(--n-700);
+    }
+
+    .repeat-panel__stepper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .repeat-panel__btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--n-0);
+      border: 1px solid var(--n-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--n-700);
+      line-height: 1;
+    }
+
+    .repeat-panel__btn:active { opacity: 0.7; }
+
+    .repeat-panel__num {
+      width: 36px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--n-900);
+    }
+
+    .type-segment {
+      display: flex;
+      flex-direction: row;
+      gap: 0;
+    }
+
+    .type-segment__item {
+      flex: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--n-300);
+      color: var(--n-700);
+      font-size: 14px;
+      background: transparent;
+      margin-left: -1px;
+    }
+
+    .type-segment__item:first-child {
+      border-radius: 6px 0 0 6px;
+      margin-left: 0;
+    }
+
+    .type-segment__item:last-child {
+      border-radius: 0 6px 6px 0;
+    }
+
+    .type-segment__item.is-active {
+      border-color: var(--accent);
+      color: var(--accent);
+      z-index: 1;
+      background: rgba(212, 85, 58, 0.04);
+    }
+
+    .edit__error {
+      color: var(--error);
+      font-size: 12px;
+      display: block;
+      margin-top: 4px;
+    }
+
+    .edit__preview {
+      color: var(--accent);
+      font-size: 13px;
+      display: block;
+      margin: -4px 0 16px;
+    }
+
+    .edit__actions { margin-top: 8px; }
+    .edit__danger { margin-top: 16px; }
+
+    /* ── Detail ── */
+    .detail__hero {
+      background: var(--n-50);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .detail__tag {
+      font-size: 11px;
+      color: var(--n-500);
+      display: block;
+    }
+
+    .detail__title {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--n-900);
+      margin-top: 4px;
+      display: block;
+    }
+
+    .detail__year {
+      font-size: 12px;
+      color: var(--n-500);
+      margin-top: 4px;
+      display: block;
+    }
+
+    .detail__number-row {
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .detail__number {
+      font-family: var(--font-display);
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+
+    .detail__unit,
+    .detail__rest {
+      font-size: 14px;
+      color: var(--n-700);
+    }
+
+    .detail__sub-label {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--n-500);
+      display: block;
+    }
+
+    .detail__units {
+      display: flex;
+      flex-direction: row;
+      margin-top: 14px;
+      gap: 0;
+    }
+
+    .detail__unit-chip {
+      flex: 1;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--n-300);
+      color: var(--n-700);
+      font-size: 13px;
+      background: var(--n-0);
+      margin-left: -1px;
+      border-radius: 0;
+    }
+
+    .detail__unit-chip:first-child { border-radius: 6px 0 0 6px; margin-left: 0; }
+    .detail__unit-chip:last-child { border-radius: 0 6px 6px 0; }
+    .detail__unit-chip.is-active {
+      border-color: var(--accent);
+      color: var(--accent);
+      z-index: 1;
+      background: rgba(212, 85, 58, 0.04);
+    }
+
+    .detail__meta { margin-top: 20px; }
+
+    .detail__row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--n-100);
+      gap: 12px;
+    }
+
+    .detail__row--col {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .detail__label {
+      font-size: 13px;
+      color: var(--n-500);
+      flex-shrink: 0;
+    }
+
+    .detail__value {
+      font-size: 14px;
+      color: var(--n-900);
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .detail__elapsed {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .detail__cycle {
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
+      border: 1px solid var(--n-300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--n-50);
+      color: var(--n-500);
+      flex-shrink: 0;
+    }
+
+    .detail__cycle:active { opacity: 0.7; }
+
+    .detail__note {
+      font-size: 14px;
+      color: var(--n-700);
+      text-align: left;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+
+    .detail__actions { margin-top: 24px; }
+
+    .detail__star-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    .detail__star-btn {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      color: var(--n-500);
+      font-size: 13px;
+      min-height: 44px;
+    }
+
+    .detail__star-btn.is-on { color: var(--accent); }
+    .detail__star-btn:active { opacity: 0.7; }
+
+    /* ── Settings ── */
+    .settings__section { margin-bottom: 24px; }
+
+    .settings__title {
+      font-size: 12px;
+      color: var(--n-500);
+      margin-bottom: 8px;
+      display: block;
+      letter-spacing: 0.04em;
+    }
+
+    .settings__desc {
+      font-size: 12px;
+      color: var(--n-500);
+      margin-bottom: 12px;
+      display: block;
+      line-height: 1.6;
+    }
+
+    .settings__card {
+      background: var(--n-50);
+      border-radius: 6px;
+      padding: 0 12px;
+    }
+
+    .settings__row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 44px;
+    }
+
+    .settings__label { font-size: 14px; color: var(--n-900); }
+    .settings__value { font-size: 14px; color: var(--n-700); }
+
+    .settings__textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      background: var(--n-50);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--n-900);
+      margin-bottom: 10px;
+      font-family: var(--font-body);
+      border: 1px solid transparent;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .settings__textarea:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .settings__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .settings__message {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--accent);
+      display: block;
+      line-height: 1.5;
+    }
+
+    .settings__footer {
+      margin-top: 40px;
+      font-size: 11px;
+      color: var(--n-300);
+      text-align: center;
+      display: block;
+      padding-bottom: 8px;
+    }
+
+    /* ── Modal / toast ── */
+    .modal-mask {
+      position: absolute;
+      inset: 0;
+      background: rgba(28, 25, 22, 0.42);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      animation: fadeIn 150ms ease-out;
+    }
+
+    .modal-mask.is-open { display: flex; }
+
+    .modal {
+      background: var(--n-0);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 300px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(28, 25, 22, 0.18);
+    }
+
+    .modal__body {
+      padding: 24px 20px 16px;
+      text-align: center;
+    }
+
+    .modal__title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--n-900);
+      display: block;
+    }
+
+    .modal__content {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--n-500);
+      line-height: 1.55;
+      display: block;
+      word-break: break-word;
+    }
+
+    .modal__actions {
+      display: flex;
+      flex-direction: row;
+      border-top: 1px solid var(--n-100);
+    }
+
+    .modal__btn {
+      flex: 1;
+      height: 48px;
+      font-size: 15px;
+      color: var(--n-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+    }
+
+    .modal__btn + .modal__btn {
+      border-left: 1px solid var(--n-100);
+    }
+
+    .modal__btn:active { background: var(--n-50); }
+
+    .modal__btn--confirm {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .modal__btn--danger {
+      color: var(--error);
+      font-weight: 500;
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: calc(96px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(8px);
+      background: rgba(28, 25, 22, 0.88);
+      color: var(--n-0);
+      font-size: 13px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease-out, transform 180ms ease-out;
+      max-width: 80%;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .toast.is-show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Focus */
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Wide screens: phone simulator frame friendliness */
+    @media (min-width: 481px) {
+      #app {
+        border-left: 1px solid var(--n-100);
+        border-right: 1px solid var(--n-100);
+      }
+    }
+
+    /* Desktop preview body centers */
+    @media (min-height: 640px) and (min-width: 481px) {
+      body {
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        background: #efeae3;
+      }
+      #app {
+        min-height: 100vh;
+        max-height: 100vh;
+        box-shadow: 0 0 40px rgba(28, 25, 22, 0.08);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Home -->
+    <section class="screen is-active" id="screen-home" data-screen="home">
+      <header class="nav">
+        <div class="nav__left">
+          <span class="nav__brand">数日子</span>
+        </div>
+        <div class="nav__right">
+          <button type="button" class="nav__icon-btn" id="btn-go-settings" aria-label="设置">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="scroll" id="home-scroll">
+        <div id="home-body"></div>
+      </div>
+
+      <button type="button" class="fab" id="btn-fab" aria-label="添加纪念日">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+    </section>
+
+    <!-- Detail -->
+    <section class="screen" id="screen-detail" data-screen="detail">
+      <header class="nav">
+        <div class="nav__left">
+          <button type="button" class="nav__back" data-back>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            返回
+          </button>
+        </div>
+        <span class="nav__title">详情</span>
+        <div class="nav__right"></div>
+      </header>
+      <div class="scroll scroll--plain" id="detail-body"></div>
+    </section>
+
+    <!-- Edit -->
+    <section class="screen" id="screen-edit" data-screen="edit">
+      <header class="nav">
+        <div class="nav__left">
+          <button type="button" class="nav__back" data-back>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            返回
+          </button>
+        </div>
+        <span class="nav__title" id="edit-title">添加</span>
+        <div class="nav__right"></div>
+      </header>
+      <div class="scroll scroll--plain">
+        <div class="edit__form" id="edit-body" style="padding-top: 8px;"></div>
+        <div class="edit__actions" id="edit-actions"></div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section class="screen" id="screen-settings" data-screen="settings">
+      <header class="nav">
+        <div class="nav__left">
+          <button type="button" class="nav__back" data-back>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            返回
+          </button>
+        </div>
+        <span class="nav__title">设置</span>
+        <div class="nav__right"></div>
+      </header>
+      <div class="scroll scroll--plain" id="settings-body" style="padding-top: 8px;"></div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal-mask" id="modal-mask" role="dialog" aria-modal="true">
+      <div class="modal">
+        <div class="modal__body">
+          <span class="modal__title" id="modal-title"></span>
+          <span class="modal__content" id="modal-content"></span>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="modal__btn" id="modal-cancel">取消</button>
+          <button type="button" class="modal__btn modal__btn--confirm" id="modal-confirm">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <script>
+(function () {
+  'use strict';
+
+  /* ═══════════════ Tokens / utils ═══════════════ */
+  var STORAGE_KEY = 'nod:events:v1';
+  var DEMO_FLAG = 'nod:demo_seeded:v2';
+
+  function pad2(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  function formatYmd(d) {
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  }
+
+  function todayYmd() {
+    return formatYmd(new Date());
+  }
+
+  function startOfDay(d) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  function parseYmd(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    if (!m) return null;
+    var y = +m[1], mo = +m[2], day = +m[3];
+    var d = new Date(y, mo - 1, day);
+    if (d.getFullYear() !== y || d.getMonth() !== mo - 1 || d.getDate() !== day) return null;
+    return d;
+  }
+
+  function isValidDate(s) {
+    return !!parseYmd(s);
+  }
+
+  function diffDays(from, to) {
+    var a = startOfDay(from).getTime();
+    var b = startOfDay(to).getTime();
+    return Math.round((b - a) / 86400000);
+  }
+
+  function isLeapYear(y) {
+    return (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+  }
+
+  function addYearsSafe(base, years) {
+    var ty = base.getFullYear() + years;
+    var m = base.getMonth();
+    var d = base.getDate();
+    if (m === 1 && d === 29 && !isLeapYear(ty)) return new Date(ty, 1, 28);
+    return new Date(ty, m, d);
+  }
+
+  function addMonthsSafe(base, months) {
+    var total = base.getFullYear() * 12 + base.getMonth() + months;
+    var y = Math.floor(total / 12);
+    var m = ((total % 12) + 12) % 12;
+    var d = base.getDate();
+    var lastDay = new Date(y, m + 1, 0).getDate();
+    return new Date(y, m, Math.min(d, lastDay));
+  }
+
+  function addRepeat(base, unit, interval) {
+    var n = Math.max(1, Math.floor(interval));
+    if (unit === 'day') {
+      var r = new Date(base);
+      r.setDate(r.getDate() + n);
+      return r;
+    }
+    if (unit === 'week') {
+      var r2 = new Date(base);
+      r2.setDate(r2.getDate() + n * 7);
+      return r2;
+    }
+    if (unit === 'month') return addMonthsSafe(base, n);
+    return addYearsSafe(base, n);
+  }
+
+  function resolveNextDate(anchorDate, unit, interval, ref) {
+    var anchor = parseYmd(anchorDate);
+    if (!anchor) return todayYmd();
+    if (unit === 'none' || !unit) return formatYmd(anchor);
+    var next = anchor;
+    var guard = 0;
+    while (diffDays(next, ref) > 0 && guard < 20000) {
+      next = addRepeat(next, unit, interval);
+      guard += 1;
+    }
+    return formatYmd(next);
+  }
+
+  function formatRepeatLabel(unit, interval) {
+    if (!unit || unit === 'none') return undefined;
+    var n = Math.max(1, Math.floor(interval || 1));
+    var unitName = unit === 'day' ? '天' : unit === 'week' ? '周' : unit === 'month' ? '月' : '年';
+    return n === 1 ? '每' + unitName : '每 ' + n + ' ' + unitName;
+  }
+
+  function normalizeRepeat(input) {
+    var rawUnit = input.repeatUnit;
+    var interval = Math.max(1, Math.floor(Number(input.repeatInterval) || 1));
+    if (rawUnit === 'day' || rawUnit === 'week' || rawUnit === 'month' || rawUnit === 'year') {
+      return { repeatUnit: rawUnit, repeatInterval: interval };
+    }
+    if (input.type === 'annual') return { repeatUnit: 'year', repeatInterval: 1 };
+    return { repeatUnit: 'none', repeatInterval: 1 };
+  }
+
+  function createId() {
+    return 'e_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function $(sel, root) {
+    return (root || document).querySelector(sel);
+  }
+
+  function $$(sel, root) {
+    return Array.prototype.slice.call((root || document).querySelectorAll(sel));
+  }
+
+  /* ═══════════════ Storage ═══════════════ */
+  function migrateEvent(item) {
+    if (!item || typeof item.id !== 'string' || typeof item.date !== 'string') return null;
+    var nr = normalizeRepeat(item);
+    return {
+      id: item.id,
+      title: typeof item.title === 'string' ? item.title : '',
+      date: item.date,
+      note: typeof item.note === 'string' ? item.note : undefined,
+      starred: item.starred === true,
+      starRank: typeof item.starRank === 'number' ? item.starRank : undefined,
+      repeatUnit: nr.repeatUnit,
+      repeatInterval: nr.repeatInterval,
+      remindEnabled: item.remindEnabled === true,
+      createdAt: typeof item.createdAt === 'number' ? item.createdAt : Date.now(),
+      updatedAt: typeof item.updatedAt === 'number' ? item.updatedAt : Date.now()
+    };
+  }
+
+  function loadEvents() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      var data = JSON.parse(raw);
+      if (!Array.isArray(data)) return [];
+      return data.map(migrateEvent).filter(function (e) { return !!e; });
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function saveEvents(events) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+      return true;
+    } catch (err) {
+      toast('保存失败');
+      return false;
+    }
+  }
+
+  function getEvent(id) {
+    return loadEvents().find(function (e) { return e.id === id; }) || null;
+  }
+
+  function upsertEvent(event) {
+    var list = loadEvents();
+    var idx = -1;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === event.id) { idx = i; break; }
+    }
+    if (idx >= 0) list[idx] = event;
+    else list.unshift(event);
+    saveEvents(list);
+    return list;
+  }
+
+  function removeEvent(id) {
+    var list = loadEvents().filter(function (e) { return e.id !== id; });
+    saveEvents(list);
+    return list;
+  }
+
+  function toggleStar(id) {
+    var list = loadEvents();
+    var idx = -1;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === id) { idx = i; break; }
+    }
+    if (idx < 0) return list;
+    var item = list[idx];
+    if (item.starred) {
+      list[idx] = Object.assign({}, item, { starred: false, starRank: undefined, updatedAt: Date.now() });
+    } else {
+      var maxRank = list.reduce(function (m, e) {
+        if (!e.starred) return m;
+        var r = typeof e.starRank === 'number' ? e.starRank : 0;
+        return Math.max(m, r);
+      }, 0);
+      list[idx] = Object.assign({}, item, { starred: true, starRank: maxRank + 1, updatedAt: Date.now() });
+    }
+    saveEvents(list);
+    return list;
+  }
+
+  function reorderStars(orderedIds) {
+    var list = loadEvents();
+    orderedIds.forEach(function (id, idx) {
+      var item = list.find(function (e) { return e.id === id; });
+      if (item) {
+        item.starred = true;
+        item.starRank = idx + 1;
+        item.updatedAt = Date.now();
+      }
+    });
+    saveEvents(list);
+    return list;
+  }
+
+  /* ═══════════════ Compute display ═══════════════ */
+  function computeDisplay(event) {
+    var ref = startOfDay(new Date());
+    var anchor = parseYmd(event.date) || ref;
+    var repeatUnit = event.repeatUnit || 'none';
+    var repeatInterval = Math.max(1, event.repeatInterval || 1);
+    var elapsedDays = Math.max(0, diffDays(anchor, ref));
+    var repeatLabel = formatRepeatLabel(repeatUnit, repeatInterval);
+
+    if (repeatUnit !== 'none') {
+      var nextStr = resolveNextDate(event.date, repeatUnit, repeatInterval, ref);
+      var next = parseYmd(nextStr) || ref;
+      var daysToNext = Math.max(0, diffDays(ref, next));
+      var isToday = daysToNext === 0;
+      return Object.assign({}, event, {
+        repeatUnit: repeatUnit,
+        repeatInterval: repeatInterval,
+        kind: 'repeat',
+        days: daysToNext,
+        elapsedDays: elapsedDays,
+        label: isToday ? '今天' : '还有 ' + daysToNext + ' 天',
+        nextDate: nextStr,
+        repeatLabel: repeatLabel,
+        sortDate: nextStr
+      });
+    }
+
+    var pastOrFuture = diffDays(anchor, ref);
+    if (pastOrFuture === 0) {
+      return Object.assign({}, event, {
+        repeatUnit: repeatUnit,
+        repeatInterval: repeatInterval,
+        kind: 'today',
+        days: 0,
+        elapsedDays: 0,
+        label: '今天',
+        repeatLabel: repeatLabel,
+        sortDate: event.date
+      });
+    }
+    if (pastOrFuture < 0) {
+      var remain = Math.abs(pastOrFuture);
+      return Object.assign({}, event, {
+        repeatUnit: repeatUnit,
+        repeatInterval: repeatInterval,
+        kind: 'countdown',
+        days: remain,
+        elapsedDays: 0,
+        label: '还有 ' + remain + ' 天',
+        repeatLabel: repeatLabel,
+        sortDate: event.date
+      });
+    }
+    return Object.assign({}, event, {
+      repeatUnit: repeatUnit,
+      repeatInterval: repeatInterval,
+      kind: 'elapsed',
+      days: pastOrFuture,
+      elapsedDays: pastOrFuture,
+      label: '已经过 ' + pastOrFuture + ' 天',
+      repeatLabel: repeatLabel,
+      sortDate: event.date
+    });
+  }
+
+  function rank(e) {
+    if (e.kind === 'repeat' || e.kind === 'today') return 0;
+    if (e.kind === 'countdown') return 1;
+    return 2;
+  }
+
+  function sortEvents(displays) {
+    return displays.slice().sort(function (a, b) {
+      if (!!a.starred !== !!b.starred) return a.starred ? -1 : 1;
+      if (a.starred && b.starred) {
+        var sa = typeof a.starRank === 'number' ? a.starRank : 0;
+        var sb = typeof b.starRank === 'number' ? b.starRank : 0;
+        if (sa !== sb) return sa - sb;
+      }
+      var ra = rank(a);
+      var rb = rank(b);
+      if (ra !== rb) return ra - rb;
+      if (ra === 2) return String(b.sortDate).localeCompare(String(a.sortDate));
+      return String(a.sortDate).localeCompare(String(b.sortDate));
+    });
+  }
+
+  function pickNearest(list) {
+    if (!list.length) return null;
+    var upcoming = list.filter(function (e) {
+      return (e.kind === 'repeat' || e.kind === 'countdown') && e.days > 0;
+    });
+    if (upcoming.length) {
+      return upcoming.slice().sort(function (a, b) {
+        return (a.days - b.days) || String(a.id).localeCompare(String(b.id));
+      })[0];
+    }
+    return list[0];
+  }
+
+  function carouselList(list) {
+    if (!list.length) return [];
+    var nearest = pickNearest(list);
+    if (!nearest) return list;
+    return [nearest].concat(list.filter(function (e) { return e.id !== nearest.id; }));
+  }
+
+  function validateEventForm(input) {
+    var title = (input.title || '').trim();
+    if (!title) return '请填写标题';
+    if (title.length > 30) return '标题不超过 30 字';
+    if (!input.date || !isValidDate(input.date)) return '请选择合法日期';
+    if (input.repeatUnit !== 'none') {
+      var n = Math.floor(input.repeatInterval);
+      if (!n || n < 1) return '重复间隔至少为 1';
+      if (n > 999) return '重复间隔过大';
+    }
+    return null;
+  }
+
+  /* ── Duration ── */
+  function splitDuration(start, end) {
+    var s = startOfDay(start);
+    var e = startOfDay(end);
+    var sign = e.getTime() >= s.getTime() ? 1 : -1;
+    var from = sign > 0 ? s : e;
+    var to = sign > 0 ? e : s;
+
+    var years = to.getFullYear() - from.getFullYear();
+    var afterYears = new Date(from.getFullYear() + years, from.getMonth(), from.getDate());
+    if (afterYears.getTime() > to.getTime()) {
+      years -= 1;
+      afterYears = new Date(from.getFullYear() + years, from.getMonth(), from.getDate());
+    }
+    var monthsAfterYears = 0;
+    var cur = new Date(afterYears.getTime());
+    while (true) {
+      var nxt = addMonthsSafe(cur, 1);
+      if (nxt.getTime() <= to.getTime()) {
+        monthsAfterYears += 1;
+        cur = nxt;
+      } else break;
+      if (monthsAfterYears > 1200) break;
+    }
+    var afterYearsMonths = cur;
+    var daysAfterMonthsFromYears = Math.max(0, diffDays(afterYearsMonths, to));
+
+    var months = 0;
+    var cur2 = new Date(from.getTime());
+    while (true) {
+      var nxt2 = addMonthsSafe(cur2, 1);
+      if (nxt2.getTime() <= to.getTime()) {
+        months += 1;
+        cur2 = nxt2;
+      } else break;
+      if (months > 1200) break;
+    }
+    var daysAfterMonths = Math.max(0, diffDays(cur2, to));
+
+    return {
+      days: Math.abs(diffDays(s, e)),
+      years: years,
+      monthsAfterYears: monthsAfterYears,
+      daysAfterMonthsFromYears: daysAfterMonthsFromYears,
+      months: months,
+      daysAfterMonths: daysAfterMonths
+    };
+  }
+
+  function convertDuration(from, to) {
+    var a = startOfDay(from);
+    var b = startOfDay(to);
+    var start = a <= b ? a : b;
+    var end = a <= b ? b : a;
+    return splitDuration(start, end);
+  }
+
+  function joinNonZero(parts) {
+    return parts.filter(function (p) { return p.n > 0; })
+      .map(function (p) { return p.n + ' ' + p.u; })
+      .join(' ');
+  }
+
+  function formatDurationValue(breakdown, unit) {
+    if (unit === 'day') {
+      return { value: breakdown.days, unitLabel: '天', rest: '' };
+    }
+    if (unit === 'month') {
+      var m = breakdown.months;
+      var d = breakdown.daysAfterMonths;
+      if (m > 0) return { value: m, unitLabel: '月', rest: joinNonZero([{ n: d, u: '天' }]) };
+      return { value: d, unitLabel: '天', rest: '' };
+    }
+    var y = breakdown.years;
+    var m2 = breakdown.monthsAfterYears;
+    var d2 = breakdown.daysAfterMonthsFromYears;
+    if (y > 0) {
+      return {
+        value: y,
+        unitLabel: '年',
+        rest: joinNonZero([{ n: m2, u: '月' }, { n: d2, u: '天' }])
+      };
+    }
+    if (m2 > 0) return { value: m2, unitLabel: '月', rest: joinNonZero([{ n: d2, u: '天' }]) };
+    return { value: d2, unitLabel: '天', rest: '' };
+  }
+
+  function detailTargetDate(event) {
+    if (event.nextDate) return parseYmd(event.nextDate) || startOfDay(new Date());
+    return parseYmd(event.date) || startOfDay(new Date());
+  }
+
+  /* ── Backup ── */
+  function serializeEvents(events) {
+    return JSON.stringify({
+      app: 'NumberOurDays',
+      schemaVersion: 1,
+      exportedAt: Date.now(),
+      events: events
+    });
+  }
+
+  function sanitizeEvent(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    if (typeof raw.id !== 'string' || !raw.id) return null;
+    if (typeof raw.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(raw.date)) return null;
+    if (typeof raw.title !== 'string' || !raw.title.trim()) return null;
+    var nr = normalizeRepeat(raw);
+    var now = Date.now();
+    return {
+      id: raw.id,
+      title: raw.title.trim().slice(0, 30),
+      date: raw.date,
+      note: typeof raw.note === 'string' ? raw.note.slice(0, 100) : undefined,
+      starred: raw.starred === true,
+      starRank: typeof raw.starRank === 'number' ? raw.starRank : undefined,
+      repeatUnit: nr.repeatUnit,
+      repeatInterval: nr.repeatInterval,
+      remindEnabled: raw.remindEnabled === true,
+      createdAt: typeof raw.createdAt === 'number' ? raw.createdAt : now,
+      updatedAt: typeof raw.updatedAt === 'number' ? raw.updatedAt : now
+    };
+  }
+
+  function parseBackup(text) {
+    var trimmed = (text || '').trim();
+    if (!trimmed) return { ok: false, error: '内容为空' };
+    var data;
+    try {
+      data = JSON.parse(trimmed);
+    } catch (e) {
+      return { ok: false, error: '不是合法 JSON' };
+    }
+    var list = null;
+    if (Array.isArray(data)) list = data;
+    else if (data && Array.isArray(data.events)) list = data.events;
+    if (!list) return { ok: false, error: '缺少 events 数组' };
+    var events = [];
+    var skipped = 0;
+    for (var i = 0; i < list.length; i++) {
+      var e = sanitizeEvent(list[i]);
+      if (e) events.push(e);
+      else skipped += 1;
+    }
+    return { ok: true, events: events, skipped: skipped };
+  }
+
+  function mergeEvents(local, incoming) {
+    var map = new Map();
+    local.forEach(function (e) { map.set(e.id, e); });
+    incoming.forEach(function (r) {
+      var l = map.get(r.id);
+      if (!l) { map.set(r.id, r); return; }
+      var lt = typeof l.updatedAt === 'number' ? l.updatedAt : 0;
+      var rt = typeof r.updatedAt === 'number' ? r.updatedAt : 0;
+      if (rt >= lt) map.set(r.id, r);
+    });
+    return Array.from(map.values());
+  }
+
+  /* ── Demo ── */
+  function nextSaturdayYmd() {
+    var d = startOfDay(new Date());
+    var delta = (6 - d.getDay() + 7) % 7;
+    d.setDate(d.getDate() + delta);
+    return formatYmd(d);
+  }
+
+  function nextNewYearYmd() {
+    var from = startOfDay(new Date());
+    var y = from.getFullYear();
+    var thisYear = new Date(y, 0, 1);
+    var year = thisYear.getTime() <= from.getTime() ? y + 1 : y;
+    return year + '-01-01';
+  }
+
+  function createDemoEvents(now) {
+    now = now || Date.now();
+    return [
+      {
+        id: createId(),
+        title: '周末',
+        date: nextSaturdayYmd(),
+        repeatUnit: 'week',
+        repeatInterval: 1,
+        remindEnabled: false,
+        starred: true,
+        starRank: 1,
+        createdAt: now,
+        updatedAt: now,
+        note: '每周重复倒数演示'
+      },
+      {
+        id: createId(),
+        title: '新年',
+        date: nextNewYearYmd(),
+        repeatUnit: 'none',
+        repeatInterval: 1,
+        remindEnabled: false,
+        starred: true,
+        starRank: 2,
+        createdAt: now,
+        updatedAt: now,
+        note: '未来倒数演示'
+      }
+    ];
+  }
+
+  function ensureDemoEventsIfEmpty() {
+    var existing = loadEvents();
+    if (existing.length > 0) return false;
+    var seeded = false;
+    try { seeded = !!localStorage.getItem(DEMO_FLAG); } catch (e) {}
+    if (seeded) return false;
+    saveEvents(createDemoEvents());
+    try { localStorage.setItem(DEMO_FLAG, '1'); } catch (e) {}
+    return true;
+  }
+
+  /* ═══════════════ Toast / Modal ═══════════════ */
+  var toastTimer = null;
+  function toast(msg) {
+    var el = $('#toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('is-show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      el.classList.remove('is-show');
+    }, 2000);
+  }
+
+  var modalOnConfirm = null;
+  function showModal(opts) {
+    $('#modal-title').textContent = opts.title || '';
+    $('#modal-content').textContent = opts.content || '';
+    var cancel = $('#modal-cancel');
+    var confirm = $('#modal-confirm');
+    cancel.textContent = opts.cancelText || '取消';
+    confirm.textContent = opts.confirmText || '确定';
+    confirm.className = 'modal__btn ' + (opts.danger ? 'modal__btn--danger' : 'modal__btn--confirm');
+    modalOnConfirm = opts.onConfirm || null;
+    $('#modal-mask').classList.add('is-open');
+  }
+
+  function hideModal() {
+    $('#modal-mask').classList.remove('is-open');
+    modalOnConfirm = null;
+  }
+
+  $('#modal-cancel').addEventListener('click', hideModal);
+  $('#modal-confirm').addEventListener('click', function () {
+    var fn = modalOnConfirm;
+    hideModal();
+    if (fn) fn();
+  });
+  $('#modal-mask').addEventListener('click', function (e) {
+    if (e.target === e.currentTarget) hideModal();
+  });
+
+  /* ═══════════════ Navigation ═══════════════ */
+  var navStack = ['home'];
+  var currentScreen = 'home';
+
+  function showScreen(name, direction) {
+    var next = document.getElementById('screen-' + name);
+    if (!next) return;
+    $$('.screen').forEach(function (s) {
+      s.classList.remove('is-active', 'is-entering', 'is-entering-back');
+    });
+    next.classList.add('is-active');
+    if (direction === 'forward') next.classList.add('is-entering');
+    else if (direction === 'back') next.classList.add('is-entering-back');
+    currentScreen = name;
+
+    if (name === 'home') renderHome();
+    else if (name === 'settings') renderSettings();
+    else if (name === 'detail') renderDetail(state.detailId);
+    else if (name === 'edit') renderEdit(state.editId);
+  }
+
+  function pushScreen(name) {
+    if (navStack[navStack.length - 1] !== name) navStack.push(name);
+    showScreen(name, 'forward');
+  }
+
+  function popScreen() {
+    if (navStack.length > 1) {
+      navStack.pop();
+      var prev = navStack[navStack.length - 1];
+      showScreen(prev, 'back');
+    } else {
+      showScreen('home', 'back');
+      navStack = ['home'];
+    }
+  }
+
+  function resetToHome() {
+    navStack = ['home'];
+    showScreen('home');
+  }
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest && e.target.closest('[data-back]');
+    if (btn) {
+      e.preventDefault();
+      popScreen();
+    }
+  });
+
+  /* ═══════════════ State ═══════════════ */
+  var state = {
+    detailId: null,
+    editId: null,
+    carouselIndex: 0,
+    detailUnit: 'day',
+    detailElapsedUnit: 'day',
+    editForm: null,
+    settingsMessage: '',
+    importText: ''
+  };
+
+  var dragState = null;
+
+  /* ═══════════════ Icons (inline SVG strings) ═══════════════ */
+  function starSvg(filled) {
+    if (filled) {
+      return '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.7.9-4.9 4.6 1.3 6.6L12 17.5 5.9 20.7l1.3-6.6L2.3 9.5l6.7-.9L12 2.5z"/></svg>';
+    }
+    return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.7.9-4.9 4.6 1.3 6.6L12 17.5 5.9 20.7l1.3-6.6L2.3 9.5l6.7-.9L12 2.5z"/></svg>';
+  }
+
+  function gripSvg() {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 12h16M4 16h16"/></svg>';
+  }
+
+  function pencilSvg(size) {
+    size = size || 16;
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+  }
+
+  function refreshSvg(size) {
+    size = size || 14;
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>';
+  }
+
+  /* ═══════════════ Home ═══════════════ */
+  function getDisplayList() {
+    var events = loadEvents();
+    return sortEvents(events.map(computeDisplay));
+  }
+
+  function renderHome() {
+    ensureDemoEventsIfEmpty();
+    var list = getDisplayList();
+    var body = $('#home-body');
+    var fab = $('#btn-fab');
+    fab.style.display = '';
+
+    if (!list.length) {
+      body.innerHTML =
+        '<div class="empty">' +
+          '<div class="empty__title">还没有纪念日</div>' +
+          '<div class="empty__desc">添加一个重要日期，开始数日子</div>' +
+          '<div class="empty__action">' +
+            '<button type="button" class="btn btn--primary" id="btn-empty-add">添加纪念日</button>' +
+          '</div>' +
+        '</div>';
+      var addBtn = $('#btn-empty-add');
+      if (addBtn) addBtn.addEventListener('click', function () { openEdit(null); });
+      return;
+    }
+
+    var starred = list.filter(function (e) { return e.starred; });
+    var rest = list.filter(function (e) { return !e.starred; });
+    var renderList = starred.concat(rest);
+
+    var slides = carouselList(list);
+    if (state.carouselIndex >= slides.length) state.carouselIndex = 0;
+
+    var slidesHtml = slides.map(function (item, i) {
+      return '<div class="home-swiper__slide" data-index="' + i + '">' +
+        dayNumberHtml(item) +
+      '</div>';
+    }).join('');
+
+    var dotsHtml = slides.length > 1
+      ? '<div class="home-swiper__dots" id="swiper-dots">' +
+          slides.map(function (_, i) {
+            return '<button type="button" class="home-swiper__dot' + (i === state.carouselIndex ? ' is-active' : '') + '" data-dot="' + i + '" aria-label="第 ' + (i + 1) + ' 个"></button>';
+          }).join('') +
+        '</div>'
+      : '';
+
+    var rowsHtml = renderList.map(function (item) {
+      return eventRowHtml(item, !!item.starred);
+    }).join('');
+
+    body.innerHTML =
+      '<div class="home-swiper" id="home-swiper">' +
+        '<div class="home-swiper__track" id="swiper-track" style="transform: translateX(-' + (state.carouselIndex * 100) + '%);">' +
+          slidesHtml +
+        '</div>' +
+        dotsHtml +
+      '</div>' +
+      '<div class="section-title">全部纪念日</div>' +
+      '<div class="event-list" id="event-list">' + rowsHtml + '</div>';
+
+    bindHome(list, slides);
+  }
+
+  function dayNumberHtml(event) {
+    var tagText;
+    if (event.kind === 'repeat') tagText = event.repeatLabel || '重复';
+    else if (event.kind === 'countdown') tagText = '倒数';
+    else if (event.kind === 'elapsed') tagText = '已过';
+    else tagText = '今天';
+
+    var sub = event.date;
+    if (event.repeatLabel) sub += ' · ' + event.repeatLabel;
+    sub += ' · ' + event.label;
+
+    return '<button type="button" class="day-number" data-detail="' + escapeHtml(event.id) + '">' +
+      '<span class="day-number__tag">下一个 · ' + escapeHtml(tagText) + '</span>' +
+      '<span class="day-number__title">' + escapeHtml(event.title) + '</span>' +
+      '<div class="day-number__row">' +
+        '<span class="day-number__value">' + event.days + '</span>' +
+        '<span class="day-number__unit">天</span>' +
+      '</div>' +
+      '<span class="day-number__sub">' + escapeHtml(sub) + '</span>' +
+    '</button>';
+  }
+
+  function kindText(event) {
+    if (event.repeatLabel) return event.repeatLabel;
+    if (event.kind === 'countdown') return '倒数';
+    if (event.kind === 'elapsed') return '已过';
+    if (event.kind === 'today') return '今天';
+    return '重复';
+  }
+
+  function eventRowHtml(event, showGrip) {
+    var meta = event.date;
+    if (event.repeatLabel) meta += ' · ' + event.repeatLabel;
+    else meta += ' · ' + kindText(event);
+
+    return '<div class="event-row" data-row-id="' + escapeHtml(event.id) + '">' +
+      '<button type="button" class="event-row__star' + (event.starred ? ' is-on' : '') + '" data-star="' + escapeHtml(event.id) + '" aria-label="' + (event.starred ? '取消星标' : '星标') + '">' +
+        starSvg(!!event.starred) +
+      '</button>' +
+      '<button type="button" class="event-row__main" data-detail="' + escapeHtml(event.id) + '" style="text-align:left;background:none;border:none;padding:0;cursor:pointer;">' +
+        '<div class="event-row__title">' + escapeHtml(event.title) + '</div>' +
+        '<div class="event-row__meta">' + escapeHtml(meta) + '</div>' +
+      '</button>' +
+      '<span class="event-row__days">' + escapeHtml(event.label) + '</span>' +
+      (showGrip
+        ? '<div class="event-row__grip" data-grip="' + escapeHtml(event.id) + '" role="button" aria-label="拖动排序" tabindex="0">' + gripSvg() + '</div>'
+        : '') +
+    '</div>';
+  }
+
+  function bindHome(allList, slides) {
+    var body = $('#home-body');
+
+    $$('[data-detail]', body).forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        openDetail(el.getAttribute('data-detail'));
+      });
+    });
+
+    $$('[data-star]', body).forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var id = el.getAttribute('data-star');
+        state.carouselIndex = 0;
+        toggleStar(id);
+        renderHome();
+      });
+    });
+
+    $$('[data-dot]', body).forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        goToSlide(+el.getAttribute('data-dot'));
+      });
+    });
+
+    bindSwipe(slides.length);
+    bindDragReorder();
+  }
+
+  function goToSlide(i) {
+    var n = Math.max(0, Math.min(i, $$('.home-swiper__slide').length - 1));
+    state.carouselIndex = n;
+    var track = $('#swiper-track');
+    if (track) track.style.transform = 'translateX(-' + (n * 100) + '%)';
+    $$('.home-swiper__dot').forEach(function (d, idx) {
+      d.classList.toggle('is-active', idx === n);
+    });
+  }
+
+  function bindSwipe(slideCount) {
+    if (slideCount < 2) return;
+    var root = $('#home-swiper');
+    if (!root) return;
+    var startX = 0;
+    var startY = 0;
+    var tracking = false;
+
+    root.addEventListener('touchstart', function (e) {
+      if (!e.touches || e.touches.length !== 1) return;
+      tracking = true;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    root.addEventListener('touchend', function (e) {
+      if (!tracking) return;
+      tracking = false;
+      var t = (e.changedTouches && e.changedTouches[0]) || null;
+      if (!t) return;
+      var dx = t.clientX - startX;
+      var dy = t.clientY - startY;
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+      if (dx < 0) goToSlide(state.carouselIndex + 1);
+      else goToSlide(state.carouselIndex - 1);
+    }, { passive: true });
+  }
+
+  function bindDragReorder() {
+    var listRoot = $('#event-list');
+    if (!listRoot) return;
+
+    listRoot.addEventListener('pointerdown', function (e) {
+      var grip = e.target.closest && e.target.closest('[data-grip]');
+      if (!grip) return;
+      e.preventDefault();
+      var id = grip.getAttribute('data-grip');
+      var starred = getDisplayList().filter(function (x) { return x.starred; });
+      var from = starred.findIndex(function (x) { return x.id === id; });
+      if (from < 0) return;
+
+      var rows = $$('.event-row', listRoot);
+      var row = rows.find(function (r) { return r.getAttribute('data-row-id') === id; });
+      if (row) row.classList.add('is-dragging');
+
+      dragState = {
+        id: id,
+        from: from,
+        startY: e.clientY,
+        baseOrder: starred.map(function (x) { return x.id; }),
+        order: starred.map(function (x) { return x.id; }),
+        row: row,
+        rowH: row ? row.offsetHeight : 72
+      };
+
+      try { grip.setPointerCapture(e.pointerId); } catch (err) {}
+
+      function onMove(ev) {
+        if (!dragState) return;
+        var steps = Math.round((ev.clientY - dragState.startY) / dragState.rowH);
+        var to = Math.max(0, Math.min(dragState.baseOrder.length - 1, dragState.from + steps));
+        var next = dragState.baseOrder.slice();
+        var moved = next.splice(dragState.from, 1)[0];
+        next.splice(to, 0, moved);
+        dragState.order = next;
+        if (dragState.row) {
+          var offset = (to - dragState.from) * dragState.rowH;
+          dragState.row.style.transform = 'translateY(' + offset + 'px)';
+        }
+      }
+
+      function onUp() {
+        if (dragState && dragState.order) {
+          reorderStars(dragState.order);
+        }
+        dragState = null;
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        window.removeEventListener('pointercancel', onUp);
+        state.carouselIndex = 0;
+        renderHome();
+      }
+
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
+    });
+  }
+
+  function openDetail(id) {
+    state.detailId = id;
+    state.detailUnit = 'day';
+    state.detailElapsedUnit = 'day';
+    pushScreen('detail');
+  }
+
+  function openEdit(id) {
+    state.editId = id || null;
+    state.editForm = null;
+    pushScreen('edit');
+  }
+
+  $('#btn-go-settings').addEventListener('click', function () {
+    pushScreen('settings');
+  });
+
+  $('#btn-fab').addEventListener('click', function () {
+    openEdit(null);
+  });
+
+  /* ═══════════════ Detail ═══════════════ */
+  function renderDetail(id) {
+    var root = $('#detail-body');
+    var found = id ? getEvent(id) : null;
+    if (!found) {
+      root.innerHTML = '<div class="empty"><div class="empty__title">事件不存在</div></div>';
+      setTimeout(function () {
+        if (currentScreen === 'detail') popScreen();
+      }, 500);
+      return;
+    }
+
+    var event = computeDisplay(found);
+    var ref = startOfDay(new Date());
+    var target = detailTargetDate(event);
+    var breakdown = convertDuration(ref, target);
+    var elapsedBreakdown = convertDuration(parseYmd(event.date) || ref, ref);
+    var shown = formatDurationValue(breakdown, state.detailUnit);
+    var elapsedShown = formatDurationValue(elapsedBreakdown, state.detailElapsedUnit);
+    var elapsedText =
+      elapsedShown.value === 0 && elapsedShown.unitLabel === '天'
+        ? '0 天'
+        : [elapsedShown.value + ' ' + elapsedShown.unitLabel, elapsedShown.rest].filter(Boolean).join(' ');
+
+    var kindMap = { countdown: '倒数', elapsed: '已经过', today: '今天', repeat: '重复' };
+    var tag = event.repeatLabel || kindMap[event.kind] || '';
+
+    var units = [
+      { key: 'day', label: '天' },
+      { key: 'month', label: '月' },
+      { key: 'year', label: '年' }
+    ];
+
+    root.innerHTML =
+      '<div class="detail__hero">' +
+        '<span class="detail__tag">' + escapeHtml(tag) + '</span>' +
+        '<span class="detail__title">' + escapeHtml(event.title) + '</span>' +
+        (event.repeatLabel ? '<span class="detail__year">' + escapeHtml(event.repeatLabel) + '</span>' : '') +
+        '<div class="detail__number-row">' +
+          '<span class="detail__number">' + shown.value + '</span>' +
+          '<span class="detail__unit">' + shown.unitLabel + '</span>' +
+          (shown.rest ? '<span class="detail__rest">' + escapeHtml(shown.rest) + '</span>' : '') +
+        '</div>' +
+        '<span class="detail__sub-label">' + escapeHtml(event.label) + '</span>' +
+        '<div class="detail__units">' +
+          units.map(function (u) {
+            return '<button type="button" class="detail__unit-chip' + (state.detailUnit === u.key ? ' is-active' : '') + '" data-unit="' + u.key + '">' + u.label + '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+
+      '<div class="detail__meta">' +
+        '<div class="detail__row">' +
+          '<span class="detail__label">日期</span>' +
+          '<span class="detail__value">' + escapeHtml(event.date) + '</span>' +
+        '</div>' +
+        '<div class="detail__row">' +
+          '<span class="detail__label">重复</span>' +
+          '<span class="detail__value">' + escapeHtml(event.repeatLabel || '不重复') + '</span>' +
+        '</div>' +
+        (event.nextDate
+          ? '<div class="detail__row"><span class="detail__label">下次</span><span class="detail__value">' + escapeHtml(event.nextDate) + '</span></div>'
+          : '') +
+        '<div class="detail__row">' +
+          '<span class="detail__label">已经过</span>' +
+          '<div class="detail__elapsed">' +
+            '<span class="detail__value">' + escapeHtml(elapsedText) + '</span>' +
+            '<button type="button" class="detail__cycle" id="btn-cycle-elapsed" aria-label="切换时长单位">' + refreshSvg(14) + '</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="detail__row">' +
+          '<span class="detail__label">状态</span>' +
+          '<span class="detail__value">' + escapeHtml(event.label) + '</span>' +
+        '</div>' +
+        '<div class="detail__row">' +
+          '<span class="detail__label">提醒</span>' +
+          '<span class="detail__value">' + (event.remindEnabled ? '已开启（通知后续版本）' : '未开启') + '</span>' +
+        '</div>' +
+        (event.note
+          ? '<div class="detail__row detail__row--col"><span class="detail__label">备注</span><span class="detail__note">' + escapeHtml(event.note) + '</span></div>'
+          : '') +
+      '</div>' +
+
+      '<div class="detail__actions">' +
+        '<button type="button" class="btn btn--ghost" id="btn-edit-event">' + pencilSvg(16) + ' 编辑</button>' +
+        '<div class="detail__star-row">' +
+          '<button type="button" class="detail__star-btn' + (event.starred ? ' is-on' : '') + '" id="btn-detail-star">' +
+            starSvg(!!event.starred) +
+            '<span>' + (event.starred ? '已星标' : '星标') + '</span>' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+
+    $$('[data-unit]', root).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.detailUnit = btn.getAttribute('data-unit');
+        renderDetail(id);
+      });
+    });
+
+    var cycle = $('#btn-cycle-elapsed', root);
+    if (cycle) {
+      cycle.addEventListener('click', function () {
+        var order = ['day', 'month', 'year'];
+        var idx = order.indexOf(state.detailElapsedUnit);
+        state.detailElapsedUnit = order[(idx + 1) % order.length];
+        renderDetail(id);
+      });
+    }
+
+    var editBtn = $('#btn-edit-event', root);
+    if (editBtn) {
+      editBtn.addEventListener('click', function () { openEdit(id); });
+    }
+
+    var starBtn = $('#btn-detail-star', root);
+    if (starBtn) {
+      starBtn.addEventListener('click', function () {
+        toggleStar(id);
+        renderDetail(id);
+      });
+    }
+  }
+
+  /* ═══════════════ Edit ═══════════════ */
+  function defaultForm() {
+    return {
+      title: '',
+      date: todayYmd(),
+      note: '',
+      repeatOn: false,
+      repeatUnit: 'year',
+      repeatInterval: 1,
+      remindEnabled: false,
+      error: ''
+    };
+  }
+
+  function formFromEvent(existing) {
+    var f = defaultForm();
+    if (!existing) return f;
+    f.title = existing.title || '';
+    f.date = existing.date || todayYmd();
+    f.note = existing.note || '';
+    f.repeatOn = !!(existing.repeatUnit && existing.repeatUnit !== 'none');
+    f.repeatUnit = (existing.repeatUnit && existing.repeatUnit !== 'none') ? existing.repeatUnit : 'year';
+    f.repeatInterval = existing.repeatInterval || 1;
+    f.remindEnabled = !!existing.remindEnabled;
+    return f;
+  }
+
+  function renderEdit(id) {
+    var existing = id ? getEvent(id) : null;
+    if (!state.editForm) {
+      state.editForm = formFromEvent(existing);
+    }
+    var f = state.editForm;
+    $('#edit-title').textContent = id ? '编辑' : '添加';
+
+    var preview = null;
+    if (f.title.trim() && f.date) {
+      preview = computeDisplay({
+        id: 'preview',
+        title: f.title.trim(),
+        date: f.date,
+        repeatUnit: f.repeatOn ? f.repeatUnit : 'none',
+        repeatInterval: f.repeatOn ? f.repeatInterval : 1,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      });
+    }
+
+    var units = [
+      { key: 'day', label: '天' },
+      { key: 'week', label: '周' },
+      { key: 'month', label: '月' },
+      { key: 'year', label: '年' }
+    ];
+
+    $('#edit-body').innerHTML =
+      '<div class="form-field">' +
+        '<label class="form-field__label" for="field-title">标题</label>' +
+        '<input class="form-field__control" id="field-title" type="text" maxlength="30" placeholder="例如：在一起纪念日" value="' + escapeHtml(f.title) + '" />' +
+        (f.error && !f.title.trim() ? '<span class="form-field__error">' + escapeHtml(f.error) + '</span>' : '') +
+      '</div>' +
+
+      '<div class="form-field">' +
+        '<label class="form-field__label" for="field-date">日期</label>' +
+        '<input class="form-field__control" id="field-date" type="date" value="' + escapeHtml(f.date) + '" />' +
+      '</div>' +
+
+      (preview && f.title.trim()
+        ? '<span class="edit__preview">' +
+            (preview.kind === 'repeat'
+              ? '距离「' + escapeHtml(f.title.trim()) + '」' + escapeHtml(preview.label)
+              : escapeHtml(preview.label)) +
+          '</span>'
+        : '') +
+
+      '<div class="form-field">' +
+        '<button type="button" class="form-row" id="row-repeat">' +
+          '<span class="form-row__label">重复</span>' +
+          '<span class="nod-switch' + (f.repeatOn ? ' is-on' : '') + '"><span class="nod-switch__thumb"></span></span>' +
+        '</button>' +
+        (f.repeatOn
+          ? '<div class="repeat-panel">' +
+              '<div class="repeat-panel__line">' +
+                '<span class="repeat-panel__prefix">每</span>' +
+                '<div class="repeat-panel__stepper">' +
+                  '<button type="button" class="repeat-panel__btn" data-step="-1" aria-label="减少">−</button>' +
+                  '<span class="repeat-panel__num">' + f.repeatInterval + '</span>' +
+                  '<button type="button" class="repeat-panel__btn" data-step="1" aria-label="增加">+</button>' +
+                '</div>' +
+              '</div>' +
+              '<div class="type-segment">' +
+                units.map(function (u) {
+                  return '<button type="button" class="type-segment__item' + (f.repeatUnit === u.key ? ' is-active' : '') + '" data-unit="' + u.key + '">' + u.label + '</button>';
+                }).join('') +
+              '</div>' +
+            '</div>'
+          : '') +
+      '</div>' +
+
+      '<div class="form-field">' +
+        '<button type="button" class="form-row" id="row-remind">' +
+          '<span class="form-row__label">提醒</span>' +
+          '<span class="nod-switch' + (f.remindEnabled ? ' is-on' : '') + '"><span class="nod-switch__thumb"></span></span>' +
+        '</button>' +
+        '<span class="form-hint">已记录偏好，通知能力将在后续版本提供</span>' +
+      '</div>' +
+
+      '<div class="form-field">' +
+        '<label class="form-field__label" for="field-note">备注</label>' +
+        '<textarea class="form-field__control form-field__control--area" id="field-note" maxlength="100" placeholder="可选">' + escapeHtml(f.note) + '</textarea>' +
+      '</div>' +
+
+      (f.error && f.title.trim() ? '<span class="edit__error">' + escapeHtml(f.error) + '</span>' : '');
+
+    $('#edit-actions').innerHTML =
+      '<button type="button" class="btn btn--primary" id="btn-save">保存</button>' +
+      (existing
+        ? '<div class="edit__danger"><button type="button" class="btn btn--danger" id="btn-delete">删除</button></div>'
+        : '');
+
+    bindEdit(id, existing);
+  }
+
+  function bindEdit(id, existing) {
+    var f = state.editForm;
+
+    var titleInput = $('#field-title');
+    titleInput.addEventListener('input', function () {
+      f.title = titleInput.value;
+      if (f.error) f.error = '';
+      updateEditPreview();
+    });
+
+    var dateInput = $('#field-date');
+    dateInput.addEventListener('change', function () {
+      f.date = dateInput.value;
+      updateEditPreview();
+    });
+    dateInput.addEventListener('input', function () {
+      f.date = dateInput.value;
+      updateEditPreview();
+    });
+
+    var noteInput = $('#field-note');
+    noteInput.addEventListener('input', function () {
+      f.note = noteInput.value;
+    });
+
+    var rowRepeat = $('#row-repeat');
+    rowRepeat.addEventListener('click', function () {
+      f.repeatOn = !f.repeatOn;
+      if (f.repeatOn) f.repeatUnit = 'year';
+      renderEdit(id);
+    });
+
+    var rowRemind = $('#row-remind');
+    rowRemind.addEventListener('click', function () {
+      f.remindEnabled = !f.remindEnabled;
+      renderEdit(id);
+    });
+
+    $$('[data-step]', $('#edit-body')).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var delta = +btn.getAttribute('data-step');
+        f.repeatInterval = Math.max(1, Math.min(999, f.repeatInterval + delta));
+        renderEdit(id);
+      });
+    });
+
+    $$('.type-segment__item', $('#edit-body')).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        f.repeatUnit = btn.getAttribute('data-unit');
+        renderEdit(id);
+      });
+    });
+
+    $('#btn-save').addEventListener('click', function () {
+      saveForm(id, existing);
+    });
+
+    var delBtn = $('#btn-delete');
+    if (delBtn) {
+      delBtn.addEventListener('click', function () {
+        showModal({
+          title: '删除纪念日',
+          content: '确定删除「' + existing.title + '」？',
+          confirmText: '删除',
+          danger: true,
+          onConfirm: function () {
+            removeEvent(existing.id);
+            toast('已删除');
+            state.editForm = null;
+            resetToHome();
+          }
+        });
+      });
+    }
+  }
+
+  function updateEditPreview() {
+    var f = state.editForm;
+    if (!f.title.trim() || !f.date) {
+      var old = $('.edit__preview');
+      if (old) old.remove();
+      return;
+    }
+    var preview = computeDisplay({
+      id: 'preview',
+      title: f.title.trim(),
+      date: f.date,
+      repeatUnit: f.repeatOn ? f.repeatUnit : 'none',
+      repeatInterval: f.repeatOn ? f.repeatInterval : 1,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    });
+    var text = preview.kind === 'repeat'
+      ? '距离「' + f.title.trim() + '」' + preview.label
+      : preview.label;
+    var el = $('.edit__preview');
+    if (el) {
+      el.textContent = text;
+    } else {
+      var dateField = $('#field-date').closest('.form-field');
+      var span = document.createElement('span');
+      span.className = 'edit__preview';
+      span.textContent = text;
+      dateField.insertAdjacentElement('afterend', span);
+    }
+  }
+
+  function saveForm(id, existing) {
+    var f = state.editForm;
+    var unit = f.repeatOn ? f.repeatUnit : 'none';
+    var interval = f.repeatOn ? f.repeatInterval : 1;
+    var msg = validateEventForm({ title: f.title, date: f.date, repeatUnit: unit, repeatInterval: interval });
+    if (msg) {
+      f.error = msg;
+      renderEdit(id);
+      return;
+    }
+    f.error = '';
+    var now = Date.now();
+    var payload = {
+      id: (existing && existing.id) || createId(),
+      title: f.title.trim(),
+      date: f.date,
+      note: f.note.trim() || undefined,
+      starred: existing && existing.starred,
+      starRank: existing && existing.starRank,
+      repeatUnit: unit,
+      repeatInterval: interval,
+      remindEnabled: f.remindEnabled,
+      createdAt: (existing && existing.createdAt) || now,
+      updatedAt: now
+    };
+    upsertEvent(payload);
+    state.editForm = null;
+    state.carouselIndex = 0;
+    toast('已保存');
+    resetToHome();
+  }
+
+  /* ═══════════════ Settings ═══════════════ */
+  function renderSettings() {
+    var count = loadEvents().length;
+    var root = $('#settings-body');
+
+    root.innerHTML =
+      '<div class="settings__section">' +
+        '<span class="settings__title">数据</span>' +
+        '<div class="settings__card">' +
+          '<div class="settings__row">' +
+            '<span class="settings__label">本地事件</span>' +
+            '<span class="settings__value">' + count + ' 条</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="settings__section">' +
+        '<span class="settings__title">备份</span>' +
+        '<span class="settings__desc">数据存在本机，关闭不会丢；清除浏览器数据或卸载会丢。导出到剪贴板，或生成 JSON 文件妥善保存。</span>' +
+        '<div class="settings__actions">' +
+          '<button type="button" class="btn btn--primary" id="btn-export">导出到剪贴板</button>' +
+          '<button type="button" class="btn btn--ghost" id="btn-export-file">导出 JSON 文件</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="settings__section">' +
+        '<span class="settings__title">导入</span>' +
+        '<textarea class="settings__textarea" id="field-import" placeholder="粘贴备份 JSON">' + escapeHtml(state.importText) + '</textarea>' +
+        '<div class="settings__actions">' +
+          '<button type="button" class="btn btn--primary" id="btn-import-merge">合并导入</button>' +
+          '<button type="button" class="btn btn--danger" id="btn-import-replace">覆盖本地</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="settings__section">' +
+        '<span class="settings__title">危险操作</span>' +
+        '<div class="settings__actions">' +
+          '<button type="button" class="btn btn--danger" id="btn-clear">清空本地数据</button>' +
+        '</div>' +
+      '</div>' +
+
+      (state.settingsMessage ? '<span class="settings__message">' + escapeHtml(state.settingsMessage) + '</span>' : '') +
+
+      '<span class="settings__footer">NumberOurDays · 本地数据，卸载前请先导出</span>';
+
+    bindSettings();
+  }
+
+  function bindSettings() {
+    var importField = $('#field-import');
+    if (importField) {
+      importField.addEventListener('input', function () {
+        state.importText = importField.value;
+      });
+    }
+
+    $('#btn-export').addEventListener('click', function () {
+      var events = loadEvents();
+      if (!events.length) {
+        toast('暂无数据可导出');
+        return;
+      }
+      var text = serializeEvents(events);
+      function done() {
+        state.settingsMessage = '已导出 ' + events.length + ' 条，请粘贴保存';
+        renderSettings();
+        toast('已复制到剪贴板');
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {
+          fallbackCopy(text);
+          done();
+        });
+      } else {
+        fallbackCopy(text);
+        done();
+      }
+    });
+
+    $('#btn-export-file').addEventListener('click', function () {
+      var events = loadEvents();
+      if (!events.length) {
+        toast('暂无数据可导出');
+        return;
+      }
+      var text = serializeEvents(events);
+      var d = new Date();
+      var fileName = 'NumberOurDays-' + d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) +
+        '-' + pad2(d.getHours()) + pad2(d.getMinutes()) + '.json';
+      try {
+        var blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        state.settingsMessage = '已开始下载 ' + fileName;
+        renderSettings();
+      } catch (err) {
+        state.settingsMessage = '导出文件失败';
+        renderSettings();
+      }
+    });
+
+    $('#btn-import-merge').addEventListener('click', function () {
+      doImport('merge');
+    });
+
+    $('#btn-import-replace').addEventListener('click', function () {
+      var parsed = parseBackup(state.importText);
+      if (!parsed.ok) {
+        state.settingsMessage = parsed.error;
+        renderSettings();
+        return;
+      }
+      if (!parsed.events.length) {
+        state.settingsMessage = '备份中没有有效事件';
+        renderSettings();
+        return;
+      }
+      showModal({
+        title: '覆盖本地数据',
+        content: '将删除本地不在备份中的事件，确定继续？',
+        confirmText: '覆盖',
+        danger: true,
+        onConfirm: function () { doImport('replace'); }
+      });
+    });
+
+    $('#btn-clear').addEventListener('click', function () {
+      showModal({
+        title: '清空本地数据',
+        content: '将删除全部纪念日，且不可恢复。建议先导出备份。',
+        confirmText: '清空',
+        danger: true,
+        onConfirm: function () {
+          saveEvents([]);
+          state.settingsMessage = '已清空本地数据';
+          state.importText = '';
+          renderSettings();
+          toast('已清空');
+        }
+      });
+    });
+  }
+
+  function doImport(mode) {
+    var parsed = parseBackup(state.importText);
+    if (!parsed.ok) {
+      state.settingsMessage = parsed.error;
+      renderSettings();
+      return;
+    }
+    if (!parsed.events.length) {
+      state.settingsMessage = '备份中没有有效事件';
+      renderSettings();
+      return;
+    }
+    var local = loadEvents();
+    var next = mode === 'merge' ? mergeEvents(local, parsed.events) : parsed.events.slice();
+    saveEvents(next);
+    state.importText = '';
+    state.settingsMessage = mode === 'merge'
+      ? '已合并，共 ' + next.length + ' 条' + (parsed.skipped ? '，跳过 ' + parsed.skipped + ' 条无效' : '')
+      : '已覆盖为 ' + next.length + ' 条' + (parsed.skipped ? '，跳过 ' + parsed.skipped + ' 条无效' : '');
+    renderSettings();
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  /* ═══════════════ Init ═══════════════ */
+  ensureDemoEventsIfEmpty();
+  renderHome();
+
+  // Clear edit form when leaving edit without save via back
+  var origPop = popScreen;
+  popScreen = function () {
+    if (currentScreen === 'edit') {
+      state.editForm = null;
+    }
+    origPop();
+  };
+
+  // Re-bind back buttons to wrapped pop
+  // (delegation already uses popScreen variable via closure — reassign works for future calls)
+})();
+  </script>
+</body>
+</html>

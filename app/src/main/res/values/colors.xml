@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Neutral scale — paper -->
+    <color name="n_0">#FAF7F2</color>
+    <color name="n_50">#F3EEE6</color>
+    <color name="n_100">#E8E1D6</color>
+    <color name="n_300">#C9C0B2</color>
+    <color name="n_500">#8A8175</color>
+    <color name="n_700">#4A453E</color>
+    <color name="n_900">#1C1916</color>
+    <color name="accent">#D4553A</color>
+    <color name="error">#B33A3A</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+</resources>
