@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 object DateCalculator {
     private val FMT: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
@@ -144,6 +145,18 @@ object DateCalculator {
         if (list.isEmpty()) return emptyList()
         val nearest = pickNearest(list) ?: return list
         return listOf(nearest) + list.filter { it.id != nearest.id }
+    }
+
+    /**
+     * Final star-list index after a drag of [deltaY] px on a row of [rowHeightPx].
+     * Down is positive; result is clamped to [0, lastIndex].
+     */
+    fun dragTargetIndex(from: Int, lastIndex: Int, deltaY: Float, rowHeightPx: Float): Int {
+        if (from < 0 || lastIndex < 0 || from > lastIndex) return from
+        if (rowHeightPx <= 0f) return from
+        val steps = (deltaY / rowHeightPx).roundToInt()
+        if (steps == 0) return from
+        return (from + steps).coerceIn(0, lastIndex)
     }
 
     fun convertDuration(from: LocalDate, to: LocalDate): DurationBreakdown {

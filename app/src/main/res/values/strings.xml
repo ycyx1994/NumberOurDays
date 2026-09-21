@@ -22,6 +22,7 @@
     <string name="star">星标</string>
     <string name="unstar">取消星标</string>
     <string name="starred">已星标</string>
+    <string name="reorder_star">拖动排序</string>
     <string name="saved">已保存</string>
     <string name="deleted">已删除</string>
     <string name="data_section">数据</string>

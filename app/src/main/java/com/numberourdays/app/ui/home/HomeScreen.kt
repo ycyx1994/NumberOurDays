@@ -2,7 +2,7 @@ package com.numberourdays.app.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -80,30 +81,39 @@ fun HomeScreen(
     }
     val slides = remember(displays) { DateCalculator.carouselList(displays) }
 
-    var dragOffsetPx by remember { mutableFloatStateOf(0f) }
+    // Drag reorder: accumulate delta during the gesture; commit once on drag end
+    // so LazyColumn is not re-sorted mid-gesture (that cancels pointer input).
     var draggingId by remember { mutableStateOf<String?>(null) }
+    var dragDeltaPx by remember { mutableFloatStateOf(0f) }
+    var dragStartStarIndex by remember { mutableIntStateOf(-1) }
     val rowHeightPx = with(LocalDensity.current) { 72.dp.toPx() }
 
-    fun onDragMove(id: String, deltaY: Float) {
-        if (draggingId == null) draggingId = id
-        dragOffsetPx += deltaY
-        val steps = (dragOffsetPx / rowHeightPx).toInt()
-        if (steps == 0) return
-        val starred = displays.filter { it.starred }.map { it.id }.toMutableList()
-        val from = starred.indexOf(id)
-        if (from < 0) return
-        val to = (from + steps).coerceIn(0, starred.lastIndex)
-        if (from != to) {
-            val moved = starred.removeAt(from)
-            starred.add(to, moved)
-            repo.reorderStars(starred)
-            dragOffsetPx = 0f
-        }
+    fun onDragStart(id: String) {
+        draggingId = id
+        dragDeltaPx = 0f
+        dragStartStarIndex = displays.filter { it.starred }.indexOfFirst { it.id == id }
+    }
+
+    fun onDragMove(deltaY: Float) {
+        if (draggingId == null) return
+        dragDeltaPx += deltaY
     }
 
     fun onDragEnd() {
+        val id = draggingId
+        val from = dragStartStarIndex
+        val deltaY = dragDeltaPx
         draggingId = null
-        dragOffsetPx = 0f
+        dragDeltaPx = 0f
+        dragStartStarIndex = -1
+        if (id == null || from < 0) return
+        val starred = displays.filter { it.starred }.map { it.id }.toMutableList()
+        if (from !in starred.indices) return
+        val to = DateCalculator.dragTargetIndex(from, starred.lastIndex, deltaY, rowHeightPx)
+        if (to == from) return
+        val moved = starred.removeAt(from)
+        starred.add(to, moved)
+        repo.reorderStars(starred)
     }
 
     Scaffold(
@@ -164,7 +174,10 @@ fun HomeScreen(
                     onOpen = { onOpenDetail(item.id) },
                     onToggleStar = { repo.toggleStar(item.id) },
                     dragEnabled = item.starred,
-                    onDrag = { dy -> onDragMove(item.id, dy) },
+                    dragging = draggingId == item.id,
+                    dragOffsetPx = if (draggingId == item.id) dragDeltaPx else 0f,
+                    onDragStart = { onDragStart(item.id) },
+                    onDrag = { dy -> onDragMove(dy) },
                     onDragEnd = { onDragEnd() },
                 )
                 HorizontalDivider(color = N50, thickness = 1.dp)
@@ -304,6 +317,9 @@ private fun EventRow(
     onOpen: () -> Unit,
     onToggleStar: () -> Unit,
     dragEnabled: Boolean,
+    dragging: Boolean = false,
+    dragOffsetPx: Float = 0f,
+    onDragStart: () -> Unit = {},
     onDrag: (Float) -> Unit,
     onDragEnd: () -> Unit,
 ) {
@@ -317,6 +333,13 @@ private fun EventRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
+            .graphicsLayer {
+                translationY = dragOffsetPx
+                if (dragging) {
+                    alpha = 0.92f
+                    shadowElevation = 8f
+                }
+            }
             .clickable(onClick = onOpen)
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -358,38 +381,28 @@ private fun EventRow(
         }
         Text(item.label, color = N700, fontSize = 14.sp)
         if (dragEnabled) {
-            var dragAccum by remember(item.id) { mutableFloatStateOf(0f) }
-            var active by remember(item.id) { mutableStateOf(false) }
-            IconButton(
-                onClick = {},
+            // Dedicated handle: drag starts immediately (no long-press), outside IconButton
+            // so click/ripple handling cannot steal the drag gesture.
+            Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(40.dp)
                     .pointerInput(item.id) {
-                        detectDragGesturesAfterLongPress(
-                            onDragStart = {
-                                active = true
-                                dragAccum = 0f
-                            },
-                            onDragEnd = {
-                                active = false
-                                onDragEnd()
-                            },
-                            onDragCancel = {
-                                active = false
-                                onDragEnd()
-                            },
+                        detectDragGestures(
+                            onDragStart = { onDragStart() },
+                            onDragEnd = { onDragEnd() },
+                            onDragCancel = { onDragEnd() },
                             onDrag = { change, amount ->
                                 change.consume()
-                                dragAccum += amount.y
                                 onDrag(amount.y)
                             },
                         )
                     },
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = Icons.Default.DragHandle,
-                    contentDescription = null,
-                    tint = if (active) Accent else N500,
+                    contentDescription = stringResource(R.string.reorder_star),
+                    tint = if (dragging) Accent else N500,
                 )
             }
         } else {
