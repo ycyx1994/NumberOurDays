@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.numberourdays.app.App
@@ -106,27 +107,39 @@ fun DetailScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(N50, NodCardShape)
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(tag, color = N500, fontSize = 11.sp)
+                Text(tag, color = N500, fontSize = 11.sp, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(4.dp))
-                Text(d.title, color = N900, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    d.title,
+                    color = N900,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                )
                 if (d.repeatLabel != null && d.kind == EventKind.REPEAT) {
                     Spacer(Modifier.height(2.dp))
-                    Text(d.repeatLabel, color = N500, fontSize = 12.sp)
+                    Text(d.repeatLabel, color = N500, fontSize = 12.sp, textAlign = TextAlign.Center)
                 }
                 Spacer(Modifier.height(12.dp))
 
                 val target = DateCalculator.detailTargetDate(d)
                 val breakdown = DateCalculator.convertDuration(DateCalculator.today(), target)
                 val shown = DateCalculator.formatDuration(breakdown, unitEnum)
-                Row(verticalAlignment = Alignment.Bottom) {
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.Center,
+                ) {
                     Text(
                         text = shown.value.toString(),
                         color = Accent,
@@ -150,9 +163,12 @@ fun DetailScreen(
                     }
                 }
                 Spacer(Modifier.height(8.dp))
-                Text(d.label, color = N500, fontSize = 12.sp)
+                Text(d.label, color = N500, fontSize = 12.sp, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(14.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     UnitChip(stringResource(R.string.unit_day), unitEnum == DurationUnit.DAY) {
                         unit = DurationUnit.DAY.name
                     }

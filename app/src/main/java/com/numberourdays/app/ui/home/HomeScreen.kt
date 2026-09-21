@@ -61,6 +61,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -172,7 +173,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
+            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 96.dp),
         ) {
             item(key = "carousel") {
                 val pagerState = rememberPagerState(pageCount = { slides.size.coerceAtLeast(1) })
@@ -271,7 +272,7 @@ private fun CarouselCard(
         state = pagerState,
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp),
+            .height(200.dp),
     ) { page ->
         val item = slides[page]
         val tag = when {
@@ -283,17 +284,36 @@ private fun CarouselCard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(2.dp)
+                .padding(horizontal = 4.dp)
                 .clip(NodCardShape)
                 .background(N50)
                 .clickable { onClick(item.id) }
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            Text(stringResource(R.string.next_prefix, tag), color = N500, fontSize = 12.sp)
+            Text(
+                text = stringResource(R.string.next_prefix, tag),
+                color = N500,
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+            )
             Spacer(Modifier.height(4.dp))
-            Text(item.title, color = N900, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = item.title,
+                color = N900,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth(),
+            )
             Spacer(Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.Bottom) {
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.Center,
+            ) {
                 Text(
                     text = item.days.toString(),
                     color = Accent,
@@ -323,6 +343,7 @@ private fun CarouselCard(
                 },
                 color = N500,
                 fontSize = 12.sp,
+                textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
