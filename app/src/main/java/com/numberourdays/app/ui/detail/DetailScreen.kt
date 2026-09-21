@@ -113,11 +113,11 @@ fun DetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(N50, NodCardShape)
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(tag, color = N500, fontSize = 11.sp, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
                 Text(
                     d.title,
                     color = N900,
@@ -128,10 +128,9 @@ fun DetailScreen(
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 )
                 if (d.repeatLabel != null && d.kind == EventKind.REPEAT) {
-                    Spacer(Modifier.height(2.dp))
                     Text(d.repeatLabel, color = N500, fontSize = 12.sp, textAlign = TextAlign.Center)
                 }
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(6.dp))
 
                 val target = DateCalculator.detailTargetDate(d)
                 val breakdown = DateCalculator.convertDuration(DateCalculator.today(), target)
@@ -162,26 +161,31 @@ fun DetailScreen(
                         )
                     }
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(4.dp))
                 Text(d.label, color = N500, fontSize = 12.sp, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(14.dp))
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    UnitChip(stringResource(R.string.unit_day), unitEnum == DurationUnit.DAY) {
-                        unit = DurationUnit.DAY.name
-                    }
-                    UnitChip(stringResource(R.string.unit_month), unitEnum == DurationUnit.MONTH) {
-                        unit = DurationUnit.MONTH.name
-                    }
-                    UnitChip(stringResource(R.string.unit_year), unitEnum == DurationUnit.YEAR) {
-                        unit = DurationUnit.YEAR.name
-                    }
+            }
+
+            // Unit switch lives outside the hero card
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                UnitChip(stringResource(R.string.unit_day), unitEnum == DurationUnit.DAY) {
+                    unit = DurationUnit.DAY.name
+                }
+                Spacer(Modifier.width(6.dp))
+                UnitChip(stringResource(R.string.unit_month), unitEnum == DurationUnit.MONTH) {
+                    unit = DurationUnit.MONTH.name
+                }
+                Spacer(Modifier.width(6.dp))
+                UnitChip(stringResource(R.string.unit_year), unitEnum == DurationUnit.YEAR) {
+                    unit = DurationUnit.YEAR.name
                 }
             }
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(12.dp))
 
             MetaRow(stringResource(R.string.label_date), d.date)
             MetaRow(stringResource(R.string.label_repeat), d.repeatLabel ?: stringResource(R.string.not_repeat))
@@ -195,27 +199,33 @@ fun DetailScreen(
             val elapsedText = listOf("${elapsedShown.value} ${elapsedShown.unitLabel}", elapsedShown.rest)
                 .filter { it.isNotBlank() }
                 .joinToString(" ")
+            val elapsedUnitLabel = when (elapsedEnum) {
+                DurationUnit.DAY -> stringResource(R.string.unit_day)
+                DurationUnit.MONTH -> stringResource(R.string.unit_month)
+                DurationUnit.YEAR -> stringResource(R.string.unit_year)
+            }
             MetaRow(
                 label = stringResource(R.string.label_elapsed),
                 value = elapsedText,
+                trailing = {
+                    // Compact cycle: tap unit to rotate 天 → 月 → 年
+                    Text(
+                        text = elapsedUnitLabel,
+                        color = Accent,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(N50)
+                            .clickable {
+                                val order = listOf(DurationUnit.DAY, DurationUnit.MONTH, DurationUnit.YEAR)
+                                elapsedUnit = order[(order.indexOf(elapsedEnum) + 1) % order.size].name
+                            }
+                            .padding(horizontal = 8.dp, vertical = 3.dp),
+                    )
+                },
             )
-            // Elapsed unit — same chip language as the hero unit switch
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                UnitChip(stringResource(R.string.unit_day), elapsedEnum == DurationUnit.DAY) {
-                    elapsedUnit = DurationUnit.DAY.name
-                }
-                UnitChip(stringResource(R.string.unit_month), elapsedEnum == DurationUnit.MONTH) {
-                    elapsedUnit = DurationUnit.MONTH.name
-                }
-                UnitChip(stringResource(R.string.unit_year), elapsedEnum == DurationUnit.YEAR) {
-                    elapsedUnit = DurationUnit.YEAR.name
-                }
-            }
             MetaRow(stringResource(R.string.label_status), d.label)
             MetaRow(
                 stringResource(R.string.label_remind),
@@ -308,7 +318,7 @@ private fun MetaRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 14.dp),
+                .padding(vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(label, color = N500, fontSize = 13.sp)
