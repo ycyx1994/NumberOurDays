@@ -245,7 +245,7 @@ fun DetailScreen(
                     Icon(
                         imageVector = if (d.starred) Icons.Rounded.Star else Icons.Outlined.StarOutline,
                         contentDescription = null,
-                        tint = if (d.starred) N700 else N300,
+                        tint = if (d.starred) Accent else N300,
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(

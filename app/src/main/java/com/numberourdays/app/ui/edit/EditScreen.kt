@@ -410,7 +410,7 @@ fun EditScreen(
                 onDismissRequest = { showDatePicker = false },
                 title = {
                     Text(
-                        text = "选择日期 · $selectedIso",
+                        text = stringResource(R.string.choose_date),
                         fontSize = 16.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                         color = N900,

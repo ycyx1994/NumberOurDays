@@ -57,8 +57,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.numberourdays.app.App
@@ -198,6 +202,24 @@ fun HomeScreen(
                     HorizontalDivider(color = N100, thickness = 1.dp)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun dayCountAnnotated(label: String): AnnotatedString {
+    val match = Regex("\\d+").find(label)
+    return buildAnnotatedString {
+        if (match == null) {
+            withStyle(SpanStyle(color = Accent, fontWeight = FontWeight.Bold)) {
+                append(label)
+            }
+        } else {
+            append(label.substring(0, match.range.first))
+            withStyle(SpanStyle(color = Accent, fontWeight = FontWeight.Bold)) {
+                append(match.value)
+            }
+            append(label.substring(match.range.last + 1))
         }
     }
 }
@@ -405,7 +427,7 @@ private fun EventRow(
                 } else {
                     stringResource(R.string.star)
                 },
-                tint = if (item.starred) N700 else N300,
+                tint = if (item.starred) Accent else N300,
             )
         }
         Column(
@@ -433,10 +455,8 @@ private fun EventRow(
             )
         }
         Text(
-            item.label,
-            color = N900,
+            text = dayCountAnnotated(item.label),
             fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
         )
         if (dragEnabled) {
             // Dedicated handle: drag starts immediately (no long-press), outside IconButton
