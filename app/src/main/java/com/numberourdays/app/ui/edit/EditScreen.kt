@@ -406,22 +406,9 @@ fun EditScreen(
         } ?: dateText
 
         ProvideChineseDateLocale {
-            AlertDialog(
+            // No chrome title — DatePicker alone is enough
+            DatePickerDialog(
                 onDismissRequest = { showDatePicker = false },
-                title = {
-                    Text(
-                        text = stringResource(R.string.choose_date),
-                        fontSize = 16.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                        color = N900,
-                    )
-                },
-                text = {
-                    DatePicker(
-                        state = datePickerState,
-                        showModeToggle = false,
-                    )
-                },
                 confirmButton = {
                     TextButton(onClick = {
                         dateText = selectedIso
@@ -431,7 +418,12 @@ fun EditScreen(
                 dismissButton = {
                     TextButton(onClick = { showDatePicker = false }) { Text("取消") }
                 },
-            )
+            ) {
+                DatePicker(
+                    state = datePickerState,
+                    showModeToggle = false,
+                )
+            }
         }
     }
 }
