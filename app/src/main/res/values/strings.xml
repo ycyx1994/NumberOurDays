@@ -30,9 +30,14 @@
     <string name="import_section">导入</string>
     <string name="danger_section">危险操作</string>
     <string name="local_events">本地事件</string>
-    <string name="export_clip">导出到剪贴板</string>
-    <string name="export_file">导出 JSON 文件</string>
+    <string name="local_events_value">%1$d 条纪念日</string>
+    <string name="export_clip">复制到剪贴板</string>
+    <string name="export_file">导出到文件</string>
     <string name="import_from_file">从文件导入</string>
+    <string name="import_advanced">粘贴 JSON（高级）</string>
+    <string name="import_advanced_expand">展开粘贴导入</string>
+    <string name="import_advanced_collapse">收起粘贴导入</string>
+    <string name="choose_date">选择日期</string>
     <string name="exported_to_file">已导出 %1$d 条到文件</string>
     <string name="export_failed">导出失败</string>
     <string name="read_file_failed">读取文件失败</string>
@@ -49,7 +54,7 @@
     <string name="clear_data">清空本地数据</string>
     <string name="paste_backup">粘贴备份 JSON</string>
     <string name="footer">NumberOurDays · 本地数据，卸载前请先导出</string>
-    <string name="backup_desc">数据存在本机，关闭不会丢；清除应用数据或卸载会丢。导出到剪贴板，或生成 JSON 文件妥善保存。</string>
+    <string name="backup_desc">数据存在本机，关闭不会丢；清除应用数据或卸载会丢。优先导出到文件妥善保存。</string>
     <string name="remind_hint">已记录偏好，通知能力将在后续版本提供</string>
     <string name="title_hint">例如：在一起纪念日</string>
     <string name="note_hint">可选</string>

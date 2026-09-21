@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,6 +48,7 @@ import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.ErrorRed
 import com.numberourdays.app.ui.theme.N0
+import com.numberourdays.app.ui.theme.N100
 import com.numberourdays.app.ui.theme.N300
 import com.numberourdays.app.ui.theme.N50
 import com.numberourdays.app.ui.theme.N500
@@ -63,6 +66,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var message by rememberSaveable { mutableStateOf<String?>(null) }
     var confirmReplace by rememberSaveable { mutableStateOf(false) }
     var confirmClear by rememberSaveable { mutableStateOf(false) }
+    var pasteAdvanced by rememberSaveable { mutableStateOf(false) }
     var pendingFileImport by remember { mutableStateOf<List<DayEvent>?>(null) }
     var pendingFileImportNote by remember { mutableStateOf<String?>(null) }
     var showFileImportConfirm by remember { mutableStateOf(false) }
@@ -123,15 +127,18 @@ fun SettingsScreen(onBack: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
             Text(stringResource(R.string.data_section), color = N500, fontSize = 12.sp)
-            Spacer(Modifier.height(8.dp))
-            OutlinedTextField(
-                value = "${events.size} 条",
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(stringResource(R.string.local_events), color = N500) },
-                modifier = Modifier.fillMaxWidth(),
-                shape = NodFieldShape,
-                colors = fieldColors(),
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = stringResource(R.string.local_events),
+                color = N500,
+                fontSize = 12.sp,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.local_events_value, events.size),
+                color = N900,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(Modifier.height(24.dp))
@@ -140,44 +147,47 @@ fun SettingsScreen(onBack: () -> Unit) {
             Text(stringResource(R.string.backup_desc), color = N500, fontSize = 12.sp)
             Spacer(Modifier.height(12.dp))
 
+            // Primary: real file export via SAF
             Button(
                 onClick = {
                     if (events.isEmpty()) {
                         Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
                         return@Button
                     }
-                    val text = repo.serialize(events)
-                    val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    cm.setPrimaryClip(ClipData.newPlainText("NumberOurDays", text))
-                    showMessage("已导出 ${events.size} 条，请粘贴保存")
-                    Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
+                    exportFileLauncher.launch(BackupTransfer.defaultBackupFileName())
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(44.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Accent, contentColor = N0),
                 shape = NodButtonShape,
-            ) { Text(stringResource(R.string.export_clip), fontSize = 14.sp) }
+            ) { Text(stringResource(R.string.export_file), fontSize = 14.sp) }
 
             Spacer(Modifier.height(8.dp))
+            // Secondary: clipboard
             OutlinedButton(
                 onClick = {
                     if (events.isEmpty()) {
                         Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
                         return@OutlinedButton
                     }
-                    exportFileLauncher.launch(BackupTransfer.defaultBackupFileName())
+                    val text = repo.serialize(events)
+                    val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    cm.setPrimaryClip(ClipData.newPlainText("NumberOurDays", text))
+                    showMessage(context.getString(R.string.copied))
+                    Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(44.dp),
                 shape = NodButtonShape,
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = N700),
-            ) { Text(stringResource(R.string.export_file), color = N700, fontSize = 14.sp) }
+            ) { Text(stringResource(R.string.export_clip), color = N700, fontSize = 14.sp) }
 
             Spacer(Modifier.height(24.dp))
             Text(stringResource(R.string.import_section), color = N500, fontSize = 12.sp)
             Spacer(Modifier.height(8.dp))
+            // Primary: file import
             Button(
                 onClick = {
                     importFileLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
@@ -190,49 +200,77 @@ fun SettingsScreen(onBack: () -> Unit) {
             ) { Text(stringResource(R.string.import_from_file), fontSize = 14.sp) }
 
             Spacer(Modifier.height(8.dp))
-            OutlinedTextField(
-                value = importText,
-                onValueChange = { importText = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                placeholder = { Text(stringResource(R.string.paste_backup), color = N300, fontSize = 12.sp) },
-                shape = NodFieldShape,
-                colors = fieldColors(),
-            )
-
-            Spacer(Modifier.height(10.dp))
-            Button(
-                onClick = {
-                    val (evts, note) = repo.parseBackup(importText)
-                    if (evts.isEmpty()) {
-                        showMessage(note ?: "备份中没有有效事件")
-                        return@Button
-                    }
-                    val next = repo.merge(repo.loadEvents(), evts)
-                    repo.saveAll(next)
-                    importText = ""
-                    val skipped = note?.let { "，$it" } ?: ""
-                    showMessage("已合并 ${next.size} 条$skipped")
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(44.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Accent, contentColor = N0),
-                shape = NodButtonShape,
-            ) { Text(stringResource(R.string.import_merge), fontSize = 14.sp) }
-
-            Spacer(Modifier.height(8.dp))
+            // Advanced: paste JSON collapsed by default
             OutlinedButton(
-                onClick = { confirmReplace = true },
+                onClick = { pasteAdvanced = !pasteAdvanced },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(44.dp),
                 shape = NodButtonShape,
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed),
-            ) { Text(stringResource(R.string.import_replace), fontSize = 14.sp) }
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = N700),
+            ) {
+                Text(
+                    text = stringResource(
+                        if (pasteAdvanced) R.string.import_advanced_collapse
+                        else R.string.import_advanced_expand
+                    ),
+                    color = N700,
+                    fontSize = 14.sp,
+                )
+            }
+
+            if (pasteAdvanced) {
+                Spacer(Modifier.height(12.dp))
+                Text(stringResource(R.string.import_advanced), color = N500, fontSize = 12.sp)
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = importText,
+                    onValueChange = { importText = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp),
+                    placeholder = {
+                        Text(stringResource(R.string.paste_backup), color = N300, fontSize = 12.sp)
+                    },
+                    shape = NodFieldShape,
+                    colors = fieldColors(),
+                )
+                Spacer(Modifier.height(10.dp))
+                OutlinedButton(
+                    onClick = {
+                        val (evts, note) = repo.parseBackup(importText)
+                        if (evts.isEmpty()) {
+                            showMessage(note ?: context.getString(R.string.import_file_empty))
+                            return@OutlinedButton
+                        }
+                        val next = repo.merge(repo.loadEvents(), evts)
+                        repo.saveAll(next)
+                        importText = ""
+                        val skipped = note?.let { "，$it" } ?: ""
+                        showMessage("已合并 ${next.size} 条$skipped")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp),
+                    shape = NodButtonShape,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = N700),
+                ) {
+                    Text(stringResource(R.string.import_merge), color = N700, fontSize = 14.sp)
+                }
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { confirmReplace = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp),
+                    shape = NodButtonShape,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed),
+                ) { Text(stringResource(R.string.import_replace), fontSize = 14.sp) }
+            }
 
             Spacer(Modifier.height(24.dp))
+            HorizontalDivider(color = N100)
+            Spacer(Modifier.height(16.dp))
             Text(stringResource(R.string.danger_section), color = N500, fontSize = 12.sp)
             Spacer(Modifier.height(10.dp))
             OutlinedButton(

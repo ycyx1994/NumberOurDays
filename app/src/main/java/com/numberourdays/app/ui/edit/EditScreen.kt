@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -23,6 +26,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -164,8 +168,8 @@ fun EditScreen(
             Spacer(Modifier.height(16.dp))
             Text(stringResource(R.string.date_label), color = N500, fontSize = 12.sp)
             Spacer(Modifier.height(6.dp))
-            // ISO 中国式展示：2026-09-21
-            Column(
+            // ISO date field with calendar affordance
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(NodFieldShape)
@@ -173,8 +177,20 @@ fun EditScreen(
                     .border(1.dp, N300, NodFieldShape)
                     .clickable { showDatePicker = true }
                     .padding(horizontal = 12.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(dateText, color = N900, fontSize = 15.sp)
+                Text(
+                    text = dateText,
+                    color = N900,
+                    fontSize = 15.sp,
+                    modifier = Modifier.weight(1f),
+                )
+                Icon(
+                    imageVector = Icons.Outlined.CalendarMonth,
+                    contentDescription = stringResource(R.string.choose_date),
+                    tint = N500,
+                    modifier = Modifier.size(20.dp),
+                )
             }
 
             if (preview != null) {
@@ -394,7 +410,7 @@ fun EditScreen(
                 onDismissRequest = { showDatePicker = false },
                 title = {
                     Text(
-                        text = "选择日期 · $selectedIso",
+                        text = stringResource(R.string.choose_date),
                         fontSize = 16.sp,
                         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                         color = N900,

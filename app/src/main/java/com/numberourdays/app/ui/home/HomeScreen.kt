@@ -57,8 +57,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.numberourdays.app.App
@@ -75,6 +80,9 @@ import com.numberourdays.app.ui.theme.N50
 import com.numberourdays.app.ui.theme.N500
 import com.numberourdays.app.ui.theme.N700
 import com.numberourdays.app.ui.theme.N900
+import com.numberourdays.app.ui.theme.NodCardShape
+import com.numberourdays.app.ui.theme.NodDisplayNumber
+import com.numberourdays.app.ui.theme.NodFabShape
 import kotlin.math.roundToInt
 
 @Composable
@@ -145,6 +153,7 @@ fun HomeScreen(
                 onClick = onOpenAdd,
                 containerColor = Accent,
                 contentColor = N0,
+                shape = NodFabShape,
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_event))
             }
@@ -164,7 +173,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
+            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 20.dp, bottom = 96.dp),
         ) {
             item(key = "carousel") {
                 val pagerState = rememberPagerState(pageCount = { slides.size.coerceAtLeast(1) })
@@ -191,9 +200,27 @@ fun HomeScreen(
                     onDragEnd = { onDragEnd() },
                 )
                 if (!isDraggingItem) {
-                    HorizontalDivider(color = N50, thickness = 1.dp)
+                    HorizontalDivider(color = N100, thickness = 1.dp)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun dayCountAnnotated(label: String): AnnotatedString {
+    val match = Regex("\\d+").find(label)
+    return buildAnnotatedString {
+        if (match == null) {
+            withStyle(SpanStyle(color = Accent, fontWeight = FontWeight.Bold)) {
+                append(label)
+            }
+        } else {
+            append(label.substring(0, match.range.first))
+            withStyle(SpanStyle(color = Accent, fontWeight = FontWeight.Bold)) {
+                append(match.value)
+            }
+            append(label.substring(match.range.last + 1))
         }
     }
 }
@@ -245,7 +272,7 @@ private fun CarouselCard(
         state = pagerState,
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp),
+            .height(200.dp),
     ) { page ->
         val item = slides[page]
         val tag = when {
@@ -257,22 +284,40 @@ private fun CarouselCard(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(2.dp)
-                .clip(MaterialTheme.shapes.large)
+                .padding(horizontal = 4.dp)
+                .clip(NodCardShape)
                 .background(N50)
                 .clickable { onClick(item.id) }
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            Text(stringResource(R.string.next_prefix, tag), color = N500, fontSize = 12.sp)
+            Text(
+                text = stringResource(R.string.next_prefix, tag),
+                color = N500,
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = item.title,
+                color = N900,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth(),
+            )
             Spacer(Modifier.height(4.dp))
-            Text(item.title, color = N900, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.Bottom) {
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.Center,
+            ) {
                 Text(
                     text = item.days.toString(),
                     color = Accent,
-                    fontSize = 64.sp,
-                    fontWeight = FontWeight.Bold,
+                    style = NodDisplayNumber,
                 )
                 Spacer(Modifier.width(6.dp))
                 Text(
@@ -282,15 +327,23 @@ private fun CarouselCard(
                     modifier = Modifier.padding(bottom = 10.dp),
                 )
             }
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(4.dp))
             Text(
                 text = buildString {
                     append(item.date)
                     if (item.repeatLabel != null) append(" · ").append(item.repeatLabel)
-                    else append(" · ").append(item.label)
+                    else append(" · ").append(
+                        when (item.kind) {
+                            EventKind.COUNTDOWN -> "倒数"
+                            EventKind.ELAPSED -> "已过"
+                            EventKind.TODAY -> "今天"
+                            EventKind.REPEAT -> "重复"
+                        }
+                    )
                 },
                 color = N500,
                 fontSize = 12.sp,
+                textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -315,9 +368,9 @@ private fun Dots(count: Int, selected: Int) {
             Box(
                 modifier = Modifier
                     .padding(horizontal = 3.dp)
-                    .size(6.dp)
+                    .size(7.dp)
                     .clip(CircleShape)
-                    .background(if (i == selected) Accent else N300)
+                    .background(if (i == selected) N700 else N300)
             )
         }
     }
@@ -343,7 +396,7 @@ private fun EventRow(
     }
     // Paper-card lift: warm surface + hairline border only.
     // No platform shadowElevation — on settle it left a dark frame when bg faded out.
-    val dragShape = RoundedCornerShape(12.dp)
+    val dragShape = NodCardShape
     val liftScale by animateFloatAsState(
         targetValue = if (dragging) 1.015f else 1f,
         animationSpec = tween(durationMillis = 160),
@@ -422,7 +475,10 @@ private fun EventRow(
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        Text(item.label, color = N700, fontSize = 14.sp)
+        Text(
+            text = dayCountAnnotated(item.label),
+            fontSize = 14.sp,
+        )
         if (dragEnabled) {
             // Dedicated handle: drag starts immediately (no long-press), outside IconButton
             // so click/ripple handling cannot steal the drag gesture.
