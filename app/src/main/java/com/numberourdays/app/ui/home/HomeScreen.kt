@@ -62,6 +62,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -238,10 +239,16 @@ private fun dayCountAnnotated(label: String): AnnotatedString {
         fontWeight = FontWeight.Normal,
         fontSize = NodDisplayCount.fontSize * 16f / 17f,
     )
+    // System CJK bold so "今天" actually thickens (Barlow has no Han glyphs).
+    val todayStyle = SpanStyle(
+        color = Accent,
+        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily.Default,
+        fontSize = NodDisplayCount.fontSize * 16f / 17f,
+    )
     return buildAnnotatedString {
         if (match == null) {
-            // e.g. "今天" — same emphasis as day-count digits
-            withStyle(digitStyle) {
+            withStyle(todayStyle) {
                 append(label)
             }
         } else {
