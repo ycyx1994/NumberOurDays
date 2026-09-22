@@ -3,6 +3,7 @@ package com.numberourdays.app.data
 import android.content.Context
 import android.widget.Toast
 import com.numberourdays.app.domain.DateCalculator
+import com.numberourdays.app.notify.ReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,6 +43,10 @@ class EventRepository(private val context: Context) {
         }
     }
 
+    private fun syncReminders(events: List<DayEvent>) {
+        events.forEach { ReminderScheduler.schedule(context, it) }
+    }
+
     private fun migrate(obj: JSONObject?): DayEvent? = DayEventCodec.migrate(obj)
 
     private fun toJson(e: DayEvent): JSONObject = DayEventCodec.toJson(e)
@@ -52,15 +57,19 @@ class EventRepository(private val context: Context) {
         val list = _events.value.toMutableList()
         val idx = list.indexOfFirst { it.id == event.id }
         if (idx >= 0) list[idx] = event else list.add(0, event)
-        persist(list)
+        if (persist(list)) ReminderScheduler.schedule(context, event)
     }
 
     fun remove(id: String) {
-        persist(_events.value.filterNot { it.id == id })
+        val next = _events.value.filterNot { it.id == id }
+        if (persist(next)) ReminderScheduler.cancel(context, id)
     }
 
     fun clearAll() {
-        persist(emptyList())
+        val ids = _events.value.map { it.id }
+        if (persist(emptyList())) {
+            ids.forEach { ReminderScheduler.cancel(context, it) }
+        }
     }
 
     fun toggleStar(id: String) {
@@ -74,7 +83,7 @@ class EventRepository(private val context: Context) {
             val maxRank = list.filter { it.starred }.maxOfOrNull { it.starRank ?: 0 } ?: 0
             item.copy(starred = true, starRank = maxRank + 1, updatedAt = System.currentTimeMillis())
         }
-        persist(list)
+        if (persist(list)) ReminderScheduler.schedule(context, list[idx])
     }
 
     fun reorderStars(orderedIds: List<String>) {
@@ -93,7 +102,14 @@ class EventRepository(private val context: Context) {
     }
 
     fun saveAll(events: List<DayEvent>) {
-        persist(events)
+        val previousIds = _events.value.map { it.id }.toSet()
+        if (persist(events)) {
+            syncReminders(events)
+            val liveIds = events.map { it.id }.toSet()
+            previousIds.forEach { oldId ->
+                if (oldId !in liveIds) ReminderScheduler.cancel(context, oldId)
+            }
+        }
     }
 
     fun serialize(events: List<DayEvent>): String = DayEventCodec.serialize(events)

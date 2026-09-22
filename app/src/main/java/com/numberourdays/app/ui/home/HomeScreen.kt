@@ -2,8 +2,10 @@ package com.numberourdays.app.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -71,6 +74,7 @@ import com.numberourdays.app.R
 import com.numberourdays.app.data.DayEventDisplay
 import com.numberourdays.app.data.EventKind
 import com.numberourdays.app.domain.DateCalculator
+import com.numberourdays.app.ui.components.DayCountHero
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.N0
@@ -81,9 +85,15 @@ import com.numberourdays.app.ui.theme.N500
 import com.numberourdays.app.ui.theme.N700
 import com.numberourdays.app.ui.theme.N900
 import com.numberourdays.app.ui.theme.NodCardShape
+import com.numberourdays.app.ui.theme.NodDisplayCount
 import com.numberourdays.app.ui.theme.NodDisplayNumber
 import com.numberourdays.app.ui.theme.NodFabShape
-import kotlin.math.roundToInt
+import com.numberourdays.app.ui.theme.HeroCardMinHeight
+import com.numberourdays.app.ui.theme.HeroCardPadH
+import com.numberourdays.app.ui.theme.HeroCardPadV
+import com.numberourdays.app.ui.theme.HeroPageMarginH
+import com.numberourdays.app.ui.theme.HeroPageMarginTop
+import kotlin.math.absoluteValue
 
 @Composable
 fun HomeScreen(
@@ -169,38 +179,46 @@ fun HomeScreen(
             return@Scaffold
         }
 
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 20.dp, bottom = 96.dp),
+                .padding(padding)
+                .padding(
+                    horizontal = HeroPageMarginH,
+                    vertical = HeroPageMarginTop,
+                ),
         ) {
-            item(key = "carousel") {
-                val pagerState = rememberPagerState(pageCount = { slides.size.coerceAtLeast(1) })
-                CarouselCard(slides = slides, pagerState = pagerState, onClick = onOpenDetail)
-                Dots(count = slides.size, selected = pagerState.currentPage)
-                Text(
-                    text = stringResource(R.string.all_events),
-                    color = N500,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
-                )
-            }
-            items(displays, key = { it.id }) { item ->
-                val isDraggingItem = draggingId == item.id
-                EventRow(
-                    item = item,
-                    onOpen = { onOpenDetail(item.id) },
-                    onToggleStar = { repo.toggleStar(item.id) },
-                    dragEnabled = item.starred,
-                    dragging = isDraggingItem,
-                    dragOffsetPx = if (isDraggingItem) dragDeltaPx else 0f,
-                    onDragStart = { onDragStart(item.id) },
-                    onDrag = { dy -> onDragMove(dy) },
-                    onDragEnd = { onDragEnd() },
-                )
-                if (!isDraggingItem) {
-                    HorizontalDivider(color = N100, thickness = 1.dp)
+            val pagerState = rememberPagerState(pageCount = { slides.size.coerceAtLeast(1) })
+            CarouselCard(slides = slides, pagerState = pagerState, onClick = onOpenDetail)
+            Dots(count = slides.size, selected = pagerState.currentPage)
+            Text(
+                text = stringResource(R.string.all_events),
+                color = N500,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(bottom = 96.dp),
+            ) {
+                items(displays, key = { it.id }) { item ->
+                    val isDraggingItem = draggingId == item.id
+                    EventRow(
+                        item = item,
+                        onOpen = { onOpenDetail(item.id) },
+                        onToggleStar = { repo.toggleStar(item.id) },
+                        dragEnabled = item.starred,
+                        dragging = isDraggingItem,
+                        dragOffsetPx = if (isDraggingItem) dragDeltaPx else 0f,
+                        onDragStart = { onDragStart(item.id) },
+                        onDrag = { dy -> onDragMove(dy) },
+                        onDragEnd = { onDragEnd() },
+                    )
+                    if (!isDraggingItem) {
+                        HorizontalDivider(color = N100, thickness = 1.dp)
+                    }
                 }
             }
         }
@@ -210,17 +228,32 @@ fun HomeScreen(
 @Composable
 private fun dayCountAnnotated(label: String): AnnotatedString {
     val match = Regex("\\d+").find(label)
+    val digitStyle = SpanStyle(
+        color = Accent,
+        fontWeight = FontWeight.Bold,
+        fontFamily = NodDisplayCount.fontFamily,
+        fontSize = NodDisplayCount.fontSize * 18f / 17f,
+    )
+    val plainStyle = SpanStyle(
+        color = N700,
+        fontWeight = FontWeight.Normal,
+        fontSize = NodDisplayCount.fontSize * 16f / 17f,
+    )
     return buildAnnotatedString {
         if (match == null) {
-            withStyle(SpanStyle(color = Accent, fontWeight = FontWeight.Bold)) {
+            withStyle(digitStyle) {
                 append(label)
             }
         } else {
-            append(label.substring(0, match.range.first))
-            withStyle(SpanStyle(color = Accent, fontWeight = FontWeight.Bold)) {
+            withStyle(plainStyle) {
+                append(label.substring(0, match.range.first))
+            }
+            withStyle(digitStyle) {
                 append(match.value)
             }
-            append(label.substring(match.range.last + 1))
+            withStyle(plainStyle) {
+                append(label.substring(match.range.last + 1))
+            }
         }
     }
 }
@@ -268,85 +301,66 @@ private fun CarouselCard(
     onClick: (String) -> Unit,
 ) {
     if (slides.isEmpty()) return
-    HorizontalPager(
-        state = pagerState,
+    // Single rounded surface for the whole pager — pages themselves are
+    // unclipped so swiping never opens a paper gap between corners.
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp),
-    ) { page ->
-        val item = slides[page]
-        val tag = when {
-            item.repeatLabel != null && item.kind == EventKind.REPEAT -> item.repeatLabel
-            item.kind == EventKind.COUNTDOWN -> "倒数"
-            item.kind == EventKind.ELAPSED -> "已过"
-            else -> "今天"
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 4.dp)
-                .clip(NodCardShape)
-                .background(N50)
-                .clickable { onClick(item.id) }
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = stringResource(R.string.next_prefix, tag),
-                color = N500,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = item.title,
-                color = N900,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Spacer(Modifier.height(4.dp))
-            Row(
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.Center,
+            .clip(NodCardShape)
+            .background(N50),
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            pageSpacing = 0.dp,
+            modifier = Modifier.fillMaxWidth(),
+        ) { page ->
+            val item = slides[page]
+            val tag = when {
+                item.repeatLabel != null && item.kind == EventKind.REPEAT -> item.repeatLabel
+                item.kind == EventKind.COUNTDOWN -> "倒数"
+                item.kind == EventKind.ELAPSED -> "已过"
+                else -> "今天"
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = HeroCardMinHeight)
+                    .clickable { onClick(item.id) }
+                    .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
             ) {
                 Text(
-                    text = item.days.toString(),
-                    color = Accent,
-                    style = NodDisplayNumber,
+                    text = stringResource(R.string.next_prefix, tag),
+                    color = N500,
+                    fontSize = 11.sp,
+                    textAlign = TextAlign.Center,
                 )
-                Spacer(Modifier.width(6.dp))
                 Text(
-                    text = stringResource(R.string.unit_day),
-                    color = N700,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 10.dp),
+                    text = item.title,
+                    color = N900,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                DayCountHero(
+                    value = item.days.toString(),
+                    suffix = stringResource(R.string.unit_day),
+                    suffixBottomPadding = 6,
+                    suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
+                )
+                Text(
+                    text = item.date,
+                    color = N500,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = buildString {
-                    append(item.date)
-                    if (item.repeatLabel != null) append(" · ").append(item.repeatLabel)
-                    else append(" · ").append(
-                        when (item.kind) {
-                            EventKind.COUNTDOWN -> "倒数"
-                            EventKind.ELAPSED -> "已过"
-                            EventKind.TODAY -> "今天"
-                            EventKind.REPEAT -> "重复"
-                        }
-                    )
-                },
-                color = N500,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
         }
     }
 }
@@ -354,23 +368,30 @@ private fun CarouselCard(
 @Composable
 private fun Dots(count: Int, selected: Int) {
     if (count <= 1) {
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         return
     }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(16.dp),
+            .padding(top = 14.dp, bottom = 4.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(count) { i ->
+            val active = i == selected
+            val width by animateDpAsState(
+                targetValue = if (active) 18.dp else 6.dp,
+                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                label = "dotW",
+            )
             Box(
                 modifier = Modifier
                     .padding(horizontal = 3.dp)
-                    .size(7.dp)
-                    .clip(CircleShape)
-                    .background(if (i == selected) N700 else N300)
+                    .height(6.dp)
+                    .width(width)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(if (active) N700 else N300)
             )
         }
     }
@@ -477,7 +498,7 @@ private fun EventRow(
         }
         Text(
             text = dayCountAnnotated(item.label),
-            fontSize = 14.sp,
+            style = NodDisplayCount,
         )
         if (dragEnabled) {
             // Dedicated handle: drag starts immediately (no long-press), outside IconButton

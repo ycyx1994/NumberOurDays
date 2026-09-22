@@ -8,10 +8,12 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.numberourdays.app.R
 
 /** Controls: inputs, buttons — 8dp */
 val NodButtonShape = RoundedCornerShape(8.dp)
@@ -22,6 +24,14 @@ val NodCardShape = RoundedCornerShape(12.dp)
 
 /** FAB locked shape (do not rely on ROM defaults) */
 val NodFabShape = RoundedCornerShape(16.dp)
+
+/** Shared hero-card chrome so home ↔ detail stays seamless. */
+val HeroPageMarginH = 12.dp
+val HeroPageMarginTop = 8.dp
+val HeroCardPadH = 16.dp
+val HeroCardPadV = 10.dp
+/** Content-sized hero with a floor so short cards do not collapse. */
+val HeroCardMinHeight = 132.dp
 
 val N0 = Color(0xFFFAF7F2)
 val N50 = Color(0xFFF3EEE6)
@@ -56,14 +66,20 @@ private val LightColors = lightColorScheme(
 
 /**
  * Brand-display number style shared by home carousel + detail hero.
- * v1: system sans with tightened tracking; swap fontFamily when a licensed
- * condensed/numeric face ships — only this TextStyle needs to change.
+ * Barlow Condensed Bold (OFL) bundled in res/font.
  */
 val NodDisplayNumber = TextStyle(
-    fontFamily = FontFamily.SansSerif,
-    fontSize = 64.sp,
+    fontFamily = FontFamily(Font(R.font.barlow_condensed_bold, weight = FontWeight.Bold)),
+    fontSize = 56.sp,
     fontWeight = FontWeight.Bold,
-    letterSpacing = (-1).sp,
+    letterSpacing = 0.sp,
+)
+
+/** List day-count label — display face; digits emphasized in spans, not whole string. */
+val NodDisplayCount = TextStyle(
+    fontFamily = FontFamily(Font(R.font.barlow_condensed_bold, weight = FontWeight.Bold)),
+    fontSize = 17.sp,
+    fontWeight = FontWeight.Normal,
 )
 
 private val NodTypography = Typography(
