@@ -46,6 +46,7 @@ import com.numberourdays.app.R
 import com.numberourdays.app.data.DurationUnit
 import com.numberourdays.app.data.EventKind
 import com.numberourdays.app.domain.DateCalculator
+import com.numberourdays.app.ui.components.DayCountHero
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.N0
@@ -127,40 +128,18 @@ fun DetailScreen(
                     maxLines = 1,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 )
-                if (d.repeatLabel != null && d.kind == EventKind.REPEAT) {
-                    Text(d.repeatLabel, color = N500, fontSize = 12.sp, textAlign = TextAlign.Center)
-                }
 
                 val target = DateCalculator.detailTargetDate(d)
                 val breakdown = DateCalculator.convertDuration(DateCalculator.today(), target)
                 val shown = DateCalculator.formatDuration(breakdown, unitEnum)
-                Row(
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    Text(
-                        text = shown.value.toString(),
-                        color = Accent,
-                        style = NodDisplayNumber,
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        text = shown.unitLabel,
-                        color = N700,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 4.dp),
-                    )
-                    if (shown.rest.isNotEmpty()) {
-                        Spacer(Modifier.width(4.dp))
-                        Text(
-                            text = shown.rest,
-                            color = N700,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(bottom = 4.dp),
-                        )
-                    }
-                }
-                Text(d.label, color = N500, fontSize = 12.sp, textAlign = TextAlign.Center)
+                val suffix = listOf(shown.unitLabel, shown.rest)
+                    .filter { it.isNotBlank() }
+                    .joinToString(" ")
+                DayCountHero(
+                    value = shown.value.toString(),
+                    suffix = suffix,
+                    suffixBottomPadding = 6,
+                )
             }
 
             // Unit switch lives outside the hero card

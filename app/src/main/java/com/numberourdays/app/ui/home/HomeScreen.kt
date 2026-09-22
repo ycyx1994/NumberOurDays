@@ -71,6 +71,7 @@ import com.numberourdays.app.R
 import com.numberourdays.app.data.DayEventDisplay
 import com.numberourdays.app.data.EventKind
 import com.numberourdays.app.domain.DateCalculator
+import com.numberourdays.app.ui.components.DayCountHero
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.N0
@@ -313,36 +314,15 @@ private fun CarouselCard(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Row(
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                Text(
-                    text = item.days.toString(),
-                    color = Accent,
-                    style = NodDisplayNumber,
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = stringResource(R.string.unit_day),
-                    color = N700,
-                    fontSize = 15.sp,
-                    modifier = Modifier.padding(bottom = 8.dp),
-                )
-            }
+            DayCountHero(
+                value = item.days.toString(),
+                suffix = stringResource(R.string.unit_day),
+                suffixBottomPadding = 6,
+                suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
+            )
+            // Date only — kind/repeat already in the tag line
             Text(
-                text = buildString {
-                    append(item.date)
-                    if (item.repeatLabel != null) append(" · ").append(item.repeatLabel)
-                    else append(" · ").append(
-                        when (item.kind) {
-                            EventKind.COUNTDOWN -> "倒数"
-                            EventKind.ELAPSED -> "已过"
-                            EventKind.TODAY -> "今天"
-                            EventKind.REPEAT -> "重复"
-                        }
-                    )
-                },
+                text = item.date,
                 color = N500,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
