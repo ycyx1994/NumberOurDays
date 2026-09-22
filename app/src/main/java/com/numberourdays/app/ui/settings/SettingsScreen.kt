@@ -114,19 +114,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        titleClicks++
-                        if (titleClicks >= 5) {
-                            showDebug = true
-                            titleClicks = 0
-                        }
-                    },
-            ) {
-                NodTopBar(stringResource(R.string.settings), onBack = onBack)
-            }
+            NodTopBar(stringResource(R.string.settings), onBack = onBack)
         },
     ) { padding ->
         Column(
@@ -142,7 +130,15 @@ fun SettingsScreen(onBack: () -> Unit) {
                 color = N900,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 10.dp),
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .clickable {
+                        titleClicks++
+                        if (titleClicks >= 5) {
+                            showDebug = true
+                            titleClicks = 0
+                        }
+                    },
             )
             SectionLabel(stringResource(R.string.backup_section))
             Text(stringResource(R.string.backup_desc), color = N500, fontSize = 12.sp)
