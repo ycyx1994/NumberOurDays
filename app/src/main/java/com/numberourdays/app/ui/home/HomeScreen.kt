@@ -177,43 +177,46 @@ fun HomeScreen(
             return@Scaffold
         }
 
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(
-                start = HeroPageMarginH,
-                end = HeroPageMarginH,
-                top = HeroPageMarginTop,
-                bottom = 96.dp,
-            ),
+                .padding(padding)
+                .padding(
+                    horizontal = HeroPageMarginH,
+                    vertical = HeroPageMarginTop,
+                ),
         ) {
-            item(key = "carousel") {
-                val pagerState = rememberPagerState(pageCount = { slides.size.coerceAtLeast(1) })
-                CarouselCard(slides = slides, pagerState = pagerState, onClick = onOpenDetail)
-                Dots(count = slides.size, selected = pagerState.currentPage)
-                Text(
-                    text = stringResource(R.string.all_events),
-                    color = N500,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
-                )
-            }
-            items(displays, key = { it.id }) { item ->
-                val isDraggingItem = draggingId == item.id
-                EventRow(
-                    item = item,
-                    onOpen = { onOpenDetail(item.id) },
-                    onToggleStar = { repo.toggleStar(item.id) },
-                    dragEnabled = item.starred,
-                    dragging = isDraggingItem,
-                    dragOffsetPx = if (isDraggingItem) dragDeltaPx else 0f,
-                    onDragStart = { onDragStart(item.id) },
-                    onDrag = { dy -> onDragMove(dy) },
-                    onDragEnd = { onDragEnd() },
-                )
-                if (!isDraggingItem) {
-                    HorizontalDivider(color = N100, thickness = 1.dp)
+            val pagerState = rememberPagerState(pageCount = { slides.size.coerceAtLeast(1) })
+            CarouselCard(slides = slides, pagerState = pagerState, onClick = onOpenDetail)
+            Dots(count = slides.size, selected = pagerState.currentPage)
+            Text(
+                text = stringResource(R.string.all_events),
+                color = N500,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(bottom = 96.dp),
+            ) {
+                items(displays, key = { it.id }) { item ->
+                    val isDraggingItem = draggingId == item.id
+                    EventRow(
+                        item = item,
+                        onOpen = { onOpenDetail(item.id) },
+                        onToggleStar = { repo.toggleStar(item.id) },
+                        dragEnabled = item.starred,
+                        dragging = isDraggingItem,
+                        dragOffsetPx = if (isDraggingItem) dragDeltaPx else 0f,
+                        onDragStart = { onDragStart(item.id) },
+                        onDrag = { dy -> onDragMove(dy) },
+                        onDragEnd = { onDragEnd() },
+                    )
+                    if (!isDraggingItem) {
+                        HorizontalDivider(color = N100, thickness = 1.dp)
+                    }
                 }
             }
         }
