@@ -9,6 +9,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -85,7 +90,22 @@ private fun NodApp(initialEventId: String? = null) {
         }
     }
 
-    NavHost(navController = nav, startDestination = "home") {
+    NavHost(
+        navController = nav,
+        startDestination = "home",
+        enterTransition = {
+            slideInHorizontally(tween(200)) { it / 4 } + fadeIn(tween(200))
+        },
+        exitTransition = {
+            slideOutHorizontally(tween(200)) { -it / 8 } + fadeOut(tween(150))
+        },
+        popEnterTransition = {
+            slideInHorizontally(tween(200)) { -it / 8 } + fadeIn(tween(150))
+        },
+        popExitTransition = {
+            slideOutHorizontally(tween(200)) { it / 4 } + fadeOut(tween(200))
+        },
+    ) {
         composable("home") {
             HomeScreen(
                 onOpenDetail = { id -> nav.navigate("detail/$id") },
