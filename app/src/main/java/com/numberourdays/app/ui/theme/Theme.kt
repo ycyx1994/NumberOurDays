@@ -8,10 +8,12 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.numberourdays.app.R
 
 /** Controls: inputs, buttons — 8dp */
 val NodButtonShape = RoundedCornerShape(8.dp)
@@ -56,14 +58,13 @@ private val LightColors = lightColorScheme(
 
 /**
  * Brand-display number style shared by home carousel + detail hero.
- * v1: system sans with tightened tracking; swap fontFamily when a licensed
- * condensed/numeric face ships — only this TextStyle needs to change.
+ * Barlow Condensed Bold (OFL) bundled in res/font.
  */
 val NodDisplayNumber = TextStyle(
-    fontFamily = FontFamily.SansSerif,
+    fontFamily = FontFamily(Font(R.font.barlow_condensed_bold)),
     fontSize = 64.sp,
     fontWeight = FontWeight.Bold,
-    letterSpacing = (-1).sp,
+    letterSpacing = 0.sp,
 )
 
 private val NodTypography = Typography(
