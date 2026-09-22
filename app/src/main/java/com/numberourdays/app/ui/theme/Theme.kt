@@ -62,7 +62,7 @@ private val LightColors = lightColorScheme(
  */
 val NodDisplayNumber = TextStyle(
     fontFamily = FontFamily(Font(R.font.barlow_condensed_bold, weight = FontWeight.Bold)),
-    fontSize = 64.sp,
+    fontSize = 56.sp,
     fontWeight = FontWeight.Bold,
     letterSpacing = 0.sp,
 )

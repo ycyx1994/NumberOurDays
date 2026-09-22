@@ -278,7 +278,7 @@ private fun CarouselCard(
         state = pagerState,
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp),
+            .height(164.dp),
     ) { page ->
         val item = slides[page]
         val tag = when {
@@ -294,7 +294,7 @@ private fun CarouselCard(
                 .clip(NodCardShape)
                 .background(N50)
                 .clickable { onClick(item.id) }
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -304,7 +304,6 @@ private fun CarouselCard(
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(2.dp))
             Text(
                 text = item.title,
                 color = N900,
@@ -315,7 +314,6 @@ private fun CarouselCard(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(4.dp))
             Row(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.Center,
@@ -325,15 +323,14 @@ private fun CarouselCard(
                     color = Accent,
                     style = NodDisplayNumber,
                 )
-                Spacer(Modifier.width(6.dp))
+                Spacer(Modifier.width(4.dp))
                 Text(
                     text = stringResource(R.string.unit_day),
                     color = N700,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 10.dp),
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(bottom = 8.dp),
                 )
             }
-            Spacer(Modifier.height(4.dp))
             Text(
                 text = buildString {
                     append(item.date)
@@ -350,7 +347,7 @@ private fun CarouselCard(
                 color = N500,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
         }

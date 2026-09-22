@@ -114,24 +114,22 @@ fun DetailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(N50, NodCardShape)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(tag, color = N500, fontSize = 11.sp, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(2.dp))
                 Text(
                     d.title,
                     color = N900,
-                    fontSize = 18.sp,
+                    fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 )
                 if (d.repeatLabel != null && d.kind == EventKind.REPEAT) {
                     Text(d.repeatLabel, color = N500, fontSize = 12.sp, textAlign = TextAlign.Center)
                 }
-                Spacer(Modifier.height(6.dp))
 
                 val target = DateCalculator.detailTargetDate(d)
                 val breakdown = DateCalculator.convertDuration(DateCalculator.today(), target)
@@ -145,7 +143,7 @@ fun DetailScreen(
                         color = Accent,
                         style = NodDisplayNumber,
                     )
-                    Spacer(Modifier.width(6.dp))
+                    Spacer(Modifier.width(4.dp))
                     Text(
                         text = shown.unitLabel,
                         color = N700,
@@ -162,7 +160,6 @@ fun DetailScreen(
                         )
                     }
                 }
-                Spacer(Modifier.height(4.dp))
                 Text(d.label, color = N500, fontSize = 12.sp, textAlign = TextAlign.Center)
             }
 
@@ -170,7 +167,7 @@ fun DetailScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp),
+                    .padding(top = 8.dp),
                 horizontalArrangement = Arrangement.Center,
             ) {
                 UnitChip(stringResource(R.string.unit_day), unitEnum == DurationUnit.DAY) {
@@ -186,7 +183,7 @@ fun DetailScreen(
                 }
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(10.dp))
 
             MetaRow(stringResource(R.string.label_date), d.date)
             MetaRow(stringResource(R.string.label_repeat), d.repeatLabel ?: stringResource(R.string.not_repeat))
