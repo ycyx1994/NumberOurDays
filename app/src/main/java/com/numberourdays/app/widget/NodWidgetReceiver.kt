@@ -6,8 +6,13 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.view.View
 import android.widget.RemoteViews
+import androidx.core.content.res.ResourcesCompat
 import com.numberourdays.app.App
 import com.numberourdays.app.R
 import com.numberourdays.app.data.EventKind
@@ -59,16 +64,42 @@ class NodWidgetReceiver : AppWidgetProvider() {
                 App.repository.loadEvents().map { DateCalculator.computeDisplay(it) },
             ).let { DateCalculator.pickNearest(it) }
 
+        private fun numberBitmap(
+            context: Context,
+            text: String,
+            textSizePx: Float,
+        ): Bitmap {
+            val typeface: Typeface = ResourcesCompat.getFont(
+                context,
+                R.font.barlow_condensed_bold,
+            ) ?: Typeface.DEFAULT_BOLD
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = 0xFFD4553A.toInt()
+                this.textSize = textSizePx
+                this.typeface = typeface
+                textAlign = Paint.Align.LEFT
+            }
+            val pad = (textSizePx * 0.12f).toInt().coerceAtLeast(2)
+            val textW = paint.measureText(text)
+            val fm = paint.fontMetricsInt
+            val h = fm.descent - fm.ascent + pad * 2
+            val w = (textW + pad * 2).toInt().coerceAtLeast(1)
+            val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bmp)
+            canvas.drawText(text, pad.toFloat(), pad - fm.ascent.toFloat(), paint)
+            return bmp
+        }
+
         private fun buildViews(context: Context, display: com.numberourdays.app.data.DayEventDisplay?): RemoteViews {
             val wide = RemoteViews(context.packageName, R.layout.widget_daycount_wide)
             val compact = RemoteViews(context.packageName, R.layout.widget_daycount)
             listOf(wide, compact).forEach { views ->
                 if (display == null) {
                     views.setTextViewText(R.id.widget_title, context.getString(R.string.widget_empty_title))
-                    views.setTextViewText(R.id.widget_value, "—")
                     views.setTextViewText(R.id.widget_tag, context.getString(R.string.app_name))
                     views.setTextViewText(R.id.widget_meta, context.getString(R.string.widget_empty_meta))
                     views.setTextViewText(R.id.widget_unit, "")
+                    views.setImageViewResource(R.id.widget_value, android.R.color.transparent)
                     val pi = mainPending(context, null)
                     views.setOnClickPendingIntent(R.id.widget_root, pi)
                 } else {
@@ -81,28 +112,19 @@ class NodWidgetReceiver : AppWidgetProvider() {
                         }
                     views.setTextViewText(R.id.widget_tag, context.getString(R.string.next_prefix, tag))
                     views.setTextViewText(R.id.widget_title, display.title)
-                    views.setTextViewText(R.id.widget_value, display.days.toString())
                     views.setTextViewText(R.id.widget_meta, display.date)
                     views.setTextViewText(R.id.widget_unit, context.getString(R.string.unit_day))
+                    val sp = context.resources.displayMetrics.scaledDensity
+                    val px = if (views === wide) 56f * sp else 40f * sp
+                    views.setImageViewBitmap(
+                        R.id.widget_value,
+                        numberBitmap(context, display.days.toString(), px),
+                    )
                     val pi = mainPending(context, display.id)
                     views.setOnClickPendingIntent(R.id.widget_root, pi)
                 }
             }
-            // Prefer wide if available in host; same IDs so both work when inflated alone.
-            // HyperOS often uses the provider initialLayout (compact) after resize.
-            return mergeForHost(wide, compact)
-        }
-
-        /** Single RemoteViews graph — HyperOS/Android pick layout via size; we ship compact as primary. */
-        private fun mergeForHost(wide: RemoteViews, compact: RemoteViews): RemoteViews {
-            // Return compact as initialLayout-compatible views; also expose wide via apply.
-            // Hosts that only support one layout get compact (matches xml initialLayout).
-            return compact.apply {
-                // keep wide content parity already applied
-            }.also {
-                // unused param kept for API symmetry / future size-specific APIs
-                wide.hashCode()
-            }
+            return compact
         }
 
         private fun mainPending(context: Context, eventId: String?): PendingIntent {
