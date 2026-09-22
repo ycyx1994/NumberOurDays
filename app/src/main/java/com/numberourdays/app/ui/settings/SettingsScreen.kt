@@ -144,14 +144,16 @@ fun SettingsScreen(onBack: () -> Unit) {
             SectionLabel(stringResource(R.string.backup_section))
             Text(stringResource(R.string.backup_desc), color = N500, fontSize = 12.sp)
             ActionPair(
-                stringResource(R.string.export_file), true, {
+                stringResource(R.string.export_file),
+                {
                     if (events.isEmpty()) {
                         Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
                         return@ActionPair
                     }
                     exportFileLauncher.launch(BackupTransfer.defaultBackupFileName())
                 },
-                stringResource(R.string.export_clip), false, {
+                stringResource(R.string.export_clip),
+                {
                     if (events.isEmpty()) {
                         Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
                         return@ActionPair
@@ -161,15 +163,13 @@ fun SettingsScreen(onBack: () -> Unit) {
                     message = context.getString(R.string.copied)
                     Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
                 },
-                exportTone = true,
+                greenPair = true,
             )
             SectionLabel(stringResource(R.string.import_section))
             ActionPair(
-                stringResource(R.string.import_from_file), true, {
-                    importFileLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
-                },
+                stringResource(R.string.import_from_file),
+                { importFileLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
                 stringResource(if (pasteAdvanced) R.string.import_advanced_collapse else R.string.import_advanced_expand),
-                false,
                 { pasteAdvanced = !pasteAdvanced },
             )
             if (pasteAdvanced) {
@@ -201,7 +201,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             }
             if (showDebug) {
                 SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
+                FullButton(stringResource(R.string.test_notification), muted = true) {
                     val sample = events.firstOrNull()
                     if (sample == null) {
                         Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
@@ -310,8 +310,10 @@ private fun SectionLabel(text: String) {
     Text(text, color = N500, fontSize = 12.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
 }
 
-private val ExportGreenBg = Color(0xFFE3ECE1)
-private val ExportGreenFg = Color(0xFF5B7A5A)
+private val ToneGreenBg = Color(0xFFE3ECE1)
+private val ToneGreenFg = Color(0xFF5B7A5A)
+private val ToneAccentBg = Color(0xFFF4E3DE)
+private val ToneDangerBg = Color(0xFFF3E3E1)
 
 @Composable
 private fun ActionButton(
@@ -319,16 +321,21 @@ private fun ActionButton(
     modifier: Modifier = Modifier,
     primary: Boolean = false,
     green: Boolean = false,
+    danger: Boolean = false,
+    muted: Boolean = false,
     onClick: () -> Unit,
 ) {
     val bg = when {
-        green -> ExportGreenBg
-        primary -> Accent
+        green -> ToneGreenBg
+        danger -> ToneDangerBg
+        primary -> ToneAccentBg
         else -> N50
     }
     val fg = when {
-        green -> ExportGreenFg
-        primary -> N0
+        green -> ToneGreenFg
+        danger -> ErrorRed
+        primary -> Accent
+        muted -> N500
         else -> N700
     }
     Row(
@@ -346,34 +353,41 @@ private fun ActionButton(
 
 @Composable
 private fun ActionPair(
-    aLabel: String, aPrimary: Boolean, onA: () -> Unit,
-    bLabel: String, bPrimary: Boolean, onB: () -> Unit,
-    exportTone: Boolean = false,
+    aLabel: String,
+    onA: () -> Unit,
+    bLabel: String,
+    onB: () -> Unit,
+    greenPair: Boolean = false,
 ) {
     Row(
         Modifier.fillMaxWidth().padding(vertical = 4.dp),
         Arrangement.spacedBy(10.dp),
     ) {
-        ActionButton(aLabel, Modifier.weight(1f), aPrimary, green = exportTone, onClick = onA)
-        ActionButton(bLabel, Modifier.weight(1f), bPrimary, green = exportTone, onClick = onB)
+        if (greenPair) {
+            ActionButton(aLabel, Modifier.weight(1f), green = true, onClick = onA)
+            ActionButton(bLabel, Modifier.weight(1f), green = true, muted = true, onClick = onB)
+        } else {
+            ActionButton(aLabel, Modifier.weight(1f), primary = true, onClick = onA)
+            ActionButton(bLabel, Modifier.weight(1f), onClick = onB)
+        }
     }
 }
 
 @Composable
-private fun FullButton(label: String, danger: Boolean = false, onClick: () -> Unit) {
+private fun FullButton(label: String, danger: Boolean = false, muted: Boolean = false, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
+            .background(if (danger) ToneDangerBg else N50)
             .clickable(onClick = onClick),
         Arrangement.Center,
         Alignment.CenterVertically,
     ) {
         Text(
             label,
-            color = if (danger) N0 else Accent,
+            color = if (danger) ErrorRed else if (muted) N500 else Accent,
             fontSize = 15.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(vertical = 14.dp),
