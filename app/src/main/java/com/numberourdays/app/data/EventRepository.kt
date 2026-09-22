@@ -141,8 +141,12 @@ class EventRepository(private val context: Context) {
 
     fun ensureDemoIfEmpty() {
         scope.launch {
-            if (dao.count() > 0) return@launch
-            if (prefs.getBoolean(KEY_DEMO, false)) return@launch
+            // Idempotent: stable ids + flag; safe if App/init both call.
+            if (prefs.getBoolean(KEY_DEMO, false) && dao.count() > 0) return@launch
+            if (dao.count() > 0) {
+                prefs.edit().putBoolean(KEY_DEMO, true).apply()
+                return@launch
+            }
             dao.upsertAll(createDemoEvents().map { it.toEntity() })
             prefs.edit().putBoolean(KEY_DEMO, true).apply()
         }
@@ -159,7 +163,7 @@ class EventRepository(private val context: Context) {
 
         return listOf(
             DayEvent(
-                id = createId(),
+                id = "demo_weekend",
                 title = "周末",
                 date = DateCalculator.format(sat),
                 note = "每周重复倒数演示",
@@ -171,7 +175,7 @@ class EventRepository(private val context: Context) {
                 updatedAt = now,
             ),
             DayEvent(
-                id = createId(),
+                id = "demo_newyear",
                 title = "新年",
                 date = DateCalculator.format(newYear),
                 note = "未来倒数演示",
