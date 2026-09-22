@@ -52,6 +52,8 @@ object DayEventCodec {
         put("repeatUnit", e.repeatUnit.name.lowercase())
         put("repeatInterval", e.repeatInterval)
         put("remindEnabled", e.remindEnabled)
+        put("remindHour", e.remindHour)
+        put("remindMinute", e.remindMinute)
         put("createdAt", e.createdAt)
         put("updatedAt", e.updatedAt)
     }
@@ -73,6 +75,8 @@ object DayEventCodec {
             repeatUnit = unit,
             repeatInterval = interval,
             remindEnabled = obj.optBoolean("remindEnabled", false),
+            remindHour = obj.optInt("remindHour", 9).coerceIn(0, 23),
+            remindMinute = obj.optInt("remindMinute", 0).coerceIn(0, 59),
             createdAt = obj.optLong("createdAt", System.currentTimeMillis()),
             updatedAt = obj.optLong("updatedAt", System.currentTimeMillis()),
         )

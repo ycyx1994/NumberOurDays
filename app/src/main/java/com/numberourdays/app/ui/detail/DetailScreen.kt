@@ -239,7 +239,11 @@ fun DetailScreen(
                     MetaRow(stringResource(R.string.label_status), d.label)
                     MetaRow(
                         stringResource(R.string.label_remind),
-                        if (d.remindEnabled) stringResource(R.string.remind_on) else stringResource(R.string.remind_off),
+                        if (d.remindEnabled) {
+                            stringResource(R.string.remind_on, d.remindHour, d.remindMinute)
+                        } else {
+                            stringResource(R.string.remind_off)
+                        },
                     )
                     if (!d.note.isNullOrBlank()) {
                         Column(modifier = Modifier.padding(vertical = 14.dp)) {

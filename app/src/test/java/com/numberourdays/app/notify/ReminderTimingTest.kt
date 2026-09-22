@@ -78,14 +78,39 @@ class ReminderTimingTest {
     }
 
     @Test
-    fun week_repeat_sameMorningBeforeNine_schedulesToday() {
-        val now = utcMillis(2026, 9, 26, 8, 0)
-        val at = ReminderTiming.nextReminderMillisUtc(
-            anchorDate = "2026-09-26",
-            unit = RepeatUnit.WEEK,
+    fun presetHourMinute_alignment() {
+        val now = utcMillis(2026, 9, 21, 8, 0)
+        val at20 = ReminderTiming.nextReminderMillisUtc(
+            anchorDate = "2026-09-21",
+            unit = RepeatUnit.NONE,
             interval = 1,
             now = now,
+            hourOfDay = 20,
+            minuteOfHour = 0,
         )
-        assertEquals(utcMillis(2026, 9, 26, 9, 0), at)
+        assertEquals(utcMillis(2026, 9, 21, 20, 0), at20)
+
+        val at1230 = ReminderTiming.nextReminderMillisUtc(
+            anchorDate = "2026-09-21",
+            unit = RepeatUnit.NONE,
+            interval = 1,
+            now = now,
+            hourOfDay = 12,
+            minuteOfHour = 30,
+        )
+        assertEquals(utcMillis(2026, 9, 21, 12, 30), at1230)
+    }
+
+    @Test
+    fun presetAfterFireTime_null() {
+        val now = utcMillis(2026, 9, 21, 21, 0)
+        val at = ReminderTiming.nextReminderMillisUtc(
+            anchorDate = "2026-09-21",
+            unit = RepeatUnit.NONE,
+            interval = 1,
+            now = now,
+            hourOfDay = 20,
+        )
+        assertNull(at)
     }
 }

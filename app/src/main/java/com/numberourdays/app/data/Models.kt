@@ -29,6 +29,8 @@ data class DayEvent(
     val repeatUnit: RepeatUnit = RepeatUnit.NONE,
     val repeatInterval: Int = 1,
     val remindEnabled: Boolean = false,
+    val remindHour: Int = 9,
+    val remindMinute: Int = 0,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
 )
@@ -49,6 +51,8 @@ data class DayEventDisplay(
     val starred: Boolean get() = event.starred
     val note: String? get() = event.note
     val remindEnabled: Boolean get() = event.remindEnabled
+    val remindHour: Int get() = event.remindHour
+    val remindMinute: Int get() = event.remindMinute
 }
 
 data class DurationBreakdown(

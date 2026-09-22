@@ -13,6 +13,8 @@ fun DayEvent.toEntity(): DayEventEntity = DayEventEntity(
     repeatUnit = repeatUnit.name.lowercase(),
     repeatInterval = repeatInterval,
     remindEnabled = remindEnabled,
+    remindHour = remindHour,
+    remindMinute = remindMinute,
     createdAt = createdAt,
     updatedAt = updatedAt,
 )
@@ -27,6 +29,8 @@ fun DayEventEntity.toDomain(): DayEvent = DayEvent(
     repeatUnit = RepeatUnit.from(repeatUnit),
     repeatInterval = repeatInterval,
     remindEnabled = remindEnabled,
+    remindHour = remindHour,
+    remindMinute = remindMinute,
     createdAt = createdAt,
     updatedAt = updatedAt,
 )

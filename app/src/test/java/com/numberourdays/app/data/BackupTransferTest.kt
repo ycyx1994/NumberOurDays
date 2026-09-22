@@ -152,4 +152,22 @@ class BackupTransferTest {
         assertEquals(1, once.size)
         assertEquals(1, twice.size)
     }
+
+    @Test
+    fun remindTime_defaultsWhenMissing() {
+        val json = """{"id":"x","title":"t","date":"2026-01-01","remindEnabled":true}"""
+        val (events, _) = DayEventCodec.parseBackup("""{"events":[$json]}""")
+        assertEquals(1, events.size)
+        assertEquals(9, events[0].remindHour)
+        assertEquals(0, events[0].remindMinute)
+    }
+
+    @Test
+    fun remindTime_roundTrip() {
+        val e = sampleEvent(id = "r1", title = "提醒", date = "2026-09-21")
+            .copy(remindEnabled = true, remindHour = 20, remindMinute = 0)
+        val (parsed, _) = DayEventCodec.parseBackup(DayEventCodec.serialize(listOf(e)))
+        assertEquals(20, parsed[0].remindHour)
+        assertEquals(0, parsed[0].remindMinute)
+    }
 }

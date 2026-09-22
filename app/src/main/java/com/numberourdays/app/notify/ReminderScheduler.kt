@@ -24,6 +24,8 @@ object ReminderScheduler {
             anchorDate = event.date,
             unit = event.repeatUnit,
             interval = event.repeatInterval,
+            hourOfDay = event.remindHour,
+            minuteOfHour = event.remindMinute,
             notBefore = System.currentTimeMillis(),
         )
         if (at == null) {
