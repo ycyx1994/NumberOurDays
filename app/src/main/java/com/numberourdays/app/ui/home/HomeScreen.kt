@@ -232,10 +232,12 @@ private fun dayCountAnnotated(label: String): AnnotatedString {
         color = Accent,
         fontWeight = FontWeight.Bold,
         fontFamily = NodDisplayCount.fontFamily,
+        fontSize = NodDisplayCount.fontSize * 18f / 17f,
     )
     val plainStyle = SpanStyle(
         color = N700,
         fontWeight = FontWeight.Normal,
+        fontSize = NodDisplayCount.fontSize * 16f / 17f,
     )
     return buildAnnotatedString {
         if (match == null) {
