@@ -2,8 +2,10 @@ package com.numberourdays.app.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -91,7 +93,7 @@ import com.numberourdays.app.ui.theme.HeroCardPadH
 import com.numberourdays.app.ui.theme.HeroCardPadV
 import com.numberourdays.app.ui.theme.HeroPageMarginH
 import com.numberourdays.app.ui.theme.HeroPageMarginTop
-import kotlin.math.roundToInt
+import kotlin.math.absoluteValue
 
 @Composable
 fun HomeScreen(
@@ -291,6 +293,7 @@ private fun CarouselCard(
     if (slides.isEmpty()) return
     HorizontalPager(
         state = pagerState,
+        pageSpacing = 0.dp,
         modifier = Modifier.fillMaxWidth(),
     ) { page ->
         val item = slides[page]
@@ -300,11 +303,18 @@ private fun CarouselCard(
             item.kind == EventKind.ELAPSED -> "已过"
             else -> "今天"
         }
+        // Flatten corners while the page is between slots so adjacent
+        // rounded cards do not open a paper-colored gap mid-swipe.
+        val pageOffset = (
+            (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+        ).absoluteValue.coerceIn(0f, 1f)
+        // Follow the finger 1:1 — no extra animation lag mid-swipe.
+        val cardShape = RoundedCornerShape((12f * (1f - pageOffset)).dp)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .defaultMinSize(minHeight = HeroCardMinHeight)
-                .clip(NodCardShape)
+                .clip(cardShape)
                 .background(N50)
                 .clickable { onClick(item.id) }
                 .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
@@ -349,23 +359,30 @@ private fun CarouselCard(
 @Composable
 private fun Dots(count: Int, selected: Int) {
     if (count <= 1) {
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         return
     }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(16.dp),
+            .padding(top = 14.dp, bottom = 4.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(count) { i ->
+            val active = i == selected
+            val width by animateDpAsState(
+                targetValue = if (active) 18.dp else 6.dp,
+                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                label = "dotW",
+            )
             Box(
                 modifier = Modifier
                     .padding(horizontal = 3.dp)
-                    .size(7.dp)
-                    .clip(CircleShape)
-                    .background(if (i == selected) N700 else N300)
+                    .height(6.dp)
+                    .width(width)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(if (active) N700 else N300)
             )
         }
     }
