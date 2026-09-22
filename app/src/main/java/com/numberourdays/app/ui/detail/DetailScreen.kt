@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -59,7 +60,7 @@ import com.numberourdays.app.ui.theme.N900
 import com.numberourdays.app.ui.theme.NodButtonShape
 import com.numberourdays.app.ui.theme.NodCardShape
 import com.numberourdays.app.ui.theme.NodDisplayNumber
-import com.numberourdays.app.ui.theme.HeroCardHeight
+import com.numberourdays.app.ui.theme.HeroCardMinHeight
 import com.numberourdays.app.ui.theme.HeroCardPadH
 import com.numberourdays.app.ui.theme.HeroCardPadV
 import com.numberourdays.app.ui.theme.HeroPageMarginH
@@ -119,7 +120,7 @@ fun DetailScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(HeroCardHeight)
+                    .defaultMinSize(minHeight = HeroCardMinHeight)
                     .background(N50, NodCardShape)
                     .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
                 horizontalAlignment = Alignment.CenterHorizontally,

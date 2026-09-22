@@ -30,7 +30,8 @@ val HeroPageMarginH = 12.dp
 val HeroPageMarginTop = 8.dp
 val HeroCardPadH = 16.dp
 val HeroCardPadV = 10.dp
-val HeroCardHeight = 164.dp
+/** Content-sized hero with a floor so short cards do not collapse. */
+val HeroCardMinHeight = 132.dp
 
 val N0 = Color(0xFFFAF7F2)
 val N50 = Color(0xFFF3EEE6)

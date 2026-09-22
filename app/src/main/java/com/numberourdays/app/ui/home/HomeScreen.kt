@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -85,7 +86,7 @@ import com.numberourdays.app.ui.theme.NodCardShape
 import com.numberourdays.app.ui.theme.NodDisplayCount
 import com.numberourdays.app.ui.theme.NodDisplayNumber
 import com.numberourdays.app.ui.theme.NodFabShape
-import com.numberourdays.app.ui.theme.HeroCardHeight
+import com.numberourdays.app.ui.theme.HeroCardMinHeight
 import com.numberourdays.app.ui.theme.HeroCardPadH
 import com.numberourdays.app.ui.theme.HeroCardPadV
 import com.numberourdays.app.ui.theme.HeroPageMarginH
@@ -287,9 +288,7 @@ private fun CarouselCard(
     if (slides.isEmpty()) return
     HorizontalPager(
         state = pagerState,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(HeroCardHeight),
+        modifier = Modifier.fillMaxWidth(),
     ) { page ->
         val item = slides[page]
         val tag = when {
@@ -300,7 +299,8 @@ private fun CarouselCard(
         }
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = HeroCardMinHeight)
                 .clip(NodCardShape)
                 .background(N50)
                 .clickable { onClick(item.id) }
