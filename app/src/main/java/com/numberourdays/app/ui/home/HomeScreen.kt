@@ -240,8 +240,8 @@ private fun dayCountAnnotated(label: String): AnnotatedString {
     )
     return buildAnnotatedString {
         if (match == null) {
-            // e.g. "今天" — same weight/color as the non-digit parts of "还有 X 天"
-            withStyle(plainStyle) {
+            // e.g. "今天" — theme accent, same weight as non-digit parts of other labels
+            withStyle(plainStyle.copy(color = Accent)) {
                 append(label)
             }
         } else {
