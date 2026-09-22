@@ -8,6 +8,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -134,24 +135,21 @@ fun SettingsScreen(onBack: () -> Unit) {
             Text(stringResource(R.string.backup_desc), color = N500, fontSize = 12.sp)
             Spacer(Modifier.height(4.dp))
 
-            // One primary per section; others are quiet rows.
-            ActionRow(
-                label = stringResource(R.string.export_file),
-                emphasize = true,
-                onClick = {
+            ActionPair(
+                aLabel = stringResource(R.string.export_file),
+                aPrimary = true,
+                onA = {
                     if (events.isEmpty()) {
                         Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
-                        return@ActionRow
+                        return@ActionPair
                     }
                     exportFileLauncher.launch(BackupTransfer.defaultBackupFileName())
                 },
-            )
-            ActionRow(
-                label = stringResource(R.string.export_clip),
-                onClick = {
+                bLabel = stringResource(R.string.export_clip),
+                onB = {
                     if (events.isEmpty()) {
                         Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
-                        return@ActionRow
+                        return@ActionPair
                     }
                     val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     cm.setPrimaryClip(ClipData.newPlainText("NumberOurDays", repo.serialize(events)))
@@ -162,19 +160,17 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             Spacer(Modifier.height(16.dp))
             SectionLabel(stringResource(R.string.import_section))
-            ActionRow(
-                label = stringResource(R.string.import_from_file),
-                emphasize = true,
-                onClick = {
+            ActionPair(
+                aLabel = stringResource(R.string.import_from_file),
+                aPrimary = true,
+                onA = {
                     importFileLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
                 },
-            )
-            ActionRow(
-                label = stringResource(
+                bLabel = stringResource(
                     if (pasteAdvanced) R.string.import_advanced_collapse
                     else R.string.import_advanced_expand
                 ),
-                onClick = { pasteAdvanced = !pasteAdvanced },
+                onB = { pasteAdvanced = !pasteAdvanced },
             )
 
             if (pasteAdvanced) {
@@ -211,13 +207,13 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             Spacer(Modifier.height(16.dp))
             SectionLabel(stringResource(R.string.danger_section))
-            ActionRow(
-                label = stringResource(R.string.test_notification),
-                onClick = {
+            ActionPair(
+                aLabel = stringResource(R.string.test_notification),
+                onA = {
                     val sample = events.firstOrNull()
                     if (sample == null) {
                         Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@ActionRow
+                        return@ActionPair
                     }
                     NotificationHelper.showReminder(
                         context = context,
@@ -227,11 +223,9 @@ fun SettingsScreen(onBack: () -> Unit) {
                     )
                     message = context.getString(R.string.test_notification)
                 },
-            )
-            ActionRow(
-                label = stringResource(R.string.clear_data),
-                danger = true,
-                onClick = { confirmClear = true },
+                bLabel = stringResource(R.string.clear_data),
+                bDanger = true,
+                onB = { confirmClear = true },
             )
 
             message?.let {
@@ -343,47 +337,51 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun ActionRow(
+private fun ActionButton(
     label: String,
-    emphasize: Boolean = false,
+    primary: Boolean = false,
     danger: Boolean = false,
     onClick: () -> Unit,
 ) {
-    if (emphasize) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(N50)
-                .clickable(onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = label,
-                color = Accent,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.weight(1f),
-            )
-        }
-    } else {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(horizontal = 4.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = label,
-                color = if (danger) ErrorRed else N700,
-                fontSize = 14.sp,
-                modifier = Modifier.weight(1f),
-            )
-        }
-        HorizontalDivider(color = N100, thickness = 1.dp)
+    val bg = when {
+        primary -> Accent
+        danger -> ErrorRed
+        else -> N50
+    }
+    val fg = if (primary || danger) N0 else N700
+    Row(
+        modifier = Modifier
+            .weight(1f)
+            .height(44.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(bg)
+            .clickable(onClick = onClick),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, color = fg, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+    }
+}
+
+@Composable
+private fun ActionPair(
+    aLabel: String,
+    aPrimary: Boolean = false,
+    aDanger: Boolean = false,
+    onA: () -> Unit,
+    bLabel: String,
+    bPrimary: Boolean = false,
+    bDanger: Boolean = false,
+    onB: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        ActionButton(aLabel, aPrimary, aDanger, onA)
+        ActionButton(bLabel, bPrimary, bDanger, onB)
     }
 }
 
