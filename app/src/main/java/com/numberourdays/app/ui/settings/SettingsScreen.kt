@@ -339,6 +339,7 @@ private fun SectionLabel(text: String) {
 @Composable
 private fun ActionButton(
     label: String,
+    modifier: Modifier = Modifier,
     primary: Boolean = false,
     danger: Boolean = false,
     onClick: () -> Unit,
@@ -350,8 +351,7 @@ private fun ActionButton(
     }
     val fg = if (primary || danger) N0 else N700
     Row(
-        modifier = Modifier
-            .weight(1f)
+        modifier = modifier
             .height(44.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(bg)
@@ -380,8 +380,8 @@ private fun ActionPair(
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        ActionButton(aLabel, aPrimary, aDanger, onA)
-        ActionButton(bLabel, bPrimary, bDanger, onB)
+        ActionButton(aLabel, Modifier.weight(1f), aPrimary, aDanger, onA)
+        ActionButton(bLabel, Modifier.weight(1f), bPrimary, bDanger, onB)
     }
 }
 
