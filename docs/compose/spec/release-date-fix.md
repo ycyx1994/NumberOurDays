@@ -1,14 +1,31 @@
 ---
 feature: release-date-fix
-status: in-progress
+status: delivered
 updated: 2026-09-22
 branch: feature/release-date-fix
-commits: 751e3c9..<TBD>
+commits: 751e3c9..c2764f3
 ---
 
 # Release Hardening + Month-End Date Fix
 
 ## Report
+
+## Report
+
+**What was built** — (1) `resolveNextDate` 从锚点日稳定步进月/年，1/31 每月序列为 2/28 → 3/31，不再漂到 3/28；2/29 年规则平年 2/28、闰年 2/29。(2) 本地自签 Release：RSA keystore（gitignore）+ `keystore.properties` + minify/shrink，`assembleRelease` 产出已签名 `app-release.apk` 1.1.0 (versionCode 2)。
+
+**Verification** —
+- `testDebugUnitTest` — PASS — 23 tests, 0 failures (Backup 6 + Drag 5 + Reminder 5 + ResolveNextDate 7)
+- `assembleDebug` / `assembleRelease` — PASS
+- `apksigner verify` — PASS (CN=NumberOurDays)
+- adb install release to nezha — PASS (11:03:44) after USB-install enabled
+
+**Journey log** —
+- 月/年重复必须从 anchor 的 dayOfMonth 一次性推算目标年月，禁止 `plusMonths` 迭代累加。
+- 测试期望须符合「on/after ref」语义：ref 等于锚点日时返回当天。
+- keystore/properties 必须 gitignore；example 可入库。
+- 小米机 `INSTALL_FAILED_USER_RESTRICTED` 需打开「USB 安装」，与 debug/release 无关。
+
 
 ## [S1] Problem
 
@@ -52,8 +69,8 @@ commits: 751e3c9..<TBD>
 
 ## Tasks
 
-- [ ] T1: `resolveNextDate` 稳定月/年步进 + 回归测试 — acceptance: 1/31 月序列为 …2/28, 3/31；2/29 年规则正确；既有单测仍绿 (covers: S2.1)
-- [ ] T2: 生成 keystore + properties 模板 + gitignore — acceptance: keystore 在 app/ 且被忽略；example 无真实密码 (covers: S2.2)
-- [ ] T3: release signingConfig + minify + proguard + 版本号 — acceptance: `assembleRelease` 产出已签名 APK (covers: S2.2; depends: T2)
-- [ ] T4: 全量单测 + debug/release 构建 — acceptance: `testDebugUnitTest` 通过；debug/release 均 assemble 成功 (covers: S2; depends: T1–T3)
-- [ ] T5: （可选）release 包安装冒烟 — acceptance: release APK 可安装启动 (covers: S2.2; depends: T3)
+- [x] T1: `resolveNextDate` 稳定月/年步进 + 回归测试 — acceptance: 1/31 月序列为 …2/28, 3/31；2/29 年规则正确；既有单测仍绿 (covers: S2.1)
+- [x] T2: 生成 keystore + properties 模板 + gitignore — acceptance: keystore 在 app/ 且被忽略；example 无真实密码 (covers: S2.2)
+- [x] T3: release signingConfig + minify + proguard + 版本号 — acceptance: `assembleRelease` 产出已签名 APK (covers: S2.2; depends: T2)
+- [x] T4: 全量单测 + debug/release 构建 — acceptance: `testDebugUnitTest` 通过；debug/release 均 assemble 成功 (covers: S2; depends: T1–T3)
+- [x] T5: （可选）release 包安装冒烟 — acceptance: release APK 可安装启动 (covers: S2.2; depends: T3)
