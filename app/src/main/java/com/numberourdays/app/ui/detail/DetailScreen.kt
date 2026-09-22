@@ -59,6 +59,11 @@ import com.numberourdays.app.ui.theme.N900
 import com.numberourdays.app.ui.theme.NodButtonShape
 import com.numberourdays.app.ui.theme.NodCardShape
 import com.numberourdays.app.ui.theme.NodDisplayNumber
+import com.numberourdays.app.ui.theme.HeroCardHeight
+import com.numberourdays.app.ui.theme.HeroCardPadH
+import com.numberourdays.app.ui.theme.HeroCardPadV
+import com.numberourdays.app.ui.theme.HeroPageMarginH
+import com.numberourdays.app.ui.theme.HeroPageMarginTop
 
 @Composable
 fun DetailScreen(
@@ -109,14 +114,16 @@ fun DetailScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = HeroPageMarginH, vertical = HeroPageMarginTop),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(HeroCardHeight)
                     .background(N50, NodCardShape)
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                    .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
             ) {
                 Text(tag, color = N500, fontSize = 11.sp, textAlign = TextAlign.Center)
                 Text(

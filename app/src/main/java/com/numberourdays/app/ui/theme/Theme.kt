@@ -25,6 +25,13 @@ val NodCardShape = RoundedCornerShape(12.dp)
 /** FAB locked shape (do not rely on ROM defaults) */
 val NodFabShape = RoundedCornerShape(16.dp)
 
+/** Shared hero-card chrome so home ↔ detail stays seamless. */
+val HeroPageMarginH = 12.dp
+val HeroPageMarginTop = 8.dp
+val HeroCardPadH = 16.dp
+val HeroCardPadV = 10.dp
+val HeroCardHeight = 164.dp
+
 val N0 = Color(0xFFFAF7F2)
 val N50 = Color(0xFFF3EEE6)
 val N100 = Color(0xFFE8E1D6)

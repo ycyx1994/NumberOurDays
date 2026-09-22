@@ -85,6 +85,11 @@ import com.numberourdays.app.ui.theme.NodCardShape
 import com.numberourdays.app.ui.theme.NodDisplayCount
 import com.numberourdays.app.ui.theme.NodDisplayNumber
 import com.numberourdays.app.ui.theme.NodFabShape
+import com.numberourdays.app.ui.theme.HeroCardHeight
+import com.numberourdays.app.ui.theme.HeroCardPadH
+import com.numberourdays.app.ui.theme.HeroCardPadV
+import com.numberourdays.app.ui.theme.HeroPageMarginH
+import com.numberourdays.app.ui.theme.HeroPageMarginTop
 import kotlin.math.roundToInt
 
 @Composable
@@ -175,7 +180,12 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 96.dp),
+            contentPadding = PaddingValues(
+                start = HeroPageMarginH,
+                end = HeroPageMarginH,
+                top = HeroPageMarginTop,
+                bottom = 96.dp,
+            ),
         ) {
             item(key = "carousel") {
                 val pagerState = rememberPagerState(pageCount = { slides.size.coerceAtLeast(1) })
@@ -279,7 +289,7 @@ private fun CarouselCard(
         state = pagerState,
         modifier = Modifier
             .fillMaxWidth()
-            .height(164.dp),
+            .height(HeroCardHeight),
     ) { page ->
         val item = slides[page]
         val tag = when {
@@ -294,20 +304,20 @@ private fun CarouselCard(
                 .clip(NodCardShape)
                 .background(N50)
                 .clickable { onClick(item.id) }
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
         ) {
             Text(
                 text = stringResource(R.string.next_prefix, tag),
                 color = N500,
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 textAlign = TextAlign.Center,
             )
             Text(
                 text = item.title,
                 color = N900,
-                fontSize = 16.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
