@@ -90,4 +90,37 @@ class ResolveNextDateTest {
             DateCalculator.resolveNextDate("2026-09-26", RepeatUnit.NONE, 1, LocalDate.of(2026, 10, 1)),
         )
     }
+
+    @Test
+    fun mar31_every2Months_keepsDayWhenPossible() {
+        val a = LocalDate.of(2026, 3, 31)
+        assertEquals(LocalDate.of(2026, 5, 31), DateCalculator.plusMonthsFromAnchor(a, 2))
+        assertEquals(LocalDate.of(2026, 7, 31), DateCalculator.plusMonthsFromAnchor(a, 4))
+        assertEquals(LocalDate.of(2026, 9, 30), DateCalculator.plusMonthsFromAnchor(a, 6))
+        assertEquals(LocalDate.of(2026, 11, 30), DateCalculator.plusMonthsFromAnchor(a, 8))
+    }
+
+    @Test
+    fun mar31_every2Months_resolveNext() {
+        val anchor = "2026-03-31"
+        assertEquals(
+            LocalDate.of(2026, 5, 31),
+            DateCalculator.resolveNextDate(anchor, RepeatUnit.MONTH, 2, LocalDate.of(2026, 4, 1)),
+        )
+        assertEquals(
+            LocalDate.of(2026, 7, 31),
+            DateCalculator.resolveNextDate(anchor, RepeatUnit.MONTH, 2, LocalDate.of(2026, 6, 1)),
+        )
+        assertEquals(
+            LocalDate.of(2026, 9, 30),
+            DateCalculator.resolveNextDate(anchor, RepeatUnit.MONTH, 2, LocalDate.of(2026, 8, 1)),
+        )
+    }
+
+    @Test
+    fun interval3_fromDec31() {
+        val a = LocalDate.of(2026, 12, 31)
+        assertEquals(LocalDate.of(2027, 3, 31), DateCalculator.plusMonthsFromAnchor(a, 3))
+        assertEquals(LocalDate.of(2027, 6, 30), DateCalculator.plusMonthsFromAnchor(a, 6))
+    }
 }
