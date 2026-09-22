@@ -22,11 +22,11 @@ import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -252,37 +252,35 @@ fun DetailScreen(
                 }
             }
 
-            // Left-side floating actions: edit / star
+            // Right-side floating actions (same FAB size as home), stacked
             Column(
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(start = 16.dp, bottom = 24.dp),
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                SmallFloatingActionButton(
+                FloatingActionButton(
                     onClick = { onEdit(event.id) },
                     containerColor = N50,
                     contentColor = N700,
                     shape = NodFabShape,
-                    content = {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = stringResource(R.string.edit),
-                        )
-                    },
-                )
-                SmallFloatingActionButton(
+                ) {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = stringResource(R.string.edit),
+                    )
+                }
+                FloatingActionButton(
                     onClick = { repo.toggleStar(event.id) },
                     containerColor = if (d.starred) Accent else N50,
                     contentColor = if (d.starred) N0 else N300,
                     shape = NodFabShape,
-                    content = {
-                        Icon(
-                            imageVector = if (d.starred) Icons.Rounded.Star else Icons.Outlined.StarOutline,
-                            contentDescription = stringResource(if (d.starred) R.string.unstar else R.string.star),
-                        )
-                    },
-                )
+                ) {
+                    Icon(
+                        imageVector = if (d.starred) Icons.Rounded.Star else Icons.Outlined.StarOutline,
+                        contentDescription = stringResource(if (d.starred) R.string.unstar else R.string.star),
+                    )
+                }
             }
         }
     }
