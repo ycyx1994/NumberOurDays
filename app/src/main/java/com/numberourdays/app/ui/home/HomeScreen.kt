@@ -11,7 +11,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +33,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.rounded.Star
@@ -63,6 +62,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -239,9 +239,16 @@ private fun dayCountAnnotated(label: String): AnnotatedString {
         fontWeight = FontWeight.Normal,
         fontSize = NodDisplayCount.fontSize * 16f / 17f,
     )
+    // System CJK bold so "今天" actually thickens (Barlow has no Han glyphs).
+    val todayStyle = SpanStyle(
+        color = Accent,
+        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily.Default,
+        fontSize = NodDisplayCount.fontSize * 16f / 17f,
+    )
     return buildAnnotatedString {
         if (match == null) {
-            withStyle(digitStyle) {
+            withStyle(todayStyle) {
                 append(label)
             }
         } else {
@@ -457,6 +464,23 @@ private fun EventRow(
             }
             .background(color = liftSurface, shape = dragShape)
             .border(1.dp, liftBorder, dragShape)
+            .then(
+                if (dragEnabled) {
+                    Modifier.pointerInput(item.id) {
+                        detectDragGesturesAfterLongPress(
+                            onDragStart = { onDragStart() },
+                            onDragEnd = { onDragEnd() },
+                            onDragCancel = { onDragEnd() },
+                            onDrag = { change, amount ->
+                                change.consume()
+                                onDrag(amount.y)
+                            },
+                        )
+                    }
+                } else {
+                    Modifier
+                }
+            )
             .clickable(onClick = onOpen)
             .padding(horizontal = liftPad, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -500,40 +524,5 @@ private fun EventRow(
             text = dayCountAnnotated(item.label),
             style = NodDisplayCount,
         )
-        if (dragEnabled) {
-            // Dedicated handle: drag starts immediately (no long-press), outside IconButton
-            // so click/ripple handling cannot steal the drag gesture.
-            Box(
-                modifier = Modifier
-                    .padding(start = 4.dp)
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(
-                        color = if (dragging) Accent.copy(alpha = 0.12f) else N50,
-                        shape = RoundedCornerShape(10.dp),
-                    )
-                    .pointerInput(item.id) {
-                        detectDragGestures(
-                            onDragStart = { onDragStart() },
-                            onDragEnd = { onDragEnd() },
-                            onDragCancel = { onDragEnd() },
-                            onDrag = { change, amount ->
-                                change.consume()
-                                onDrag(amount.y)
-                            },
-                        )
-                    },
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.DragHandle,
-                    contentDescription = stringResource(R.string.reorder_star),
-                    tint = if (dragging) Accent else N300,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
-        } else {
-            Spacer(Modifier.width(36.dp))
-        }
     }
 }
