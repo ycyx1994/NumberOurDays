@@ -2,49 +2,59 @@ package com.numberourdays.app.data
 
 import android.content.Context
 import android.widget.Toast
+import com.numberourdays.app.data.db.NodDatabase
+import com.numberourdays.app.data.db.toDomain
+import com.numberourdays.app.data.db.toEntity
 import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.notify.ReminderScheduler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.LocalDate
 import java.util.UUID
 
+/**
+ * Room-backed store. Public API stays synchronous-looking for UI:
+ * mutations enqueue IO work and [events] reflects the latest DB state.
+ */
 class EventRepository(private val context: Context) {
     private val prefs = context.getSharedPreferences(KEY_FILE, Context.MODE_PRIVATE)
+    private val dao = NodDatabase.get(context).dayEventDao()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private val _events = MutableStateFlow(loadFromPrefs())
+    private val _events = MutableStateFlow<List<DayEvent>>(emptyList())
     val events: StateFlow<List<DayEvent>> = _events.asStateFlow()
 
-    private fun loadFromPrefs(): List<DayEvent> {
-        val raw = prefs.getString(KEY_EVENTS, null) ?: return emptyList()
-        return try {
-            val arr = JSONArray(raw)
-            (0 until arr.length()).mapNotNull { migrate(arr.optJSONObject(it)) }
-        } catch (_: Exception) {
-            emptyList()
+    init {
+        scope.launch {
+            migrateFromPrefsIfNeeded()
+            ensureDemoIfEmpty()
+            dao.observeAll().collect { rows ->
+                _events.value = rows.map { it.toDomain() }
+            }
         }
     }
 
     fun loadEvents(): List<DayEvent> = _events.value
 
-    private fun persist(events: List<DayEvent>): Boolean {
-        return try {
-            val arr = JSONArray()
-            events.forEach { arr.put(toJson(it)) }
-            prefs.edit().putString(KEY_EVENTS, arr.toString()).apply()
-            _events.value = events
-            true
-        } catch (e: Exception) {
-            Toast.makeText(context, "保存失败", Toast.LENGTH_SHORT).show()
-            false
+    private suspend fun migrateFromPrefsIfNeeded() {
+        val raw = prefs.getString(KEY_EVENTS, null) ?: return
+        val migrated = try {
+            val arr = JSONArray(raw)
+            (0 until arr.length()).mapNotNull { migrate(arr.optJSONObject(it)) }
+        } catch (_: Exception) {
+            emptyList()
         }
-    }
-
-    private fun syncReminders(events: List<DayEvent>) {
-        events.forEach { ReminderScheduler.schedule(context, it) }
+        if (migrated.isEmpty()) return
+        if (dao.count() > 0) return
+        dao.upsertAll(migrated.map { it.toEntity() })
+        // Keep a copy in prefs as last-resort backup; Room is now source of truth.
     }
 
     private fun migrate(obj: JSONObject?): DayEvent? = DayEventCodec.migrate(obj)
@@ -54,36 +64,41 @@ class EventRepository(private val context: Context) {
     fun getEvent(id: String): DayEvent? = _events.value.find { it.id == id }
 
     fun upsert(event: DayEvent) {
-        val list = _events.value.toMutableList()
-        val idx = list.indexOfFirst { it.id == event.id }
-        if (idx >= 0) list[idx] = event else list.add(0, event)
-        if (persist(list)) ReminderScheduler.schedule(context, event)
+        scope.launch {
+            dao.upsert(event.toEntity())
+            ReminderScheduler.schedule(context, event)
+        }
     }
 
     fun remove(id: String) {
-        val next = _events.value.filterNot { it.id == id }
-        if (persist(next)) ReminderScheduler.cancel(context, id)
+        scope.launch {
+            dao.deleteById(id)
+            ReminderScheduler.cancel(context, id)
+        }
     }
 
     fun clearAll() {
         val ids = _events.value.map { it.id }
-        if (persist(emptyList())) {
+        scope.launch {
+            dao.clearAll()
             ids.forEach { ReminderScheduler.cancel(context, it) }
         }
     }
 
     fun toggleStar(id: String) {
-        val list = _events.value.toMutableList()
-        val idx = list.indexOfFirst { it.id == id }
-        if (idx < 0) return
-        val item = list[idx]
-        list[idx] = if (item.starred) {
-            item.copy(starred = false, starRank = null, updatedAt = System.currentTimeMillis())
+        val current = getEvent(id) ?: return
+        val list = _events.value
+        val updated = if (current.starred) {
+            current.copy(starred = false, starRank = null, updatedAt = System.currentTimeMillis())
         } else {
             val maxRank = list.filter { it.starred }.maxOfOrNull { it.starRank ?: 0 } ?: 0
-            item.copy(starred = true, starRank = maxRank + 1, updatedAt = System.currentTimeMillis())
+            current.copy(
+                starred = true,
+                starRank = maxRank + 1,
+                updatedAt = System.currentTimeMillis(),
+            )
         }
-        if (persist(list)) ReminderScheduler.schedule(context, list[idx])
+        upsert(updated)
     }
 
     fun reorderStars(orderedIds: List<String>) {
@@ -98,16 +113,18 @@ class EventRepository(private val context: Context) {
                 )
             }
         }
-        persist(list)
+        saveAll(list)
     }
 
     fun saveAll(events: List<DayEvent>) {
         val previousIds = _events.value.map { it.id }.toSet()
-        if (persist(events)) {
-            syncReminders(events)
-            val liveIds = events.map { it.id }.toSet()
+        scope.launch {
+            dao.clearAll()
+            dao.upsertAll(events.map { it.toEntity() })
+            events.forEach { ReminderScheduler.schedule(context, it) }
+            val live = events.map { it.id }.toSet()
             previousIds.forEach { oldId ->
-                if (oldId !in liveIds) ReminderScheduler.cancel(context, oldId)
+                if (oldId !in live) ReminderScheduler.cancel(context, oldId)
             }
         }
     }
@@ -122,12 +139,13 @@ class EventRepository(private val context: Context) {
     fun createId(): String =
         "e_${System.currentTimeMillis().toString(36)}_${UUID.randomUUID().toString().take(6)}"
 
-    fun ensureDemoIfEmpty(): Boolean {
-        if (_events.value.isNotEmpty()) return false
-        if (prefs.getBoolean(KEY_DEMO, false)) return false
-        saveAll(createDemoEvents())
-        prefs.edit().putBoolean(KEY_DEMO, true).apply()
-        return true
+    fun ensureDemoIfEmpty() {
+        scope.launch {
+            if (dao.count() > 0) return@launch
+            if (prefs.getBoolean(KEY_DEMO, false)) return@launch
+            dao.upsertAll(createDemoEvents().map { it.toEntity() })
+            prefs.edit().putBoolean(KEY_DEMO, true).apply()
+        }
     }
 
     private fun createDemoEvents(): List<DayEvent> {

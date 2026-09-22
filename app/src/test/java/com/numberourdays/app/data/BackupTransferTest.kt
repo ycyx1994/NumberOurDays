@@ -121,4 +121,35 @@ class BackupTransferTest {
         assertNotNull(merged.find { it.id == "local" })
         assertNotNull(merged.find { it.id == "incoming" })
     }
+
+    @Test
+    fun merge_sameNaturalKey_differentId_doesNotDuplicate() {
+        val local = listOf(
+            sampleEvent(id = "demo-weekend", title = "周末", date = "2026-09-26", updatedAt = 10L),
+        )
+        val incoming = listOf(
+            sampleEvent(
+                id = "backup-weekend",
+                title = "周末",
+                date = "2026-09-26",
+                updatedAt = 20L,
+                note = "来自备份",
+            ),
+        )
+        val merged = DayEventCodec.merge(local, incoming)
+        assertEquals(1, merged.size)
+        assertEquals("demo-weekend", merged[0].id)
+        assertEquals("来自备份", merged[0].note)
+        assertEquals(20L, merged[0].updatedAt)
+    }
+
+    @Test
+    fun merge_importTwice_staysSameSize() {
+        val local = listOf(sampleEvent(id = "a", title = "在一起", updatedAt = 5L))
+        val backup = listOf(sampleEvent(id = "b", title = "在一起", updatedAt = 5L))
+        val once = DayEventCodec.merge(local, backup)
+        val twice = DayEventCodec.merge(once, backup)
+        assertEquals(1, once.size)
+        assertEquals(1, twice.size)
+    }
 }

@@ -108,12 +108,40 @@ object DayEventCodec {
         }
     }
 
+    /**
+     * Merge by id, then by natural key (title+date+repeat) so re-importing a
+     * backup or overlapping demo rows does not create duplicate cards.
+     * When only the natural key matches, the winning row keeps the local id.
+     */
     fun merge(local: List<DayEvent>, incoming: List<DayEvent>): List<DayEvent> {
+        fun naturalKey(e: DayEvent): String = listOf(
+            e.title.trim(),
+            e.date,
+            e.repeatUnit.name,
+            e.repeatInterval.toString(),
+        ).joinToString("|")
+
         val map = LinkedHashMap<String, DayEvent>()
-        local.forEach { map[it.id] = it }
+        val keyToId = HashMap<String, String>()
+        local.forEach { l ->
+            map[l.id] = l
+            keyToId.putIfAbsent(naturalKey(l), l.id)
+        }
         incoming.forEach { r ->
-            val l = map[r.id]
-            if (l == null || r.updatedAt >= l.updatedAt) map[r.id] = r
+            val l = map[r.id] ?: keyToId[naturalKey(r)]?.let { map[it] }
+            when {
+                l == null -> {
+                    map[r.id] = r
+                    keyToId[naturalKey(r)] = r.id
+                }
+                r.updatedAt >= l.updatedAt -> {
+                    map[l.id] = r.copy(id = l.id)
+                    keyToId[naturalKey(l)] = l.id
+                }
+                else -> {
+                    keyToId[naturalKey(l)] = l.id
+                }
+            }
         }
         return map.values.toList()
     }
