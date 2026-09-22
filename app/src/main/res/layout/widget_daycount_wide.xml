@@ -47,6 +47,7 @@
         android:id="@+id/widget_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/barlow_condensed_bold"
         android:textColor="@color/accent"
         android:textSize="56sp"
         android:textStyle="bold"
