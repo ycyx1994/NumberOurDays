@@ -58,20 +58,6 @@ import com.numberourdays.app.ui.theme.N500
 import com.numberourdays.app.ui.theme.N700
 import com.numberourdays.app.ui.theme.N900
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
