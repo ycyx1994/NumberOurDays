@@ -291,67 +291,66 @@ private fun CarouselCard(
     onClick: (String) -> Unit,
 ) {
     if (slides.isEmpty()) return
-    HorizontalPager(
-        state = pagerState,
-        pageSpacing = 0.dp,
-        modifier = Modifier.fillMaxWidth(),
-    ) { page ->
-        val item = slides[page]
-        val tag = when {
-            item.repeatLabel != null && item.kind == EventKind.REPEAT -> item.repeatLabel
-            item.kind == EventKind.COUNTDOWN -> "倒数"
-            item.kind == EventKind.ELAPSED -> "已过"
-            else -> "今天"
-        }
-        // Flatten corners while the page is between slots so adjacent
-        // rounded cards do not open a paper-colored gap mid-swipe.
-        val pageOffset = (
-            (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
-        ).absoluteValue.coerceIn(0f, 1f)
-        // Follow the finger 1:1 — no extra animation lag mid-swipe.
-        val cardShape = RoundedCornerShape((12f * (1f - pageOffset)).dp)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = HeroCardMinHeight)
-                .clip(cardShape)
-                .background(N50)
-                .clickable { onClick(item.id) }
-                .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
-        ) {
-            Text(
-                text = stringResource(R.string.next_prefix, tag),
-                color = N500,
-                fontSize = 11.sp,
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                text = item.title,
-                color = N900,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            DayCountHero(
-                value = item.days.toString(),
-                suffix = stringResource(R.string.unit_day),
-                suffixBottomPadding = 6,
-                suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
-            )
-            // Date only — kind/repeat already in the tag line
-            Text(
-                text = item.date,
-                color = N500,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+    // Single rounded surface for the whole pager — pages themselves are
+    // unclipped so swiping never opens a paper gap between corners.
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(NodCardShape)
+            .background(N50),
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            pageSpacing = 0.dp,
+            modifier = Modifier.fillMaxWidth(),
+        ) { page ->
+            val item = slides[page]
+            val tag = when {
+                item.repeatLabel != null && item.kind == EventKind.REPEAT -> item.repeatLabel
+                item.kind == EventKind.COUNTDOWN -> "倒数"
+                item.kind == EventKind.ELAPSED -> "已过"
+                else -> "今天"
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = HeroCardMinHeight)
+                    .clickable { onClick(item.id) }
+                    .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top,
+            ) {
+                Text(
+                    text = stringResource(R.string.next_prefix, tag),
+                    color = N500,
+                    fontSize = 11.sp,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = item.title,
+                    color = N900,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                DayCountHero(
+                    value = item.days.toString(),
+                    suffix = stringResource(R.string.unit_day),
+                    suffixBottomPadding = 6,
+                    suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
+                )
+                Text(
+                    text = item.date,
+                    color = N500,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }
