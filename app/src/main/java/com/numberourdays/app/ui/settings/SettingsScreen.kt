@@ -21,7 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -53,7 +52,6 @@ import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.ErrorRed
 import com.numberourdays.app.ui.theme.N0
-import com.numberourdays.app.ui.theme.N100
 import com.numberourdays.app.ui.theme.N300
 import com.numberourdays.app.ui.theme.N50
 import com.numberourdays.app.ui.theme.N500
@@ -72,32 +70,6 @@ fun SettingsScreen(onBack: () -> Unit) {
     var pasteAdvanced by rememberSaveable { mutableStateOf(false) }
     var showDebug by rememberSaveable { mutableStateOf(false) }
     var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
-    var showDebug by rememberSaveable { mutableStateOf(false) }
-    var titleClicks by rememberSaveable { mutableStateOf(0) }
     var pendingFileImport by remember { mutableStateOf<List<DayEvent>?>(null) }
     var pendingFileImportNote by remember { mutableStateOf<String?>(null) }
     var showFileImportConfirm by remember { mutableStateOf(false) }
@@ -113,9 +85,8 @@ fun SettingsScreen(onBack: () -> Unit) {
         }
         val text = repo.serialize(snapshot)
         if (BackupTransfer.writeText(context, uri, text)) {
-            val msg = context.getString(R.string.exported_to_file, snapshot.size)
-            message = msg
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            message = context.getString(R.string.exported_to_file, snapshot.size)
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         } else {
             message = context.getString(R.string.export_failed)
         }
@@ -142,10 +113,24 @@ fun SettingsScreen(onBack: () -> Unit) {
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = { NodTopBar(title = stringResource(R.string.settings), onBack = onBack) },
+        topBar = {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        titleClicks++
+                        if (titleClicks >= 5) {
+                            showDebug = true
+                            titleClicks = 0
+                        }
+                    },
+            ) {
+                NodTopBar(stringResource(R.string.settings), onBack = onBack)
+            }
+        },
     ) { padding ->
         Column(
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
@@ -153,29 +138,23 @@ fun SettingsScreen(onBack: () -> Unit) {
         ) {
             SectionLabel(stringResource(R.string.data_section))
             Text(
-                text = stringResource(R.string.local_events_value, events.size),
+                stringResource(R.string.local_events_value, events.size),
                 color = N900,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 10.dp),
             )
-
             SectionLabel(stringResource(R.string.backup_section))
             Text(stringResource(R.string.backup_desc), color = N500, fontSize = 12.sp)
-            Spacer(Modifier.height(4.dp))
-
             ActionPair(
-                aLabel = stringResource(R.string.export_file),
-                aPrimary = true,
-                onA = {
+                stringResource(R.string.export_file), true, {
                     if (events.isEmpty()) {
                         Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
                         return@ActionPair
                     }
                     exportFileLauncher.launch(BackupTransfer.defaultBackupFileName())
                 },
-                bLabel = stringResource(R.string.export_clip),
-                onB = {
+                stringResource(R.string.export_clip), false, {
                     if (events.isEmpty()) {
                         Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
                         return@ActionPair
@@ -186,34 +165,23 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
                 },
             )
-
-            Spacer(Modifier.height(16.dp))
             SectionLabel(stringResource(R.string.import_section))
             ActionPair(
-                aLabel = stringResource(R.string.import_from_file),
-                aPrimary = true,
-                onA = {
+                stringResource(R.string.import_from_file), true, {
                     importFileLauncher.launch(arrayOf("application/json", "text/plain", "*/*"))
                 },
-                bLabel = stringResource(
-                    if (pasteAdvanced) R.string.import_advanced_collapse
-                    else R.string.import_advanced_expand
-                ),
-                onB = { pasteAdvanced = !pasteAdvanced },
+                stringResource(if (pasteAdvanced) R.string.import_advanced_collapse else R.string.import_advanced_expand),
+                false,
+                { pasteAdvanced = !pasteAdvanced },
             )
-
             if (pasteAdvanced) {
-                Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = importText,
-                    onValueChange = { importText = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
+                    importText, { importText = it },
+                    Modifier.fillMaxWidth().height(100.dp),
                     placeholder = {
                         Text(stringResource(R.string.paste_backup), color = N300, fontSize = 12.sp)
                     },
-                    shape = NodRowShape,
+                    shape = RoundedCornerShape(12.dp),
                     colors = fieldColors(),
                 )
                 Row(Modifier.padding(top = 8.dp)) {
@@ -233,8 +201,6 @@ fun SettingsScreen(onBack: () -> Unit) {
                     }
                 }
             }
-
-            Spacer(Modifier.height(16.dp))
             if (showDebug) {
                 SectionLabel("调试")
                 FullButton(stringResource(R.string.test_notification)) {
@@ -244,281 +210,27 @@ fun SettingsScreen(onBack: () -> Unit) {
                         return@FullButton
                     }
                     NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
+                        context, sample.id, sample.title,
+                        context.getString(R.string.test_notification_body),
                     )
                     message = context.getString(R.string.test_notification)
                 }
-                Spacer(Modifier.height(8.dp))
             }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            if (showDebug) {
-                SectionLabel("调试")
-                FullButton(stringResource(R.string.test_notification)) {
-                    val sample = events.firstOrNull()
-                    if (sample == null) {
-                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
-                        return@FullButton
-                    }
-                    NotificationHelper.showReminder(
-                        context = context,
-                        eventId = sample.id,
-                        title = sample.title,
-                        text = context.getString(R.string.test_notification_body),
-                    )
-                    message = context.getString(R.string.test_notification)
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
             SectionLabel(stringResource(R.string.danger_section))
             FullButton(stringResource(R.string.clear_data), danger = true) { confirmClear = true }
-
             message?.let {
                 Spacer(Modifier.height(12.dp))
                 Text(it, color = N500, fontSize = 12.sp)
             }
-
             Spacer(Modifier.height(36.dp))
             Text(
-                text = stringResource(R.string.footer),
+                stringResource(R.string.footer),
                 color = N300,
                 fontSize = 11.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(24.dp)
-            )
+            Spacer(Modifier.height(24.dp))
         }
     }
 
@@ -526,11 +238,7 @@ fun SettingsScreen(onBack: () -> Unit) {
         val incoming = pendingFileImport.orEmpty()
         val noteSuffix = pendingFileImportNote?.let { "，$it" } ?: ""
         AlertDialog(
-            onDismissRequest = {
-                showFileImportConfirm = false
-                pendingFileImport = null
-                pendingFileImportNote = null
-            },
+            { showFileImportConfirm = false; pendingFileImport = null; pendingFileImportNote = null },
             title = { Text(stringResource(R.string.import_file_title)) },
             text = { Text(stringResource(R.string.import_file_message, incoming.size, noteSuffix)) },
             confirmButton = {
@@ -560,10 +268,9 @@ fun SettingsScreen(onBack: () -> Unit) {
             },
         )
     }
-
     if (confirmReplace) {
         AlertDialog(
-            onDismissRequest = { confirmReplace = false },
+            { confirmReplace = false },
             title = { Text("覆盖本地数据") },
             text = { Text("将删除本地不在备份中的事件，确定继续？") },
             confirmButton = {
@@ -580,15 +287,12 @@ fun SettingsScreen(onBack: () -> Unit) {
                     confirmReplace = false
                 }) { Text("覆盖", color = ErrorRed) }
             },
-            dismissButton = {
-                TextButton(onClick = { confirmReplace = false }) { Text("取消") }
-            },
+            dismissButton = { TextButton(onClick = { confirmReplace = false }) { Text("取消") } },
         )
     }
-
     if (confirmClear) {
         AlertDialog(
-            onDismissRequest = { confirmClear = false },
+            { confirmClear = false },
             title = { Text("清空本地数据") },
             text = { Text("将删除全部纪念日，且不可恢复。建议先导出备份。") },
             confirmButton = {
@@ -598,14 +302,10 @@ fun SettingsScreen(onBack: () -> Unit) {
                     confirmClear = false
                 }) { Text("清空", color = ErrorRed) }
             },
-            dismissButton = {
-                TextButton(onClick = { confirmClear = false }) { Text("取消") }
-            },
+            dismissButton = { TextButton(onClick = { confirmClear = false }) { Text("取消") } },
         )
     }
 }
-
-private val NodRowShape = RoundedCornerShape(10.dp)
 
 @Composable
 private fun SectionLabel(text: String) {
@@ -617,403 +317,46 @@ private fun ActionButton(
     label: String,
     modifier: Modifier = Modifier,
     primary: Boolean = false,
-    danger: Boolean = false,
     onClick: () -> Unit,
 ) {
-    val bg = when {
-        primary -> Accent
-        danger -> ErrorRed
-        else -> N50
-    }
-    val fg = if (primary || danger) N0 else N700
     Row(
-        modifier = modifier
+        modifier
             .height(44.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(bg)
+            .background(if (primary) Accent else N50)
             .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
+        Arrangement.Center,
+        Alignment.CenterVertically,
     ) {
-        Text(label, color = fg, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        Text(label, color = if (primary) N0 else N700, fontSize = 14.sp, fontWeight = FontWeight.Medium)
     }
 }
 
 @Composable
 private fun ActionPair(
-    aLabel: String,
-    aPrimary: Boolean = false,
-    aDanger: Boolean = false,
-    onA: () -> Unit,
-    bLabel: String,
-    bPrimary: Boolean = false,
-    bDanger: Boolean = false,
-    onB: () -> Unit,
+    aLabel: String, aPrimary: Boolean, onA: () -> Unit,
+    bLabel: String, bPrimary: Boolean, onB: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        Arrangement.spacedBy(10.dp),
     ) {
-        ActionButton(aLabel, Modifier.weight(1f), aPrimary, aDanger, onA)
-        ActionButton(bLabel, Modifier.weight(1f), bPrimary, bDanger, onB)
+        ActionButton(aLabel, Modifier.weight(1f), aPrimary, onA)
+        ActionButton(bLabel, Modifier.weight(1f), bPrimary, onB)
     }
 }
 
 @Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
+private fun FullButton(label: String, danger: Boolean = false, onClick: () -> Unit) {
     Row(
-        modifier = Modifier
+        Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(if (danger) ErrorRed else N50)
             .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            label,
-            color = if (danger) N0 else Accent,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 14.dp),
-        )
-    }
-}
-
-@Composable
-private fun FullButton(
-    label: String,
-    danger: Boolean = false,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ErrorRed else N50)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
+        Arrangement.Center,
+        Alignment.CenterVertically,
     ) {
         Text(
             label,
