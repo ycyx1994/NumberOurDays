@@ -8,10 +8,12 @@ import com.numberourdays.app.data.DurationUnit
 import com.numberourdays.app.data.EventKind
 import com.numberourdays.app.data.RepeatUnit
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 object DateCalculator {
@@ -46,31 +48,44 @@ object DateCalculator {
         return if (n == 1) "每$unitName" else "每 $n $unitName"
     }
 
-    /** Next occurrence on/after ref; for NONE returns anchor as-is. */
+    /**
+     * Next occurrence on/after ref; for NONE returns anchor as-is.
+     * MONTH/YEAR steps always measure from the anchor day-of-month so
+     * 1/31 monthly stays …1/31, 2/28, 3/31… instead of drifting to 3/28.
+     */
     fun resolveNextDate(anchorDate: String, unit: RepeatUnit, interval: Int, ref: LocalDate = today()): LocalDate {
         val anchor = parse(anchorDate) ?: return ref
         if (unit == RepeatUnit.NONE) return anchor
         var next = anchor
         val step = max(1, interval)
+        var n = 0
         var guard = 0
         while (next.isBefore(ref) && guard < 20000) {
+            n += 1
             next = when (unit) {
-                RepeatUnit.DAY -> next.plusDays(step.toLong())
-                RepeatUnit.WEEK -> next.plusWeeks(step.toLong())
-                RepeatUnit.MONTH -> next.plusMonths(step.toLong())
-                RepeatUnit.YEAR -> next.plusYears(step.toLong()).let { candidate ->
-                    // Feb 29 -> Feb 28 when target year not leap
-                    if (anchor.monthValue == 2 && anchor.dayOfMonth == 29 &&
-                        candidate.monthValue == 2 && candidate.dayOfMonth == 1 && !candidate.isLeapYear
-                    ) {
-                        candidate.withDayOfMonth(28)
-                    } else candidate
-                }
+                RepeatUnit.DAY -> anchor.plusDays(n.toLong() * step)
+                RepeatUnit.WEEK -> anchor.plusWeeks(n.toLong() * step)
+                RepeatUnit.MONTH -> plusMonthsFromAnchor(anchor, n.toLong() * step)
+                RepeatUnit.YEAR -> plusYearsFromAnchor(anchor, n.toLong() * step)
                 RepeatUnit.NONE -> next
             }
             guard++
         }
         return next
+    }
+
+    /** anchor + months, keeping day-of-month when the target month allows it. */
+    fun plusMonthsFromAnchor(anchor: LocalDate, monthsToAdd: Long): LocalDate {
+        val ym = YearMonth.from(anchor).plusMonths(monthsToAdd)
+        val day = min(anchor.dayOfMonth, ym.lengthOfMonth())
+        return ym.atDay(day)
+    }
+
+    /** anchor + years; 2/29 falls on 2/28 in non-leap target years. */
+    fun plusYearsFromAnchor(anchor: LocalDate, yearsToAdd: Long): LocalDate {
+        val year = (anchor.year + yearsToAdd.toInt())
+        val day = min(anchor.dayOfMonth, YearMonth.of(year, anchor.month).lengthOfMonth())
+        return LocalDate.of(year, anchor.month, day)
     }
 
     fun computeDisplay(event: DayEvent, ref: LocalDate = today()): DayEventDisplay {

@@ -16,3 +16,8 @@ node_modules/
 .DS_Store
 *.log
 .worktrees/
+
+# release signing (never commit)
+keystore.properties
+*.keystore
+*.jks
