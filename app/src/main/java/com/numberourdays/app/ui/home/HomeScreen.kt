@@ -233,17 +233,25 @@ private fun dayCountAnnotated(label: String): AnnotatedString {
         fontWeight = FontWeight.Bold,
         fontFamily = NodDisplayCount.fontFamily,
     )
+    val plainStyle = SpanStyle(
+        color = N700,
+        fontWeight = FontWeight.Normal,
+    )
     return buildAnnotatedString {
         if (match == null) {
             withStyle(digitStyle) {
                 append(label)
             }
         } else {
-            append(label.substring(0, match.range.first))
+            withStyle(plainStyle) {
+                append(label.substring(0, match.range.first))
+            }
             withStyle(digitStyle) {
                 append(match.value)
             }
-            append(label.substring(match.range.last + 1))
+            withStyle(plainStyle) {
+                append(label.substring(match.range.last + 1))
+            }
         }
     }
 }
