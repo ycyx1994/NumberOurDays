@@ -1,14 +1,30 @@
 ---
 feature: reminders-display-font
-status: in-progress
+status: delivered
 updated: 2026-09-21
 branch: feature/reminders-display-font
-commits: 0268e7e..<TBD>
+commits: 0268e7e..98c5bd9
 ---
 
 # Reminders + Display Font
 
 ## Report
+
+**What was built** — 目标日（或下次重复日）本地 09:00 的 WorkManager 唯一提醒：通知渠道 + 运行时权限、开关/删除取消、重复到点续期；主数字改为打包的 Barlow Condensed Bold（OFL）。保存提醒时若未授权通知会 Toast 提示。
+
+**Verification** —
+- `testDebugUnitTest` — PASS — 16 tests, 0 failures (Backup 6 + Drag 5 + ReminderTiming 5)
+- `assembleDebug` — PASS
+- adb install to nezha — PASS
+- Independent review (general-3) — PASS — 0 critical；已补 Font Bold 权重、权限 Toast、通知文案
+
+**Journey log** —
+- 09:00 用 WorkManager 而非精确 Alarm，避开 SCHEDULE_EXACT_ALARM 限制。
+- OFL 许可证不能放 `res/font`（资源合并要求扩展名），改到 `docs/licenses/`。
+- Compose `Font(@FontRes)` 默认 Normal，Bold 字体需显式 `weight = FontWeight.Bold` 避免合成加粗。
+- `afterFire` 在 schedule 里靠 `notBefore=now` 推进到下一周期；Worker 发完再 schedule。
+- 月末 `plusMonths` 夹断为既有 DateCalculator 行为，会连带影响月/年提醒日。
+
 
 ## [S1] Problem
 
@@ -62,9 +78,9 @@ UI：`strings` 去掉「通知能力将在后续版本提供」；提醒 hint �
 
 ## Tasks
 
-- [ ] T1: 接入 Barlow Condensed Bold 到 `NodDisplayNumber` — acceptance: 首页/详情主数字使用 res/font 字体；OFL 说明存在 (covers: S2.2)
-- [ ] T2: 通知渠道 + 运行时权限请求 — acceptance: API33+ 启动请求通知权限；渠道创建；文案更新 (covers: S2.1)
-- [ ] T3: `ReminderScheduler` + `ReminderWorker` + 09:00 纯函数与单测 — acceptance: `nextReminderMillis` 单测通过；schedule/cancel 可被仓库调用 (covers: S2.1)
-- [ ] T4: 仓库/UI 接线（保存开关、删除、重复续期） — acceptance: 开提醒保存后有 unique work；关/删后 cancel；Worker 发通知后重复事件续期 (covers: S2.1; depends: T3)
-- [ ] T5: `assembleDebug` + `testDebugUnitTest` — acceptance: 全绿 (covers: S2; depends: T1–T4)
-- [ ] T6: 安装测试机并人工点检提醒与字体 — acceptance: 大数字为 Barlow Condensed；开提醒可触发（可用改系统时间/短 initialDelay 调试或说明验证方式） (covers: S2; depends: T5)
+- [x] T1: 接入 Barlow Condensed Bold 到 `NodDisplayNumber` — acceptance: 首页/详情主数字使用 res/font 字体；OFL 说明存在 (covers: S2.2)
+- [x] T2: 通知渠道 + 运行时权限请求 — acceptance: API33+ 启动请求通知权限；渠道创建；文案更新 (covers: S2.1)
+- [x] T3: `ReminderScheduler` + `ReminderWorker` + 09:00 纯函数与单测 — acceptance: `nextReminderMillis` 单测通过；schedule/cancel 可被仓库调用 (covers: S2.1)
+- [x] T4: 仓库/UI 接线（保存开关、删除、重复续期） — acceptance: 开提醒保存后有 unique work；关/删后 cancel；Worker 发通知后重复事件续期 (covers: S2.1; depends: T3)
+- [x] T5: `assembleDebug` + `testDebugUnitTest` — acceptance: 全绿 (covers: S2; depends: T1–T4)
+- [x] T6: 安装测试机并人工点检提醒与字体 — acceptance: 大数字为 Barlow Condensed；开提醒可触发（可用改系统时间/短 initialDelay 调试或说明验证方式） (covers: S2; depends: T5)

@@ -1,5 +1,6 @@
 package com.numberourdays.app.ui.edit
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -60,6 +61,7 @@ import com.numberourdays.app.data.DayEvent
 import com.numberourdays.app.data.EventKind
 import com.numberourdays.app.data.RepeatUnit
 import com.numberourdays.app.domain.DateCalculator
+import com.numberourdays.app.notify.NotificationHelper
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.ErrorRed
@@ -106,6 +108,7 @@ fun EditScreen(
 ) {
     val repo = App.repository
     val events by repo.events.collectAsState()
+    val context = LocalContext.current
     val existing = eventId?.let { id -> events.find { it.id == id } }
 
     var title by rememberSaveable { mutableStateOf(existing?.title.orEmpty()) }
@@ -343,6 +346,13 @@ fun EditScreen(
                         updatedAt = now,
                     )
                     repo.upsert(payload)
+                    if (remindOn && !NotificationHelper.canPost(context)) {
+                        Toast.makeText(
+                            context,
+                            R.string.notif_permission_needed,
+                            Toast.LENGTH_LONG,
+                        ).show()
+                    }
                     onSaved()
                 },
                 modifier = Modifier

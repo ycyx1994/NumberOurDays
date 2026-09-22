@@ -19,11 +19,7 @@ class ReminderWorker(
         if (!event.remindEnabled) return Result.success()
 
         val display = DateCalculator.computeDisplay(event)
-        val body = applicationContext.getString(
-            R.string.notif_body,
-            display.title,
-            display.label,
-        )
+        val body = applicationContext.getString(R.string.notif_body, display.label)
         NotificationHelper.showReminder(
             context = applicationContext,
             eventId = event.id,

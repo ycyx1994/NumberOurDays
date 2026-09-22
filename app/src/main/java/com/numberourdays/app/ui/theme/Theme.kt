@@ -61,7 +61,7 @@ private val LightColors = lightColorScheme(
  * Barlow Condensed Bold (OFL) bundled in res/font.
  */
 val NodDisplayNumber = TextStyle(
-    fontFamily = FontFamily(Font(R.font.barlow_condensed_bold)),
+    fontFamily = FontFamily(Font(R.font.barlow_condensed_bold, weight = FontWeight.Bold)),
     fontSize = 64.sp,
     fontWeight = FontWeight.Bold,
     letterSpacing = 0.sp,

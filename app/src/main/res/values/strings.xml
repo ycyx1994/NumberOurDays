@@ -72,7 +72,7 @@
     <string name="remind_off">未开启</string>
     <string name="remind_on">已开启</string>
     <string name="notif_channel_name">纪念日提醒</string>
-    <string name="notif_body">今天：%1$s · %2$s</string>
+    <string name="notif_body">今天 · %1$s</string>
     <string name="notif_permission_needed">请允许通知，才能在目标日提醒你</string>
     <string name="event_missing">事件不存在</string>
     <string name="nothing_export">暂无数据可导出</string>

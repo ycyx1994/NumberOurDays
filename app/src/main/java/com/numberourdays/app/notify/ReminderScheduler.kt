@@ -19,12 +19,12 @@ object ReminderScheduler {
             wm.cancelUniqueWork(name)
             return
         }
-        val notBefore = System.currentTimeMillis()
+        // after fire, "now" is already past the fired 09:00, so nextReminderMillis advances
         val at = ReminderTiming.nextReminderMillis(
             anchorDate = event.date,
             unit = event.repeatUnit,
             interval = event.repeatInterval,
-            notBefore = if (afterFire) notBefore else notBefore,
+            notBefore = System.currentTimeMillis(),
         )
         if (at == null) {
             wm.cancelUniqueWork(name)
