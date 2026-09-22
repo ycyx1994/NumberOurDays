@@ -57,6 +57,21 @@ import com.numberourdays.app.ui.theme.N50
 import com.numberourdays.app.ui.theme.N500
 import com.numberourdays.app.ui.theme.N700
 import com.numberourdays.app.ui.theme.N900
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
@@ -160,6 +175,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     message = context.getString(R.string.copied)
                     Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
                 },
+                exportTone = true,
             )
             SectionLabel(stringResource(R.string.import_section))
             ActionPair(
@@ -308,23 +324,37 @@ private fun SectionLabel(text: String) {
     Text(text, color = N500, fontSize = 12.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
 }
 
+private val ExportGreenBg = Color(0xFFE3ECE1)
+private val ExportGreenFg = Color(0xFF5B7A5A)
+
 @Composable
 private fun ActionButton(
     label: String,
     modifier: Modifier = Modifier,
     primary: Boolean = false,
+    green: Boolean = false,
     onClick: () -> Unit,
 ) {
+    val bg = when {
+        green -> ExportGreenBg
+        primary -> Accent
+        else -> N50
+    }
+    val fg = when {
+        green -> ExportGreenFg
+        primary -> N0
+        else -> N700
+    }
     Row(
         modifier
             .height(44.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(if (primary) Accent else N50)
+            .background(bg)
             .clickable(onClick = onClick),
         Arrangement.Center,
         Alignment.CenterVertically,
     ) {
-        Text(label, color = if (primary) N0 else N700, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        Text(label, color = fg, fontSize = 14.sp, fontWeight = FontWeight.Medium)
     }
 }
 
@@ -332,13 +362,14 @@ private fun ActionButton(
 private fun ActionPair(
     aLabel: String, aPrimary: Boolean, onA: () -> Unit,
     bLabel: String, bPrimary: Boolean, onB: () -> Unit,
+    exportTone: Boolean = false,
 ) {
     Row(
         Modifier.fillMaxWidth().padding(vertical = 4.dp),
         Arrangement.spacedBy(10.dp),
     ) {
-        ActionButton(aLabel, Modifier.weight(1f), aPrimary, onA)
-        ActionButton(bLabel, Modifier.weight(1f), bPrimary, onB)
+        ActionButton(aLabel, Modifier.weight(1f), aPrimary, green = exportTone, onClick = onA)
+        ActionButton(bLabel, Modifier.weight(1f), bPrimary, green = exportTone, onClick = onB)
     }
 }
 
