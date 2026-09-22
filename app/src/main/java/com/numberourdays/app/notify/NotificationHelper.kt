@@ -16,6 +16,7 @@ import com.numberourdays.app.ui.MainActivity
 
 object NotificationHelper {
     const val CHANNEL_ID = "nod_reminders"
+    const val EXTRA_EVENT_ID = "com.numberourdays.app.extra.EVENT_ID"
     private const val NOTIFY_ID_BASE = 0x0D02
 
     fun createChannel(context: Context) {
@@ -41,6 +42,7 @@ object NotificationHelper {
         if (!canPost(context)) return
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra(EXTRA_EVENT_ID, eventId)
         }
         val pending = PendingIntent.getActivity(
             context,

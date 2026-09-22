@@ -44,6 +44,7 @@ import com.numberourdays.app.App
 import com.numberourdays.app.R
 import com.numberourdays.app.data.BackupTransfer
 import com.numberourdays.app.data.DayEvent
+import com.numberourdays.app.notify.NotificationHelper
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.ErrorRed
@@ -273,6 +274,29 @@ fun SettingsScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(16.dp))
             Text(stringResource(R.string.danger_section), color = N500, fontSize = 12.sp)
             Spacer(Modifier.height(10.dp))
+            OutlinedButton(
+                onClick = {
+                    val sample = events.firstOrNull()
+                    if (sample == null) {
+                        Toast.makeText(context, R.string.test_notification_empty, Toast.LENGTH_SHORT).show()
+                        return@OutlinedButton
+                    }
+                    NotificationHelper.showReminder(
+                        context = context,
+                        eventId = sample.id,
+                        title = sample.title,
+                        text = context.getString(R.string.test_notification_body),
+                    )
+                    showMessage(context.getString(R.string.test_notification))
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp),
+                shape = NodButtonShape,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = N700),
+            ) { Text(stringResource(R.string.test_notification), color = N700, fontSize = 14.sp) }
+
+            Spacer(Modifier.height(8.dp))
             OutlinedButton(
                 onClick = { confirmClear = true },
                 modifier = Modifier

@@ -26,6 +26,9 @@
     <string name="saved">已保存</string>
     <string name="deleted">已删除</string>
     <string name="data_section">数据</string>
+    <string name="test_notification">发送测试通知</string>
+    <string name="test_notification_body">测试通知 · 点击打开事件详情</string>
+    <string name="test_notification_empty">先添加一条纪念日再测试</string>
     <string name="backup_section">备份</string>
     <string name="import_section">导入</string>
     <string name="danger_section">危险操作</string>

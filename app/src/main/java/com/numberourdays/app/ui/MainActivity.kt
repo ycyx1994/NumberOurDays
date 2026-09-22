@@ -1,6 +1,7 @@
 package com.numberourdays.app.ui
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,6 +11,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,7 +35,24 @@ class MainActivity : ComponentActivity() {
         setContent {
             NumberOurDaysTheme {
                 RequestNotificationPermission()
-                NodApp()
+                NodApp(
+                    initialEventId = intent?.getStringExtra(NotificationHelper.EXTRA_EVENT_ID),
+                )
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        // Recompose path: recreate content with the new event id when possible
+        val eventId = intent.getStringExtra(NotificationHelper.EXTRA_EVENT_ID)
+        if (eventId != null) {
+            setContent {
+                NumberOurDaysTheme {
+                    RequestNotificationPermission()
+                    NodApp(initialEventId = eventId)
+                }
             }
         }
     }
@@ -51,8 +73,18 @@ private fun RequestNotificationPermission() {
 }
 
 @Composable
-private fun NodApp() {
+private fun NodApp(initialEventId: String? = null) {
     val nav = rememberNavController()
+    var deepLinkId by rememberSaveable { mutableStateOf(initialEventId.orEmpty()) }
+
+    LaunchedEffect(Unit) {
+        val id = deepLinkId
+        if (id.isNotEmpty()) {
+            nav.navigate("detail/$id")
+            deepLinkId = ""
+        }
+    }
+
     NavHost(navController = nav, startDestination = "home") {
         composable("home") {
             HomeScreen(
