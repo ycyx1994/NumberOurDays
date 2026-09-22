@@ -349,29 +349,42 @@ private fun ActionRow(
     danger: Boolean = false,
     onClick: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp)
-            .clip(NodRowShape)
-            .background(if (emphasize) N50 else N0)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = label,
-            color = when {
-                danger -> ErrorRed
-                emphasize -> N900
-                else -> N700
-            },
-            fontSize = 15.sp,
-            fontWeight = if (emphasize) FontWeight.Medium else FontWeight.Normal,
-            modifier = Modifier.weight(1f),
-        )
+    if (emphasize) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(N50)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = label,
+                color = Accent,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    } else {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 4.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = label,
+                color = if (danger) ErrorRed else N700,
+                fontSize = 14.sp,
+                modifier = Modifier.weight(1f),
+            )
+        }
+        HorizontalDivider(color = N100, thickness = 1.dp)
     }
-    HorizontalDivider(color = N100, thickness = 1.dp)
 }
 
 @Composable
