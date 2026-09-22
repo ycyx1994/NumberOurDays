@@ -7,6 +7,7 @@ import com.numberourdays.app.data.db.toDomain
 import com.numberourdays.app.data.db.toEntity
 import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.notify.ReminderScheduler
+import com.numberourdays.app.widget.NodWidgetReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -61,12 +62,17 @@ class EventRepository(private val context: Context) {
 
     private fun toJson(e: DayEvent): JSONObject = DayEventCodec.toJson(e)
 
+    private fun notifyWidgets() {
+        runCatching { NodWidgetReceiver.requestRefresh(context) }
+    }
+
     fun getEvent(id: String): DayEvent? = _events.value.find { it.id == id }
 
     fun upsert(event: DayEvent) {
         scope.launch {
             dao.upsert(event.toEntity())
             ReminderScheduler.schedule(context, event)
+            notifyWidgets()
         }
     }
 
@@ -74,6 +80,7 @@ class EventRepository(private val context: Context) {
         scope.launch {
             dao.deleteById(id)
             ReminderScheduler.cancel(context, id)
+            notifyWidgets()
         }
     }
 
@@ -82,6 +89,7 @@ class EventRepository(private val context: Context) {
         scope.launch {
             dao.clearAll()
             ids.forEach { ReminderScheduler.cancel(context, it) }
+            notifyWidgets()
         }
     }
 
@@ -126,6 +134,7 @@ class EventRepository(private val context: Context) {
             previousIds.forEach { oldId ->
                 if (oldId !in live) ReminderScheduler.cancel(context, oldId)
             }
+            notifyWidgets()
         }
     }
 
@@ -145,6 +154,7 @@ class EventRepository(private val context: Context) {
             if (prefs.getBoolean(KEY_DEMO, false)) return@launch
             dao.upsertAll(createDemoEvents().map { it.toEntity() })
             prefs.edit().putBoolean(KEY_DEMO, true).apply()
+            notifyWidgets()
         }
     }
 
