@@ -1,14 +1,28 @@
 ---
 feature: reminder-time
-status: in-progress
+status: delivered
 updated: 2026-09-22
 branch: feature/reminder-time
-commits: cc010c1..<TBD>
+commits: cc010c1..12d1b73
 ---
 
 # Reminder Time Presets + Worktree Cleanup
 
 ## Report
+
+**What was built** — 提醒改为预设时刻 Chip 09:00 / 12:00 / 20:00（仅提醒开关打开时显示），`DayEvent.remindHour/remindMinute` 落库；Room v1→v2 迁移加列；调度与备份 JSON 兼容旧数据（缺省 9:00）。已合并 worktree/分支已清理。
+
+**Verification** —
+- `testDebugUnitTest` — PASS — 30+ tests, 0 failures
+- `assembleDebug` / `assembleRelease` — PASS
+- Independent review (general-4) — PASS — 0 critical
+- Device install — pending（验证时 adb 设备离线）
+
+**Journey log** —
+- 预设 Chip 比 TimePicker 更轻，模型仍存 hour/minute 便于以后扩展。
+- Room 手写 Migration(1,2) + addMigrations，列名与 Entity 必须人工对齐。
+- 备份 schemaVersion 仍为 1，字段可选 + 默认值即可向后兼容。
+- 已合并 worktree 清理应在 feature 合并后立刻做，避免仓库膨胀。
 
 ## [S1] Problem
 
@@ -44,8 +58,8 @@ commits: cc010c1..<TBD>
 
 ## Tasks
 
-- [ ] T1: 模型 + 编解码 + ReminderTiming 支持 minute — acceptance: 旧备份可解析；新字段往返；单测通过 (covers: S2.1)
-- [ ] T2: 编辑页时刻 Chip + 详情文案 — acceptance: 仅提醒开时显示 Chip；保存后详情显示 `HH:mm` (covers: S2.1; depends: T1)
-- [ ] T3: 调度接线 — acceptance: schedule 使用事件 remindHour/Minute；12:00/20:00 用例正确 (covers: S2.1; depends: T1)
-- [ ] T4: 测试 + debug/release 构建 — acceptance: `testDebugUnitTest` + `assembleRelease` 通过 (covers: S2.1; depends: T1–T3)
-- [ ] T5: 清理已合并 worktree/分支 — acceptance: 除本轮 worktree 外无已合并残留 (covers: S2.2)
+- [x] T1: 模型 + 编解码 + ReminderTiming 支持 minute — acceptance: 旧备份可解析；新字段往返；单测通过 (covers: S2.1)
+- [x] T2: 编辑页时刻 Chip + 详情文案 — acceptance: 仅提醒开时显示 Chip；保存后详情显示 HH:mm (covers: S2.1; depends: T1)
+- [x] T3: 调度接线 — acceptance: schedule 使用事件 remindHour/Minute；12:00/20:00 用例正确 (covers: S2.1; depends: T1)
+- [x] T4: 测试 + debug/release 构建 — acceptance: testDebugUnitTest + assembleRelease 通过 (covers: S2.1; depends: T1–T3)
+- [x] T5: 清理已合并 worktree/分支 — acceptance: 除本轮 worktree 外无已合并残留 (covers: S2.2)

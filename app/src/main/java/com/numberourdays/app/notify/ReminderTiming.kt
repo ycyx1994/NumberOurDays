@@ -8,12 +8,12 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import kotlin.math.max
 
-/** Pure timing rules for day-of 09:00 reminders. */
+/** Pure timing rules for day-of reminders at a configurable wall-clock time. */
 object ReminderTiming {
     const val HOUR_OF_DAY = 9
 
     /**
-     * Epoch millis of the next 09:00 reminder for this event, or null when none should be scheduled.
+     * Epoch millis of the next reminder (hourOfDay:minuteOfHour) for this event, or null when none should be scheduled.
      * [notBefore] skips fire times already passed (used after a reminder fires).
      */
     fun nextReminderMillis(

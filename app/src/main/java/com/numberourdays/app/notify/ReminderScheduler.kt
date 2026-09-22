@@ -19,7 +19,7 @@ object ReminderScheduler {
             wm.cancelUniqueWork(name)
             return
         }
-        // after fire, "now" is already past the fired 09:00, so nextReminderMillis advances
+        // after fire, "now" is already past the fired slot, so nextReminderMillis advances
         val at = ReminderTiming.nextReminderMillis(
             anchorDate = event.date,
             unit = event.repeatUnit,
