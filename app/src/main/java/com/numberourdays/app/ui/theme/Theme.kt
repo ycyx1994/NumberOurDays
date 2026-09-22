@@ -67,6 +67,13 @@ val NodDisplayNumber = TextStyle(
     letterSpacing = 0.sp,
 )
 
+/** List day-count label — same display face, slightly larger than body. */
+val NodDisplayCount = TextStyle(
+    fontFamily = FontFamily(Font(R.font.barlow_condensed_bold, weight = FontWeight.Bold)),
+    fontSize = 17.sp,
+    fontWeight = FontWeight.Bold,
+)
+
 private val NodTypography = Typography(
     displayLarge = NodDisplayNumber,
     titleLarge = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold),

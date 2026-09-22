@@ -81,6 +81,7 @@ import com.numberourdays.app.ui.theme.N500
 import com.numberourdays.app.ui.theme.N700
 import com.numberourdays.app.ui.theme.N900
 import com.numberourdays.app.ui.theme.NodCardShape
+import com.numberourdays.app.ui.theme.NodDisplayCount
 import com.numberourdays.app.ui.theme.NodDisplayNumber
 import com.numberourdays.app.ui.theme.NodFabShape
 import kotlin.math.roundToInt
@@ -210,14 +211,19 @@ fun HomeScreen(
 @Composable
 private fun dayCountAnnotated(label: String): AnnotatedString {
     val match = Regex("\\d+").find(label)
+    val digitStyle = SpanStyle(
+        color = Accent,
+        fontWeight = FontWeight.Bold,
+        fontFamily = NodDisplayCount.fontFamily,
+    )
     return buildAnnotatedString {
         if (match == null) {
-            withStyle(SpanStyle(color = Accent, fontWeight = FontWeight.Bold)) {
+            withStyle(digitStyle) {
                 append(label)
             }
         } else {
             append(label.substring(0, match.range.first))
-            withStyle(SpanStyle(color = Accent, fontWeight = FontWeight.Bold)) {
+            withStyle(digitStyle) {
                 append(match.value)
             }
             append(label.substring(match.range.last + 1))
@@ -477,7 +483,7 @@ private fun EventRow(
         }
         Text(
             text = dayCountAnnotated(item.label),
-            fontSize = 14.sp,
+            style = NodDisplayCount,
         )
         if (dragEnabled) {
             // Dedicated handle: drag starts immediately (no long-press), outside IconButton
