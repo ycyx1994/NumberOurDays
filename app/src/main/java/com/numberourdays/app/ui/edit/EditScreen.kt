@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -124,6 +125,8 @@ fun EditScreen(
     }
     var repeatInterval by rememberSaveable { mutableStateOf((existing?.repeatInterval ?: 1).coerceIn(1, 999)) }
     var remindOn by rememberSaveable { mutableStateOf(existing?.remindEnabled ?: false) }
+    var remindHour by rememberSaveable { mutableStateOf((existing?.remindHour ?: 9).toString()) }
+    var remindMinute by rememberSaveable { mutableStateOf((existing?.remindMinute ?: 0).toString()) }
     var errorText by rememberSaveable { mutableStateOf<String?>(null) }
     var showDelete by rememberSaveable { mutableStateOf(false) }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
@@ -302,6 +305,35 @@ fun EditScreen(
                 )
             }
             Text(stringResource(R.string.remind_hint), color = N500, fontSize = 11.sp)
+            if (remindOn) {
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.remind_time_label), color = N500, fontSize = 12.sp)
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    listOf(
+                        Triple(8, 0, stringResource(R.string.remind_time_8)),
+                        Triple(9, 0, stringResource(R.string.remind_time_9)),
+                        Triple(12, 0, stringResource(R.string.remind_time_12)),
+                        Triple(20, 0, stringResource(R.string.remind_time_20)),
+                    ).forEach { (h, m, label) ->
+                        val selected = remindHour == h.toString() && remindMinute == m.toString()
+                        FilterChip(
+                            selected = selected,
+                            onClick = {
+                                remindHour = h.toString()
+                                remindMinute = m.toString()
+                            },
+                            label = { Text(label, fontSize = 13.sp) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Accent,
+                                selectedLabelColor = N0,
+                                containerColor = N0,
+                                labelColor = N700,
+                            ),
+                        )
+                    }
+                }
+            }
 
             Spacer(Modifier.height(16.dp))
             Text(stringResource(R.string.note_label), color = N500, fontSize = 12.sp)
@@ -342,6 +374,8 @@ fun EditScreen(
                         repeatUnit = repeatUnit,
                         repeatInterval = if (repeatOn) repeatInterval else 1,
                         remindEnabled = remindOn,
+                        remindHour = remindHour.toIntOrNull()?.coerceIn(0, 23) ?: 9,
+                        remindMinute = remindMinute.toIntOrNull()?.coerceIn(0, 59) ?: 0,
                         createdAt = existing?.createdAt ?: now,
                         updatedAt = now,
                     )

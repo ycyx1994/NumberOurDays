@@ -15,6 +15,8 @@ data class DayEventEntity(
     val repeatUnit: String,
     val repeatInterval: Int,
     val remindEnabled: Boolean,
+    val remindHour: Int = 9,
+    val remindMinute: Int = 0,
     val createdAt: Long,
     val updatedAt: Long,
 )

@@ -19,6 +19,8 @@ class DayEventMappersTest {
             repeatUnit = "year",
             repeatInterval = 1,
             remindEnabled = true,
+            remindHour = 20,
+            remindMinute = 0,
             createdAt = 1L,
             updatedAt = 2L,
         )
@@ -26,6 +28,7 @@ class DayEventMappersTest {
         assertEquals("e1", d.id)
         assertEquals(RepeatUnit.YEAR, d.repeatUnit)
         assertEquals(2, d.starRank)
+        assertEquals(20, d.remindHour)
         val back = d.toEntity()
         assertEquals(entity, back)
     }
@@ -42,6 +45,8 @@ class DayEventMappersTest {
             repeatUnit = "none",
             repeatInterval = 1,
             remindEnabled = false,
+            remindHour = 9,
+            remindMinute = 0,
             createdAt = 1L,
             updatedAt = 1L,
         )

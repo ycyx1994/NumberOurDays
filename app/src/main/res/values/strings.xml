@@ -55,7 +55,12 @@
     <string name="paste_backup">粘贴备份 JSON</string>
     <string name="footer">NumberOurDays · 本地数据，卸载前请先导出</string>
     <string name="backup_desc">数据存在本机，关闭不会丢；清除应用数据或卸载会丢。优先导出到文件妥善保存。</string>
-    <string name="remind_hint">将在目标日 09:00 提醒一次</string>
+    <string name="remind_hint">将在目标日所选时刻提醒一次</string>
+    <string name="remind_time_label">提醒时刻</string>
+    <string name="remind_time_8">08:00</string>
+    <string name="remind_time_9">09:00</string>
+    <string name="remind_time_12">12:00</string>
+    <string name="remind_time_20">20:00</string>
     <string name="title_hint">例如：在一起纪念日</string>
     <string name="note_hint">可选</string>
     <string name="unit_day">天</string>
@@ -70,7 +75,7 @@
     <string name="label_note">备注</string>
     <string name="not_repeat">不重复</string>
     <string name="remind_off">未开启</string>
-    <string name="remind_on">已开启</string>
+    <string name="remind_on">已开启 · %1$02d:%2$02d</string>
     <string name="notif_channel_name">纪念日提醒</string>
     <string name="notif_body">今天 · %1$s</string>
     <string name="notif_permission_needed">请允许通知，才能在目标日提醒你</string>
