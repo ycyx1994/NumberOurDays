@@ -311,6 +311,7 @@ fun EditScreen(
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf(
+                        Triple(8, 0, stringResource(R.string.remind_time_8)),
                         Triple(9, 0, stringResource(R.string.remind_time_9)),
                         Triple(12, 0, stringResource(R.string.remind_time_12)),
                         Triple(20, 0, stringResource(R.string.remind_time_20)),

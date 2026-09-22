@@ -57,6 +57,7 @@
     <string name="backup_desc">数据存在本机，关闭不会丢；清除应用数据或卸载会丢。优先导出到文件妥善保存。</string>
     <string name="remind_hint">将在目标日所选时刻提醒一次</string>
     <string name="remind_time_label">提醒时刻</string>
+    <string name="remind_time_8">08:00</string>
     <string name="remind_time_9">09:00</string>
     <string name="remind_time_12">12:00</string>
     <string name="remind_time_20">20:00</string>
