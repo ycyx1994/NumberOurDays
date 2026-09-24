@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,7 +39,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -54,6 +57,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.numberourdays.app.App
@@ -125,11 +129,12 @@ fun EditScreen(
     }
     var repeatInterval by rememberSaveable { mutableStateOf((existing?.repeatInterval ?: 1).coerceIn(1, 999)) }
     var remindOn by rememberSaveable { mutableStateOf(existing?.remindEnabled ?: false) }
-    var remindHour by rememberSaveable { mutableStateOf((existing?.remindHour ?: 9).toString()) }
+    var remindHour by rememberSaveable { mutableStateOf((existing?.remindHour ?: 8).toString()) }
     var remindMinute by rememberSaveable { mutableStateOf((existing?.remindMinute ?: 0).toString()) }
     var errorText by rememberSaveable { mutableStateOf<String?>(null) }
     var showDelete by rememberSaveable { mutableStateOf(false) }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    var showTimePicker by rememberSaveable { mutableStateOf(false) }
 
     val repeatUnit = if (repeatOn) RepeatUnit.valueOf(repeatUnitName) else RepeatUnit.NONE
     val preview = if (title.isNotBlank() && DateCalculator.isValidDate(dateText)) {
@@ -232,55 +237,43 @@ fun EditScreen(
             }
 
             if (repeatOn) {
-                Column(
+                // Single compact row: 每 [− n +] unit chips
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-                        .padding(12.dp),
+                        .padding(top = 4.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("每", color = N700, fontSize = 14.sp)
-                        Spacer(Modifier.width(8.dp))
-                        OutlinedButton(
-                            onClick = { repeatInterval = (repeatInterval - 1).coerceAtLeast(1) },
-                            modifier = Modifier.height(36.dp),
-                            shape = NodButtonShape,
-                        ) { Text("−") }
-                        Text(
-                            text = repeatInterval.toString(),
-                            color = N900,
-                            fontSize = 16.sp,
-                            modifier = Modifier
-                                .width(40.dp)
-                                .padding(horizontal = 4.dp),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    Text(stringResource(R.string.repeat_every), color = N700, fontSize = 13.sp)
+                    StepButton(label = "−", onClick = { repeatInterval = (repeatInterval - 1).coerceAtLeast(1) })
+                    Text(
+                        text = repeatInterval.toString(),
+                        color = N900,
+                        fontSize = 14.sp,
+                        modifier = Modifier.widthIn(min = 22.dp),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    )
+                    StepButton(label = "+", onClick = { repeatInterval = (repeatInterval + 1).coerceAtMost(999) })
+                    Spacer(Modifier.width(2.dp))
+                    listOf(
+                        RepeatUnit.DAY to stringResource(R.string.unit_day),
+                        RepeatUnit.WEEK to "周",
+                        RepeatUnit.MONTH to stringResource(R.string.unit_month),
+                        RepeatUnit.YEAR to stringResource(R.string.unit_year),
+                    ).forEach { (unit, label) ->
+                        FilterChip(
+                            selected = repeatUnitName == unit.name,
+                            onClick = { repeatUnitName = unit.name },
+                            label = { Text(label, fontSize = 12.sp) },
+                            modifier = Modifier.height(32.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Accent,
+                                selectedLabelColor = N0,
+                                containerColor = N0,
+                                labelColor = N700,
+                            ),
                         )
-                        OutlinedButton(
-                            onClick = { repeatInterval = (repeatInterval + 1).coerceAtMost(999) },
-                            modifier = Modifier.height(36.dp),
-                            shape = NodButtonShape,
-                        ) { Text("+") }
-                    }
-                    Spacer(Modifier.height(12.dp))
-                    Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)) {
-                        listOf(
-                            RepeatUnit.DAY to stringResource(R.string.unit_day),
-                            RepeatUnit.WEEK to "周",
-                            RepeatUnit.MONTH to stringResource(R.string.unit_month),
-                            RepeatUnit.YEAR to stringResource(R.string.unit_year),
-                        ).forEach { (unit, label) ->
-                            FilterChip(
-                                selected = repeatUnitName == unit.name,
-                                onClick = { repeatUnitName = unit.name },
-                                label = { Text(label, fontSize = 13.sp) },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = Accent,
-                                    selectedLabelColor = N0,
-                                    containerColor = N0,
-                                    labelColor = N700,
-                                ),
-                            )
-                        }
                     }
                 }
             }
@@ -309,16 +302,18 @@ fun EditScreen(
                 Spacer(Modifier.height(8.dp))
                 Text(stringResource(R.string.remind_time_label), color = N500, fontSize = 12.sp)
                 Spacer(Modifier.height(6.dp))
+                val currentHour = remindHour.toIntOrNull()?.coerceIn(0, 23) ?: 8
+                val currentMinute = remindMinute.toIntOrNull()?.coerceIn(0, 59) ?: 0
+                val presets = listOf(
+                    Triple(8, 0, stringResource(R.string.remind_time_8)),
+                    Triple(12, 0, stringResource(R.string.remind_time_12)),
+                    Triple(20, 0, stringResource(R.string.remind_time_20)),
+                )
+                val matchedPreset = presets.any { (h, m, _) -> h == currentHour && m == currentMinute }
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf(
-                        Triple(8, 0, stringResource(R.string.remind_time_8)),
-                        Triple(9, 0, stringResource(R.string.remind_time_9)),
-                        Triple(12, 0, stringResource(R.string.remind_time_12)),
-                        Triple(20, 0, stringResource(R.string.remind_time_20)),
-                    ).forEach { (h, m, label) ->
-                        val selected = remindHour == h.toString() && remindMinute == m.toString()
+                    presets.forEach { (h, m, label) ->
                         FilterChip(
-                            selected = selected,
+                            selected = h == currentHour && m == currentMinute,
                             onClick = {
                                 remindHour = h.toString()
                                 remindMinute = m.toString()
@@ -332,6 +327,30 @@ fun EditScreen(
                             ),
                         )
                     }
+                    FilterChip(
+                        selected = !matchedPreset,
+                        onClick = { showTimePicker = true },
+                        label = {
+                            Text(
+                                text = if (matchedPreset) {
+                                    stringResource(R.string.remind_time_custom)
+                                } else {
+                                    stringResource(
+                                        R.string.remind_time_custom_fmt,
+                                        currentHour,
+                                        currentMinute,
+                                    )
+                                },
+                                fontSize = 13.sp,
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = Accent,
+                            selectedLabelColor = N0,
+                            containerColor = N0,
+                            labelColor = N700,
+                        ),
+                    )
                 }
             }
 
@@ -374,7 +393,7 @@ fun EditScreen(
                         repeatUnit = repeatUnit,
                         repeatInterval = if (repeatOn) repeatInterval else 1,
                         remindEnabled = remindOn,
-                        remindHour = remindHour.toIntOrNull()?.coerceIn(0, 23) ?: 9,
+                        remindHour = remindHour.toIntOrNull()?.coerceIn(0, 23) ?: 8,
                         remindMinute = remindMinute.toIntOrNull()?.coerceIn(0, 59) ?: 0,
                         createdAt = existing?.createdAt ?: now,
                         updatedAt = now,
@@ -471,6 +490,45 @@ fun EditScreen(
             }
         }
     }
+
+    if (showTimePicker) {
+        val initHour = remindHour.toIntOrNull()?.coerceIn(0, 23) ?: 8
+        val initMinute = remindMinute.toIntOrNull()?.coerceIn(0, 59) ?: 0
+        val timeState = rememberTimePickerState(initialHour = initHour, initialMinute = initMinute)
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            title = { Text(stringResource(R.string.remind_time_custom)) },
+            text = {
+                TimePicker(state = timeState)
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    remindHour = timeState.hour.toString()
+                    remindMinute = timeState.minute.toString()
+                    showTimePicker = false
+                }) { Text("确定", color = Accent) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) { Text("取消") }
+            },
+        )
+    }
+}
+
+@Composable
+private fun StepButton(label: String, onClick: () -> Unit) {
+    Text(
+        text = label,
+        color = N700,
+        fontSize = 16.sp,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .size(28.dp)
+            .clip(NodButtonShape)
+            .border(1.dp, N300, NodButtonShape)
+            .clickable(onClick = onClick)
+            .padding(top = 3.dp),
+    )
 }
 
 @Composable

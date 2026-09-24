@@ -73,7 +73,11 @@ import com.numberourdays.app.App
 import com.numberourdays.app.R
 import com.numberourdays.app.data.DayEventDisplay
 import com.numberourdays.app.data.EventKind
+import com.numberourdays.app.data.HolidayCountdown
+import com.numberourdays.app.data.HolidayStatus
+import com.numberourdays.app.data.LegalHolidays
 import com.numberourdays.app.domain.DateCalculator
+import com.numberourdays.app.domain.HolidayCalculator
 import com.numberourdays.app.ui.components.DayCountHero
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
@@ -95,6 +99,15 @@ import com.numberourdays.app.ui.theme.HeroPageMarginH
 import com.numberourdays.app.ui.theme.HeroPageMarginTop
 import kotlin.math.absoluteValue
 
+/** Soft accent wash so legal-holiday surfaces read different from user cards (N50). */
+private val HolidayTint = Color(0xFFF6E4DC)
+private val HolidayEdge = Color(0xFFE8B8A8)
+
+private sealed interface Slide {
+    data class Event(val display: DayEventDisplay) : Slide
+    data class Holiday(val countdown: HolidayCountdown) : Slide
+}
+
 @Composable
 fun HomeScreen(
     onOpenDetail: (String) -> Unit,
@@ -106,7 +119,18 @@ fun HomeScreen(
     val displays = remember(events) {
         DateCalculator.sortEvents(events.map { DateCalculator.computeDisplay(it) })
     }
-    val slides = remember(displays) { DateCalculator.carouselList(displays) }
+    val holiday = remember {
+        HolidayCalculator.nextOrOngoing(LegalHolidays.periods(), DateCalculator.today())
+    }
+    val slides = remember(displays, holiday) {
+        val user = DateCalculator.carouselList(displays).map { Slide.Event(it) }
+        val hol = holiday?.let { Slide.Holiday(it) }
+        when {
+            hol != null && user.isEmpty() -> listOf(hol)
+            hol != null -> user + hol
+            else -> user
+        }
+    }
 
     // Drag reorder: accumulate delta during the gesture; commit once on drag end
     // so LazyColumn is not re-sorted mid-gesture (that cancels pointer input).
@@ -169,7 +193,7 @@ fun HomeScreen(
             }
         },
     ) { padding ->
-        if (displays.isEmpty()) {
+        if (displays.isEmpty() && holiday == null) {
             EmptyState(
                 modifier = Modifier
                     .fillMaxSize()
@@ -188,36 +212,53 @@ fun HomeScreen(
                     vertical = HeroPageMarginTop,
                 ),
         ) {
-            val pagerState = rememberPagerState(pageCount = { slides.size.coerceAtLeast(1) })
-            CarouselCard(slides = slides, pagerState = pagerState, onClick = onOpenDetail)
-            Dots(count = slides.size, selected = pagerState.currentPage)
-            Text(
-                text = stringResource(R.string.all_events),
-                color = N500,
-                fontSize = 13.sp,
-                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
-            )
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                contentPadding = PaddingValues(bottom = 96.dp),
-            ) {
-                items(displays, key = { it.id }) { item ->
-                    val isDraggingItem = draggingId == item.id
-                    EventRow(
-                        item = item,
-                        onOpen = { onOpenDetail(item.id) },
-                        onToggleStar = { repo.toggleStar(item.id) },
-                        dragEnabled = item.starred,
-                        dragging = isDraggingItem,
-                        dragOffsetPx = if (isDraggingItem) dragDeltaPx else 0f,
-                        onDragStart = { onDragStart(item.id) },
-                        onDrag = { dy -> onDragMove(dy) },
-                        onDragEnd = { onDragEnd() },
-                    )
-                    if (!isDraggingItem) {
-                        HorizontalDivider(color = N100, thickness = 1.dp)
+            if (slides.isNotEmpty()) {
+                val pagerState = rememberPagerState(pageCount = { slides.size })
+                CarouselCard(slides = slides, pagerState = pagerState, onClick = onOpenDetail)
+                Dots(count = slides.size, selected = pagerState.currentPage)
+            }
+            if (holiday != null) {
+                HolidayMiniCard(
+                    countdown = holiday,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+            if (displays.isEmpty()) {
+                EmptyState(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    onAdd = onOpenAdd,
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.all_events),
+                    color = N500,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(bottom = 96.dp),
+                ) {
+                    items(displays, key = { it.id }) { item ->
+                        val isDraggingItem = draggingId == item.id
+                        EventRow(
+                            item = item,
+                            onOpen = { onOpenDetail(item.id) },
+                            onToggleStar = { repo.toggleStar(item.id) },
+                            dragEnabled = item.starred,
+                            dragging = isDraggingItem,
+                            dragOffsetPx = if (isDraggingItem) dragDeltaPx else 0f,
+                            onDragStart = { onDragStart(item.id) },
+                            onDrag = { dy -> onDragMove(dy) },
+                            onDragEnd = { onDragEnd() },
+                        )
+                        if (!isDraggingItem) {
+                            HorizontalDivider(color = N100, thickness = 1.dp)
+                        }
                     }
                 }
             }
@@ -302,73 +343,180 @@ private fun EmptyState(modifier: Modifier = Modifier, onAdd: () -> Unit) {
 }
 
 @Composable
+private fun HolidayMiniCard(
+    countdown: HolidayCountdown,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(NodCardShape)
+            .background(HolidayTint)
+            .border(1.dp, HolidayEdge, NodCardShape)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.holiday_legal),
+                color = Accent,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = countdown.period.name,
+                color = N900,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Text(
+            text = when (countdown.status) {
+                HolidayStatus.ONGOING -> stringResource(R.string.holiday_ongoing)
+                HolidayStatus.UPCOMING -> stringResource(
+                    R.string.holiday_countdown,
+                    countdown.daysUntilStart,
+                )
+            },
+            style = NodDisplayCount,
+            color = Accent,
+        )
+    }
+}
+
+@Composable
 private fun CarouselCard(
-    slides: List<DayEventDisplay>,
+    slides: List<Slide>,
     pagerState: androidx.compose.foundation.pager.PagerState,
     onClick: (String) -> Unit,
 ) {
     if (slides.isEmpty()) return
-    // Single rounded surface for the whole pager — pages themselves are
-    // unclipped so swiping never opens a paper gap between corners.
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(NodCardShape)
-            .background(N50),
+            .clip(NodCardShape),
     ) {
         HorizontalPager(
             state = pagerState,
             pageSpacing = 0.dp,
             modifier = Modifier.fillMaxWidth(),
         ) { page ->
-            val item = slides[page]
-            val tag = when {
-                item.repeatLabel != null && item.kind == EventKind.REPEAT -> item.repeatLabel
-                item.kind == EventKind.COUNTDOWN -> "倒数"
-                item.kind == EventKind.ELAPSED -> "已过"
-                else -> "今天"
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = HeroCardMinHeight)
-                    .clickable { onClick(item.id) }
-                    .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top,
-            ) {
-                Text(
-                    text = stringResource(R.string.next_prefix, tag),
-                    color = N500,
-                    fontSize = 11.sp,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    text = item.title,
-                    color = N900,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                DayCountHero(
-                    value = item.days.toString(),
-                    suffix = stringResource(R.string.unit_day),
-                    suffixBottomPadding = 6,
-                    suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
-                )
-                Text(
-                    text = item.date,
-                    color = N500,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+            when (val item = slides[page]) {
+                is Slide.Event -> EventSlide(item.display, onClick)
+                is Slide.Holiday -> HolidaySlide(item.countdown)
             }
         }
+    }
+}
+
+@Composable
+private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
+    val tag = when {
+        item.repeatLabel != null && item.kind == EventKind.REPEAT -> item.repeatLabel
+        item.kind == EventKind.COUNTDOWN -> "倒数"
+        item.kind == EventKind.ELAPSED -> "已过"
+        else -> "今天"
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(N50)
+            .defaultMinSize(minHeight = HeroCardMinHeight)
+            .clickable { onClick(item.id) }
+            .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
+    ) {
+        Text(
+            text = stringResource(R.string.next_prefix, tag),
+            color = N500,
+            fontSize = 11.sp,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = item.title,
+            color = N900,
+            fontSize = 17.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        DayCountHero(
+            value = item.days.toString(),
+            suffix = stringResource(R.string.unit_day),
+            suffixBottomPadding = 6,
+            suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
+        )
+        Text(
+            text = item.date,
+            color = N500,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun HolidaySlide(countdown: HolidayCountdown) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(HolidayTint)
+            .defaultMinSize(minHeight = HeroCardMinHeight)
+            .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
+    ) {
+        Text(
+            text = stringResource(R.string.holiday_next),
+            color = Accent,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = countdown.period.name,
+            color = N900,
+            fontSize = 17.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (countdown.status == HolidayStatus.ONGOING) {
+            Text(
+                text = stringResource(R.string.holiday_ongoing),
+                color = Accent,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 18.dp, bottom = 12.dp),
+            )
+        } else {
+            DayCountHero(
+                value = countdown.daysUntilStart.toString(),
+                suffix = stringResource(R.string.unit_day),
+                suffixBottomPadding = 6,
+                suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
+            )
+        }
+        Text(
+            text = DateCalculator.format(countdown.period.start) +
+                " · " +
+                DateCalculator.format(countdown.period.end),
+            color = N500,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 

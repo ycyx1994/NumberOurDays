@@ -61,9 +61,16 @@
     <string name="remind_hint">将在目标日所选时刻提醒一次</string>
     <string name="remind_time_label">提醒时刻</string>
     <string name="remind_time_8">08:00</string>
-    <string name="remind_time_9">09:00</string>
     <string name="remind_time_12">12:00</string>
     <string name="remind_time_20">20:00</string>
+    <string name="remind_time_custom">自定义</string>
+    <string name="remind_time_custom_fmt">自定义 · %1$02d:%2$02d</string>
+    <string name="holiday_legal">法定假日</string>
+    <string name="holiday_ongoing">假期中</string>
+    <string name="holiday_today">今天放假</string>
+    <string name="holiday_countdown">还有 %1$d 天</string>
+    <string name="holiday_next">下一个 · 法定假日</string>
+    <string name="repeat_every">每</string>
     <string name="title_hint">例如：在一起纪念日</string>
     <string name="note_hint">可选</string>
     <string name="unit_day">天</string>

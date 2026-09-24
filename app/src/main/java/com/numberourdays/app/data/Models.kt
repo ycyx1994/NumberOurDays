@@ -29,7 +29,7 @@ data class DayEvent(
     val repeatUnit: RepeatUnit = RepeatUnit.NONE,
     val repeatInterval: Int = 1,
     val remindEnabled: Boolean = false,
-    val remindHour: Int = 9,
+    val remindHour: Int = 8,
     val remindMinute: Int = 0,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
