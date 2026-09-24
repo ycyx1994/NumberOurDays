@@ -42,6 +42,9 @@ val N700 = Color(0xFF4A453E)
 val N900 = Color(0xFF1C1916)
 val Accent = Color(0xFFD4553A)
 val ErrorRed = Color(0xFFB33A3A)
+/** Soft accent wash so legal-holiday surfaces read different from user cards (N50). */
+val HolidayTint = Color(0xFFF6E4DC)
+val HolidayEdge = Color(0xFFE8B8A8)
 
 private val LightColors = lightColorScheme(
     primary = Accent,

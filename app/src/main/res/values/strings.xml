@@ -70,6 +70,13 @@
     <string name="holiday_today">今天放假</string>
     <string name="holiday_countdown">还有 %1$d 天</string>
     <string name="holiday_next">下一个 · 法定假日</string>
+    <string name="holiday_list_title">法定假日</string>
+    <string name="holiday_year_title">%1$d 年法定节假日</string>
+    <string name="holiday_vacation_days">放假 %1$d 天</string>
+    <string name="holiday_past">已过</string>
+    <string name="holiday_elapsed">已过 %1$d 天</string>
+    <string name="holiday_widget_desc">最近的法定假日倒数</string>
+    <string name="widget_holiday_empty">暂无法定假日</string>
     <string name="repeat_every">每</string>
     <string name="title_hint">例如：在一起纪念日</string>
     <string name="note_hint">可选</string>

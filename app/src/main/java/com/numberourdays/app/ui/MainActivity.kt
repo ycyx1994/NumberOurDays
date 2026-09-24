@@ -28,9 +28,11 @@ import androidx.navigation.navArgument
 import com.numberourdays.app.notify.NotificationHelper
 import com.numberourdays.app.ui.detail.DetailScreen
 import com.numberourdays.app.ui.edit.EditScreen
+import com.numberourdays.app.ui.holiday.HolidayListScreen
 import com.numberourdays.app.ui.home.HomeScreen
 import com.numberourdays.app.ui.settings.SettingsScreen
 import com.numberourdays.app.ui.theme.NumberOurDaysTheme
+import com.numberourdays.app.widget.HolidayWidgetReceiver
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +44,10 @@ class MainActivity : ComponentActivity() {
                 RequestNotificationPermission()
                 NodApp(
                     initialEventId = intent?.getStringExtra(NotificationHelper.EXTRA_EVENT_ID),
+                    openHolidays = intent?.getBooleanExtra(
+                        HolidayWidgetReceiver.EXTRA_OPEN_HOLIDAYS,
+                        false,
+                    ) == true,
                 )
             }
         }
@@ -50,13 +56,16 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        // Recompose path: recreate content with the new event id when possible
         val eventId = intent.getStringExtra(NotificationHelper.EXTRA_EVENT_ID)
-        if (eventId != null) {
+        val openHolidays = intent.getBooleanExtra(
+            HolidayWidgetReceiver.EXTRA_OPEN_HOLIDAYS,
+            false,
+        )
+        if (eventId != null || openHolidays) {
             setContent {
                 NumberOurDaysTheme {
                     RequestNotificationPermission()
-                    NodApp(initialEventId = eventId)
+                    NodApp(initialEventId = eventId, openHolidays = openHolidays)
                 }
             }
         }
@@ -78,15 +87,23 @@ private fun RequestNotificationPermission() {
 }
 
 @Composable
-private fun NodApp(initialEventId: String? = null) {
+private fun NodApp(
+    initialEventId: String? = null,
+    openHolidays: Boolean = false,
+) {
     val nav = rememberNavController()
     var deepLinkId by rememberSaveable { mutableStateOf(initialEventId.orEmpty()) }
+    var pendingHolidays by rememberSaveable { mutableStateOf(openHolidays) }
 
     LaunchedEffect(Unit) {
         val id = deepLinkId
         if (id.isNotEmpty()) {
             nav.navigate("detail/$id")
             deepLinkId = ""
+        }
+        if (pendingHolidays) {
+            nav.navigate("holidays")
+            pendingHolidays = false
         }
     }
 
@@ -111,7 +128,11 @@ private fun NodApp(initialEventId: String? = null) {
                 onOpenDetail = { id -> nav.navigate("detail/$id") },
                 onOpenSettings = { nav.navigate("settings") },
                 onOpenAdd = { nav.navigate("edit") },
+                onOpenHolidays = { nav.navigate("holidays") },
             )
+        }
+        composable("holidays") {
+            HolidayListScreen(onBack = { nav.popBackStack() })
         }
         composable(
             route = "detail/{id}",

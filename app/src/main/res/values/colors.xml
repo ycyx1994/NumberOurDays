@@ -10,6 +10,8 @@
     <color name="n_900">#1C1916</color>
     <color name="accent">#D4553A</color>
     <color name="error">#B33A3A</color>
+    <color name="holiday_tint">#F6E4DC</color>
+    <color name="holiday_edge">#E8B8A8</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 </resources>

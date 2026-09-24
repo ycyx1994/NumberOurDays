@@ -42,4 +42,50 @@ object HolidayCalculator {
             label = if (days <= 0) "今天放假" else "还有 $days 天",
         )
     }
+
+    /**
+     * Year-list order: not-yet-ended blocks first (ongoing, then nearest start),
+     * then past blocks at the bottom (most recently ended first).
+     * Ordinary weekends are never rows — only vacation blocks.
+     */
+    fun listRows(
+        periods: List<HolidayPeriod>,
+        today: LocalDate,
+    ): List<HolidayListRow> {
+        return periods.map { p ->
+            val ongoing = !today.isBefore(p.start) && !today.isAfter(p.end)
+            val past = p.end.isBefore(today)
+            val days = ChronoUnit.DAYS.between(today, p.start).toInt()
+            HolidayListRow(
+                period = p,
+                ongoing = ongoing,
+                past = past,
+                daysUntilStart = days,
+                daysPastEnd = if (past) ChronoUnit.DAYS.between(p.end, today).toInt() else 0,
+            )
+        }.sortedWith(
+            compareBy<HolidayListRow> {
+                when {
+                    it.ongoing -> 0
+                    it.past -> 2
+                    else -> 1
+                }
+            }.thenComparator { a, b ->
+                if (a.past) b.period.start.compareTo(a.period.start)
+                else a.period.start.compareTo(b.period.start)
+            },
+        )
+    }
+}
+
+data class HolidayListRow(
+    val period: HolidayPeriod,
+    val ongoing: Boolean,
+    val past: Boolean,
+    val daysUntilStart: Int,
+    /** Days since vacation end; 0 unless [past]. */
+    val daysPastEnd: Int = 0,
+) {
+    val vacationDays: Int
+        get() = ChronoUnit.DAYS.between(period.start, period.end).toInt() + 1
 }

@@ -97,11 +97,9 @@ import com.numberourdays.app.ui.theme.HeroCardPadH
 import com.numberourdays.app.ui.theme.HeroCardPadV
 import com.numberourdays.app.ui.theme.HeroPageMarginH
 import com.numberourdays.app.ui.theme.HeroPageMarginTop
+import com.numberourdays.app.ui.theme.HolidayEdge
+import com.numberourdays.app.ui.theme.HolidayTint
 import kotlin.math.absoluteValue
-
-/** Soft accent wash so legal-holiday surfaces read different from user cards (N50). */
-private val HolidayTint = Color(0xFFF6E4DC)
-private val HolidayEdge = Color(0xFFE8B8A8)
 
 private sealed interface Slide {
     data class Event(val display: DayEventDisplay) : Slide
@@ -113,6 +111,7 @@ fun HomeScreen(
     onOpenDetail: (String) -> Unit,
     onOpenSettings: () -> Unit,
     onOpenAdd: () -> Unit,
+    onOpenHolidays: () -> Unit,
 ) {
     val repo = App.repository
     val events by repo.events.collectAsState()
@@ -214,13 +213,19 @@ fun HomeScreen(
         ) {
             if (slides.isNotEmpty()) {
                 val pagerState = rememberPagerState(pageCount = { slides.size })
-                CarouselCard(slides = slides, pagerState = pagerState, onClick = onOpenDetail)
+                CarouselCard(
+                    slides = slides,
+                    pagerState = pagerState,
+                    onClick = onOpenDetail,
+                    onOpenHolidays = onOpenHolidays,
+                )
                 Dots(count = slides.size, selected = pagerState.currentPage)
             }
             if (holiday != null) {
                 HolidayMiniCard(
                     countdown = holiday,
                     modifier = Modifier.padding(top = 8.dp),
+                    onClick = onOpenHolidays,
                 )
             }
             if (displays.isEmpty()) {
@@ -346,6 +351,7 @@ private fun EmptyState(modifier: Modifier = Modifier, onAdd: () -> Unit) {
 private fun HolidayMiniCard(
     countdown: HolidayCountdown,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -353,6 +359,7 @@ private fun HolidayMiniCard(
             .clip(NodCardShape)
             .background(HolidayTint)
             .border(1.dp, HolidayEdge, NodCardShape)
+            .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -392,6 +399,7 @@ private fun CarouselCard(
     slides: List<Slide>,
     pagerState: androidx.compose.foundation.pager.PagerState,
     onClick: (String) -> Unit,
+    onOpenHolidays: () -> Unit,
 ) {
     if (slides.isEmpty()) return
     Column(
@@ -406,7 +414,7 @@ private fun CarouselCard(
         ) { page ->
             when (val item = slides[page]) {
                 is Slide.Event -> EventSlide(item.display, onClick)
-                is Slide.Holiday -> HolidaySlide(item.countdown)
+                is Slide.Holiday -> HolidaySlide(item.countdown, onOpenHolidays)
             }
         }
     }
@@ -464,12 +472,13 @@ private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
 }
 
 @Composable
-private fun HolidaySlide(countdown: HolidayCountdown) {
+private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(HolidayTint)
             .defaultMinSize(minHeight = HeroCardMinHeight)
+            .clickable(onClick = onOpenHolidays)
             .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
