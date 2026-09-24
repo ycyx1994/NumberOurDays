@@ -1,14 +1,27 @@
 ---
 feature: holiday-remind-edit
-status: designed
+status: delivered
 updated: 2026-09-24
 branch: feature/holiday-remind-ui
-commits: 
+commits: d5317c7..13584b9
 ---
 
 # Holiday Countdown + Edit UX Polish
 
 ## Report
+
+**What was built** — 编辑页提醒时刻精简为 08:00 / 12:00 / 20:00 + 自定义（AlertDialog + Material3 TimePicker；非预设显示「自定义 · HH:mm」；新事件默认 08:00）。重复开启后压成单行「每 [− n +] 天/周/月/年」。内置 2026 国务院放假区间，`HolidayCalculator` 以放假首日为目标做自然日倒数（假期中显示「假期中」）；首页列表上方假日小卡 + 轮播假日页，`HolidayTint` 底色与用户纪念日卡区分；无用户事件时小卡仍显示。
+
+**Verification** —
+- `testDebugUnitTest` — PASS — 41 tests, 0 failures（含 HolidayCalculatorTest 7 例）
+- `assembleDebug` — PASS
+- Independent review (general-1) — PASS — 0 critical（spec / correctness / consistency 三项均 PASS）
+
+**Journey log** —
+- Material3 BOM 2024.10 无 `TimePickerDialog`，用 `AlertDialog` + `TimePicker` 等价实现。
+- 「不含周末」落地为：目标=放假首日（含周末首日），倒数=自然日；普通周末不是假日目标。
+- Entity/Backup 缺省仍 9 以兼容旧 JSON/迁移；新 UI/模型默认 8。
+- 假日表只内置 2026；表后日期返回 null 隐藏卡片，结构可扩 2027。
 
 ## [S1] Problem
 
@@ -23,10 +36,10 @@ commits:
 | 契约 | 行为 |
 |---|---|
 | 预设 Chip | **08:00 / 12:00 / 20:00 / 自定义**（仅 `remindOn` 时显示） |
-| 自定义 | 点「自定义」打开 Material3 `TimePickerDialog`；确认后写入 `remindHour`/`remindMinute` |
+| 自定义 | 点「自定义」打开 `AlertDialog` + Material3 `TimePicker`（BOM 2024.10 无 `TimePickerDialog`）；确认后写入 `remindHour`/`remindMinute` |
 | Chip 选中态 | hour/minute 命中预设则选中对应预设；否则选中「自定义」，Chip 文案显示当前 `HH:mm` |
 | 旧数据 | 落库字段不变（`remindHour`/`remindMinute`）；09:00 等非预设值打开时自动表现为「自定义 · 09:00」 |
-| 默认 | 新事件仍 09:00 → 首次显示为自定义 09:00；或默认改为 08:00（推荐改为 **08:00**，与预设第一档对齐） |
+| 默认 | 新事件默认 **08:00**；旧数据/备份缺省 9 仅作兼容，打开时若非预设显示为「自定义 · 09:00」 |
 | 取消 | TimePicker 取消不修改时刻 |
 | 详情/调度 | 不变：继续读 `remindHour`/`remindMinute` |
 
@@ -78,8 +91,8 @@ commits:
 
 ## Tasks
 
-- [ ] T1: 提醒时刻 Chip 8/12/20+自定义 + TimePicker — acceptance: 仅提醒开时显示；自定义弹出时间选择器；非预设显示自定义 HH:mm；保存后调度字段正确 (covers: S2.1)
-- [ ] T2: 重复模块单行紧凑 — acceptance: 开启重复后单行展示间隔+单位；高度明显低于原两行盒 (covers: S2.2)
-- [ ] T3: 内置假日表 + HolidayCalculator 单测 — acceptance: 下一段假/假期中/周末首日/表尾空 单测通过 (covers: S2.3)
-- [ ] T4: 首页假日小卡 + 轮播假日页 — acceptance: 小卡展示动态假日名与倒数；轮播页底色区分；无用户事件时小卡仍显示 (covers: S2.3; depends: T3)
-- [ ] T5: testDebugUnitTest + assembleDebug — acceptance: 单测与 debug 构建通过 (covers: S2.1–S2.3; depends: T1–T4)
+- [x] T1: 提醒时刻 Chip 8/12/20+自定义 + TimePicker — acceptance: 仅提醒开时显示；自定义弹出时间选择器；非预设显示自定义 HH:mm；保存后调度字段正确 (covers: S2.1)
+- [x] T2: 重复模块单行紧凑 — acceptance: 开启重复后单行展示间隔+单位；高度明显低于原两行盒 (covers: S2.2)
+- [x] T3: 内置假日表 + HolidayCalculator 单测 — acceptance: 下一段假/假期中/周末首日/表尾空 单测通过 (covers: S2.3)
+- [x] T4: 首页假日小卡 + 轮播假日页 — acceptance: 小卡展示动态假日名与倒数；轮播页底色区分；无用户事件时小卡仍显示 (covers: S2.3; depends: T3)
+- [x] T5: testDebugUnitTest + assembleDebug — acceptance: 单测与 debug 构建通过 (covers: S2.1–S2.3; depends: T1–T4)
