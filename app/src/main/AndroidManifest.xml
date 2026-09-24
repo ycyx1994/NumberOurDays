@@ -23,6 +23,18 @@
             </intent-filter>
         </activity>
 
+        <!-- HyperOS / Android home widget: nearest day count -->
+        <receiver
+            android:name=".widget.NodWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nod_widget_info" />
+        </receiver>
+
         <!-- HyperOS / Android home widget: next legal holiday -->
         <receiver
             android:name=".widget.HolidayWidgetReceiver"

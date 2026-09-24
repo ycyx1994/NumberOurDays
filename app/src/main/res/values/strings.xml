@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">数日子</string>
+    <string name="widget_desc">最近的纪念日倒数</string>
+    <string name="widget_empty_title">还没有纪念日</string>
+    <string name="widget_empty_meta">点击添加</string>
     <string name="settings">设置</string>
     <string name="detail">详情</string>
     <string name="edit">编辑</string>
