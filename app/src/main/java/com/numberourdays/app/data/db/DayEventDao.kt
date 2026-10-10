@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -22,6 +23,12 @@ interface DayEventDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(items: List<DayEventEntity>)
+
+    @Transaction
+    suspend fun replaceAll(items: List<DayEventEntity>) {
+        clearAll()
+        upsertAll(items)
+    }
 
     @Query("DELETE FROM day_events WHERE id = :id")
     suspend fun deleteById(id: String)

@@ -134,8 +134,7 @@ class EventRepository(private val context: Context) {
     fun saveAll(events: List<DayEvent>) {
         val previousIds = _events.value.map { it.id }.toSet()
         scope.launch {
-            dao.clearAll()
-            dao.upsertAll(events.map { it.toEntity() })
+            dao.replaceAll(events.map { it.toEntity() })
             events.forEach { ReminderScheduler.schedule(context, it) }
             val live = events.map { it.id }.toSet()
             previousIds.forEach { oldId ->
