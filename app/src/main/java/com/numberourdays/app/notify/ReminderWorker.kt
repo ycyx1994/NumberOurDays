@@ -3,9 +3,10 @@ package com.numberourdays.app.notify
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.numberourdays.app.App
 import com.numberourdays.app.R
 import com.numberourdays.app.data.RepeatUnit
+import com.numberourdays.app.data.db.NodDatabase
+import com.numberourdays.app.data.db.toDomain
 import com.numberourdays.app.domain.DateCalculator
 
 class ReminderWorker(
@@ -15,7 +16,10 @@ class ReminderWorker(
 
     override suspend fun doWork(): Result {
         val id = inputData.getString(KEY_ID) ?: return Result.success()
-        val event = App.repository.getEvent(id) ?: return Result.success()
+        val event = NodDatabase.get(applicationContext)
+            .dayEventDao()
+            .getById(id)
+            ?.toDomain() ?: return Result.success()
         if (!event.remindEnabled) return Result.success()
 
         val display = DateCalculator.computeDisplay(event)
