@@ -45,6 +45,7 @@ class EventRepository(private val context: Context) {
     fun loadEvents(): List<DayEvent> = _events.value
 
     private suspend fun migrateFromPrefsIfNeeded() {
+        if (prefs.getBoolean(KEY_PREFS_MIGRATED, false)) return
         val raw = prefs.getString(KEY_EVENTS, null) ?: return
         val migrated = try {
             val arr = JSONArray(raw)
@@ -52,9 +53,10 @@ class EventRepository(private val context: Context) {
         } catch (_: Exception) {
             emptyList()
         }
-        if (migrated.isEmpty()) return
-        if (dao.count() > 0) return
-        dao.upsertAll(migrated.map { it.toEntity() })
+        if (migrated.isNotEmpty() && dao.count() == 0) {
+            dao.upsertAll(migrated.map { it.toEntity() })
+        }
+        prefs.edit().putBoolean(KEY_PREFS_MIGRATED, true).apply()
         // Keep a copy in prefs as last-resort backup; Room is now source of truth.
     }
 
@@ -87,6 +89,11 @@ class EventRepository(private val context: Context) {
     fun clearAll() {
         val ids = _events.value.map { it.id }
         scope.launch {
+            // An explicit clear must win over one-time legacy import and demo seeding.
+            prefs.edit()
+                .putBoolean(KEY_PREFS_MIGRATED, true)
+                .putBoolean(KEY_DEMO, true)
+                .apply()
             dao.clearAll()
             ids.forEach { ReminderScheduler.cancel(context, it) }
             notifyWidgets()
@@ -151,7 +158,7 @@ class EventRepository(private val context: Context) {
     fun ensureDemoIfEmpty() {
         scope.launch {
             // Idempotent: stable ids + flag; safe if App/init both call.
-            if (prefs.getBoolean(KEY_DEMO, false) && dao.count() > 0) return@launch
+            if (prefs.getBoolean(KEY_DEMO, false)) return@launch
             if (dao.count() > 0) {
                 prefs.edit().putBoolean(KEY_DEMO, true).apply()
                 return@launch
@@ -201,5 +208,6 @@ class EventRepository(private val context: Context) {
         private const val KEY_FILE = "nod_prefs"
         private const val KEY_EVENTS = "nod:events:v1"
         private const val KEY_DEMO = "nod:demo_seeded:v2"
+        private const val KEY_PREFS_MIGRATED = "nod:prefs_migrated:v1"
     }
 }
