@@ -1,5 +1,6 @@
 package com.numberourdays.app.notify
 
+import android.annotation.SuppressLint
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -38,6 +39,7 @@ object NotificationHelper {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    @SuppressLint("MissingPermission")
     fun showReminder(context: Context, eventId: String, title: String, text: String) {
         if (!canPost(context)) return
         val intent = Intent(context, MainActivity::class.java).apply {
@@ -58,7 +60,11 @@ object NotificationHelper {
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
-        NotificationManagerCompat.from(context)
-            .notify(NOTIFY_ID_BASE + (eventId.hashCode() and 0xFFFF), notification)
+        try {
+            NotificationManagerCompat.from(context)
+                .notify(NOTIFY_ID_BASE + (eventId.hashCode() and 0xFFFF), notification)
+        } catch (_: SecurityException) {
+            // The permission can be revoked between canPost() and notify().
+        }
     }
 }
