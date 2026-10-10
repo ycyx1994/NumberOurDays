@@ -179,40 +179,30 @@ object DateCalculator {
         val end = if (from.isBefore(to)) to else from
 
         var years = end.year - start.year
-        var afterYears = start.plusYears(years.toLong())
-        if (afterYears.isAfter(end)) {
+        if (plusYearsFromAnchor(start, years.toLong()).isAfter(end)) {
             years--
-            afterYears = start.plusYears(years.toLong())
         }
-        var monthsAfterYears = 0
-        var cur = afterYears
-        while (true) {
-            val nxt = cur.plusMonths(1)
-            if (!nxt.isAfter(end)) {
-                monthsAfterYears++
-                cur = nxt
-            } else break
-            if (monthsAfterYears > 1200) break
-        }
-        val daysAfterMonthsFromYears = ChronoUnit.DAYS.between(cur, end).toInt()
 
-        var months = 0
-        var cur2 = start
-        while (true) {
-            val nxt = cur2.plusMonths(1)
-            if (!nxt.isAfter(end)) {
-                months++
-                cur2 = nxt
-            } else break
-            if (months > 1200) break
+        val monthsBeforeRemainder = years * 12
+        var monthsAfterYears = 0
+        while (
+            monthsAfterYears < 1200 &&
+            !plusMonthsFromAnchor(
+                start,
+                (monthsBeforeRemainder + monthsAfterYears + 1).toLong(),
+            ).isAfter(end)
+        ) {
+            monthsAfterYears++
         }
-        val daysAfterMonths = ChronoUnit.DAYS.between(cur2, end).toInt()
+        val months = monthsBeforeRemainder + monthsAfterYears
+        val milestone = plusMonthsFromAnchor(start, months.toLong())
+        val daysAfterMonths = ChronoUnit.DAYS.between(milestone, end).toInt()
 
         return DurationBreakdown(
             days = abs(diffDays(start, end)).toInt(),
-            years = years,
+            years = years.coerceAtLeast(0),
             monthsAfterYears = monthsAfterYears,
-            daysAfterMonthsFromYears = daysAfterMonthsFromYears,
+            daysAfterMonthsFromYears = daysAfterMonths,
             months = months,
             daysAfterMonths = daysAfterMonths,
         )

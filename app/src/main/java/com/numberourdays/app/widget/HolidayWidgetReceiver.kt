@@ -28,6 +28,21 @@ import com.numberourdays.app.ui.MainActivity
  */
 class HolidayWidgetReceiver : AppWidgetProvider() {
 
+    override fun onReceive(context: Context, intent: Intent) {
+        val dateChanged = intent.action == Intent.ACTION_DATE_CHANGED ||
+            intent.action == Intent.ACTION_TIME_CHANGED ||
+            intent.action == Intent.ACTION_TIMEZONE_CHANGED
+        if (dateChanged) {
+            val manager = AppWidgetManager.getInstance(context)
+            onUpdate(
+                context,
+                manager,
+                manager.getAppWidgetIds(ComponentName(context, HolidayWidgetReceiver::class.java)),
+            )
+        }
+        super.onReceive(context, intent)
+    }
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,

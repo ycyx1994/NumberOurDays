@@ -33,6 +33,7 @@ import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.domain.HolidayCalculator
 import com.numberourdays.app.domain.HolidayListRow
 import com.numberourdays.app.ui.components.NodTopBar
+import com.numberourdays.app.ui.components.rememberCurrentDate
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.HolidayEdge
 import com.numberourdays.app.ui.theme.HolidayTint
@@ -48,7 +49,7 @@ import com.numberourdays.app.ui.theme.NodDisplayCount
 
 @Composable
 fun HolidayListScreen(onBack: () -> Unit) {
-    val today = remember { DateCalculator.today() }
+    val today = rememberCurrentDate()
     val rows = remember(today) {
         HolidayCalculator.listRows(LegalHolidays.periods(), today)
     }

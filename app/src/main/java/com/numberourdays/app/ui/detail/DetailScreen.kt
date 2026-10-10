@@ -50,6 +50,7 @@ import com.numberourdays.app.data.EventKind
 import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.ui.components.DayCountHero
 import com.numberourdays.app.ui.components.NodTopBar
+import com.numberourdays.app.ui.components.rememberCurrentDate
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.N0
 import com.numberourdays.app.ui.theme.N100
@@ -75,6 +76,7 @@ fun DetailScreen(
     val repo = App.repository
     val events by repo.events.collectAsState()
     val event = events.find { it.id == eventId }
+    val today = rememberCurrentDate()
 
     var unit by rememberSaveable { mutableStateOf(DurationUnit.DAY.name) }
     var elapsedUnit by rememberSaveable { mutableStateOf(DurationUnit.DAY.name) }
@@ -102,7 +104,7 @@ fun DetailScreen(
             return@Scaffold
         }
 
-        val d = DateCalculator.computeDisplay(event)
+        val d = DateCalculator.computeDisplay(event, today)
         val tag = when {
             d.repeatLabel != null && d.kind == EventKind.REPEAT -> d.repeatLabel.orEmpty()
             d.kind == EventKind.COUNTDOWN -> "倒数"
@@ -149,7 +151,7 @@ fun DetailScreen(
                     )
 
                     val target = DateCalculator.detailTargetDate(d)
-                    val breakdown = DateCalculator.convertDuration(DateCalculator.today(), target)
+                    val breakdown = DateCalculator.convertDuration(today, target)
                     val shown = DateCalculator.formatDuration(breakdown, unitEnum)
                     val suffix = listOf(shown.unitLabel, shown.rest)
                         .filter { it.isNotBlank() }
@@ -203,8 +205,8 @@ fun DetailScreen(
                     d.nextDate?.let { MetaRow(stringResource(R.string.label_next), it) }
 
                     val elapsedBd = DateCalculator.convertDuration(
-                        DateCalculator.parse(d.date) ?: DateCalculator.today(),
-                        DateCalculator.today(),
+                        DateCalculator.parse(d.date) ?: today,
+                        today,
                     )
                     val elapsedShown = DateCalculator.formatDuration(elapsedBd, elapsedEnum)
                     val elapsedText = listOf("${elapsedShown.value} ${elapsedShown.unitLabel}", elapsedShown.rest)
