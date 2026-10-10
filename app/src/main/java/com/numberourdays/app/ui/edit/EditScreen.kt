@@ -68,6 +68,7 @@ import com.numberourdays.app.data.RepeatUnit
 import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.notify.NotificationHelper
 import com.numberourdays.app.ui.components.NodTopBar
+import com.numberourdays.app.ui.components.rememberCurrentDate
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.ErrorRed
 import com.numberourdays.app.ui.theme.N0
@@ -115,9 +116,10 @@ fun EditScreen(
     val events by repo.events.collectAsState()
     val context = LocalContext.current
     val existing = eventId?.let { id -> events.find { it.id == id } }
+    val today = rememberCurrentDate()
 
     var title by rememberSaveable { mutableStateOf(existing?.title.orEmpty()) }
-    var dateText by rememberSaveable { mutableStateOf(existing?.date ?: DateCalculator.format(DateCalculator.today())) }
+    var dateText by rememberSaveable { mutableStateOf(existing?.date ?: DateCalculator.format(today)) }
     var note by rememberSaveable { mutableStateOf(existing?.note.orEmpty()) }
     var repeatOn by rememberSaveable {
         mutableStateOf(existing?.repeatUnit?.let { it != RepeatUnit.NONE } ?: false)
@@ -145,7 +147,7 @@ fun EditScreen(
             repeatUnit = repeatUnit,
             repeatInterval = repeatInterval,
         )
-        DateCalculator.computeDisplay(draft)
+        DateCalculator.computeDisplay(draft, today)
     } else null
 
     Scaffold(
@@ -453,7 +455,7 @@ fun EditScreen(
     }
 
     if (showDatePicker) {
-        val parsed = DateCalculator.parse(dateText) ?: DateCalculator.today()
+        val parsed = DateCalculator.parse(dateText) ?: today
         val utc = TimeZone.getTimeZone("UTC")
         val initialMillis = remember(parsed) {
             Calendar.getInstance(utc).apply {

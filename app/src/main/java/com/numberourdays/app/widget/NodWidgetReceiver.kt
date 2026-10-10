@@ -13,9 +13,10 @@ import android.graphics.Typeface
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.content.res.ResourcesCompat
-import com.numberourdays.app.App
 import com.numberourdays.app.R
 import com.numberourdays.app.data.EventKind
+import com.numberourdays.app.data.db.NodDatabase
+import com.numberourdays.app.data.db.toDomain
 import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.notify.NotificationHelper
 import com.numberourdays.app.ui.MainActivity
@@ -30,6 +31,21 @@ import kotlinx.coroutines.launch
  */
 class NodWidgetReceiver : AppWidgetProvider() {
 
+    override fun onReceive(context: Context, intent: Intent) {
+        val dateChanged = intent.action == Intent.ACTION_DATE_CHANGED ||
+            intent.action == Intent.ACTION_TIME_CHANGED ||
+            intent.action == Intent.ACTION_TIMEZONE_CHANGED
+        if (dateChanged) {
+            val manager = AppWidgetManager.getInstance(context)
+            onUpdate(
+                context,
+                manager,
+                manager.getAppWidgetIds(ComponentName(context, NodWidgetReceiver::class.java)),
+            )
+        }
+        super.onReceive(context, intent)
+    }
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -37,7 +53,7 @@ class NodWidgetReceiver : AppWidgetProvider() {
     ) {
         val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         scope.launch {
-            val display = nearestDisplay()
+            val display = nearestDisplay(context)
             appWidgetIds.forEach { id ->
                 appWidgetManager.updateAppWidget(id, buildViews(context, display))
             }
@@ -59,10 +75,12 @@ class NodWidgetReceiver : AppWidgetProvider() {
             context.sendBroadcast(intent)
         }
 
-        private fun nearestDisplay() =
-            DateCalculator.sortEvents(
-                App.repository.loadEvents().map { DateCalculator.computeDisplay(it) },
-            ).let { DateCalculator.pickNearest(it) }
+        private suspend fun nearestDisplay(context: Context) =
+            NodDatabase.get(context).dayEventDao().getAll()
+                .map { it.toDomain() }
+                .map { DateCalculator.computeDisplay(it) }
+                .let { DateCalculator.sortEvents(it) }
+                .let { DateCalculator.pickNearest(it) }
 
         private fun numberBitmap(
             context: Context,

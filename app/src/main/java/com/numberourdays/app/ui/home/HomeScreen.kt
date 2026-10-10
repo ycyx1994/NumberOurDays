@@ -80,6 +80,7 @@ import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.domain.HolidayCalculator
 import com.numberourdays.app.ui.components.DayCountHero
 import com.numberourdays.app.ui.components.NodTopBar
+import com.numberourdays.app.ui.components.rememberCurrentDate
 import com.numberourdays.app.ui.theme.Accent
 import com.numberourdays.app.ui.theme.N0
 import com.numberourdays.app.ui.theme.N100
@@ -115,11 +116,12 @@ fun HomeScreen(
 ) {
     val repo = App.repository
     val events by repo.events.collectAsState()
-    val displays = remember(events) {
-        DateCalculator.sortEvents(events.map { DateCalculator.computeDisplay(it) })
+    val today = rememberCurrentDate()
+    val displays = remember(events, today) {
+        DateCalculator.sortEvents(events.map { DateCalculator.computeDisplay(it, today) })
     }
-    val holiday = remember {
-        HolidayCalculator.nextOrOngoing(LegalHolidays.periods(), DateCalculator.today())
+    val holiday = remember(today) {
+        HolidayCalculator.nextOrOngoing(LegalHolidays.periods(), today)
     }
     val slides = remember(displays, holiday) {
         val user = DateCalculator.carouselList(displays).map { Slide.Event(it) }
