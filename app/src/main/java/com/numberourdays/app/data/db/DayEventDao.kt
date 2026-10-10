@@ -15,6 +15,9 @@ interface DayEventDao {
     @Query("SELECT * FROM day_events")
     suspend fun getAll(): List<DayEventEntity>
 
+    @Query("SELECT * FROM day_events WHERE id = :id LIMIT 1")
+    suspend fun getById(id: String): DayEventEntity?
+
     @Query("SELECT COUNT(*) FROM day_events")
     suspend fun count(): Int
 
