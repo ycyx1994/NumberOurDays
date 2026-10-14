@@ -1,25 +1,26 @@
 package com.numberourdays.app.notify
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
+import android.content.Intent
+import android.os.Build
 import com.numberourdays.app.data.DayEvent
-import java.util.concurrent.TimeUnit
 
+/**
+ * Exact-alarm scheduler. WorkManager delays are unreliable on HyperOS/MIUI
+ * (doze + process kill), so user-facing reminders use AlarmManager like
+ * a typical medication/alarm app.
+ */
 object ReminderScheduler {
 
-    fun workName(eventId: String): String = "remind_$eventId"
+    private const val ACTION = "com.numberourdays.app.action.REMINDER"
 
     fun schedule(context: Context, event: DayEvent, afterFire: Boolean = false) {
-        val wm = WorkManager.getInstance(context)
-        val name = workName(event.id)
         if (!event.remindEnabled) {
-            wm.cancelUniqueWork(name)
+            cancel(context, event.id)
             return
         }
-        // after fire, "now" is already past the fired slot, so nextReminderMillis advances
         val at = ReminderTiming.nextReminderMillis(
             anchorDate = event.date,
             unit = event.repeatUnit,
@@ -27,23 +28,76 @@ object ReminderScheduler {
             hourOfDay = event.remindHour,
             minuteOfHour = event.remindMinute,
             notBefore = System.currentTimeMillis(),
-        )
-        if (at == null) {
-            wm.cancelUniqueWork(name)
+        ) ?: run {
+            cancel(context, event.id)
             return
         }
-        val delay = (at - System.currentTimeMillis()).coerceAtLeast(0L)
-        val request = OneTimeWorkRequestBuilder<ReminderWorker>()
-            .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-            .setInputData(workDataOf(ReminderWorker.KEY_ID to event.id))
-            .addTag(TAG)
-            .build()
-        wm.enqueueUniqueWork(name, ExistingWorkPolicy.REPLACE, request)
+
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val pending = pendingIntent(context, event.id)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pending)
+            } else {
+                am.setExact(AlarmManager.RTC_WAKEUP, at, pending)
+            }
+        } catch (_: SecurityException) {
+            // No SCHEDULE_EXACT_ALARM — fall back to inexact (may drift).
+            am.set(AlarmManager.RTC_WAKEUP, at, pending)
+        }
     }
 
     fun cancel(context: Context, eventId: String) {
-        WorkManager.getInstance(context).cancelUniqueWork(workName(eventId))
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        am.cancel(pendingIntent(context, eventId))
     }
 
-    private const val TAG = "nod_reminders"
+    fun canScheduleExact(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        return am.canScheduleExactAlarms()
+    }
+
+    /** Debug helper: fire a standalone reminder after [delayMillis] (default 60s). */
+    fun scheduleDebugReminder(context: Context, delayMillis: Long = 60_000L) {
+        val at = System.currentTimeMillis() + delayMillis
+        val intent = Intent(context, ReminderReceiver::class.java).apply {
+            action = ACTION
+            putExtra(ReminderReceiver.EXTRA_EVENT_ID, "debug_reminder")
+            putExtra(ReminderReceiver.EXTRA_DEBUG, true)
+            putExtra(ReminderReceiver.EXTRA_TITLE, "一分钟提醒")
+            putExtra(ReminderReceiver.EXTRA_TEXT, "AlarmManager 精确闹钟链路正常")
+        }
+        val pending = PendingIntent.getBroadcast(
+            context,
+            DEBUG_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pending)
+            } else {
+                am.setExact(AlarmManager.RTC_WAKEUP, at, pending)
+            }
+        } catch (_: SecurityException) {
+            am.set(AlarmManager.RTC_WAKEUP, at, pending)
+        }
+    }
+
+    private fun pendingIntent(context: Context, eventId: String): PendingIntent {
+        val intent = Intent(context, ReminderReceiver::class.java).apply {
+            action = ACTION
+            putExtra(ReminderReceiver.EXTRA_EVENT_ID, eventId)
+        }
+        return PendingIntent.getBroadcast(
+            context,
+            eventId.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
+    private const val DEBUG_REQUEST_CODE = 0x0D0B
 }

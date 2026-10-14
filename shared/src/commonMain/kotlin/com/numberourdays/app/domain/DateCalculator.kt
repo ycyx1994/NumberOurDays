@@ -1,0 +1,256 @@
+package com.numberourdays.app.domain
+
+import com.numberourdays.app.data.DayEvent
+import com.numberourdays.app.data.DayEventDisplay
+import com.numberourdays.app.data.DurationBreakdown
+import com.numberourdays.app.data.DurationDisplay
+import com.numberourdays.app.data.DurationUnit
+import com.numberourdays.app.data.EventKind
+import com.numberourdays.app.data.RepeatUnit
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
+
+object DateCalculator {
+    fun today(): LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
+
+    fun format(date: LocalDate): String = date.toString()
+
+    fun parse(text: String?): LocalDate? = runCatching {
+        LocalDate.parse(text ?: return@runCatching null)
+    }.getOrNull()
+
+    fun isValidDate(text: String?): Boolean {
+        if (text.isNullOrBlank() || !Regex("""\d{4}-\d{2}-\d{2}""").matches(text)) return false
+        return parse(text) != null
+    }
+
+    fun diffDays(from: LocalDate, to: LocalDate): Long =
+        (to.toEpochDays() - from.toEpochDays()).toLong()
+
+    /** Inclusive-free day count helper used by month-length math. */
+    fun daySpan(from: LocalDate, to: LocalDate): Int =
+        to.toEpochDays() - from.toEpochDays()
+
+    fun formatRepeatLabel(unit: RepeatUnit, interval: Int): String? {
+        if (unit == RepeatUnit.NONE) return null
+        val n = max(1, interval)
+        val unitName = when (unit) {
+            RepeatUnit.DAY -> "天"
+            RepeatUnit.WEEK -> "周"
+            RepeatUnit.MONTH -> "月"
+            RepeatUnit.YEAR -> "年"
+            RepeatUnit.NONE -> return null
+        }
+        return if (n == 1) "每$unitName" else "每 $n $unitName"
+    }
+
+    /**
+     * Next occurrence on/after ref; for NONE returns anchor as-is.
+     * MONTH/YEAR steps always measure from the anchor day-of-month so
+     * 1/31 monthly stays …1/31, 2/28, 3/31… instead of drifting to 3/28.
+     */
+    fun resolveNextDate(anchorDate: String, unit: RepeatUnit, interval: Int, ref: LocalDate = today()): LocalDate {
+        val anchor = parse(anchorDate) ?: return ref
+        if (unit == RepeatUnit.NONE) return anchor
+        var next = anchor
+        val step = max(1, interval)
+        var n = 0
+        var guard = 0
+        while (next < ref && guard < 20000) {
+            n += 1
+            next = when (unit) {
+                RepeatUnit.DAY -> anchor.plus(DatePeriod(days = n * step))
+                RepeatUnit.WEEK -> anchor.plus(DatePeriod(days = n * step * 7))
+                RepeatUnit.MONTH -> plusMonthsFromAnchor(anchor, (n.toLong() * step))
+                RepeatUnit.YEAR -> plusYearsFromAnchor(anchor, (n.toLong() * step))
+                RepeatUnit.NONE -> next
+            }
+            guard++
+        }
+        return next
+    }
+
+    /** anchor + months, keeping day-of-month when the target month allows it. */
+    fun plusMonthsFromAnchor(anchor: LocalDate, monthsToAdd: Long): LocalDate {
+        val monthIndex = anchor.year * 12L + (anchor.monthNumber - 1) + monthsToAdd
+        val year = floorDiv(monthIndex, 12L).toInt()
+        val month = floorMod(monthIndex, 12L).toInt() + 1
+        val day = min(anchor.dayOfMonth, daysInMonth(year, month))
+        return LocalDate(year, month, day)
+    }
+
+    /** anchor + years; 2/29 falls on 2/28 in non-leap target years. */
+    fun plusYearsFromAnchor(anchor: LocalDate, yearsToAdd: Long): LocalDate {
+        val year = anchor.year + yearsToAdd.toInt()
+        val day = min(anchor.dayOfMonth, daysInMonth(year, anchor.monthNumber))
+        return LocalDate(year, anchor.monthNumber, day)
+    }
+
+    fun daysInMonth(year: Int, monthNumber: Int): Int {
+        val nextYear = if (monthNumber == 12) year + 1 else year
+        val nextMonth = if (monthNumber == 12) 1 else monthNumber + 1
+        return daySpan(LocalDate(year, monthNumber, 1), LocalDate(nextYear, nextMonth, 1))
+    }
+
+    fun computeDisplay(event: DayEvent, ref: LocalDate = today()): DayEventDisplay {
+        val anchor = parse(event.date) ?: ref
+        val unit = event.repeatUnit
+        val interval = max(1, event.repeatInterval)
+        val elapsed = max(0, diffDays(anchor, ref))
+        val repeatLabel = formatRepeatLabel(unit, interval)
+
+        if (unit != RepeatUnit.NONE) {
+            val next = resolveNextDate(event.date, unit, interval, ref)
+            val toNext = max(0, diffDays(ref, next))
+            val isToday = toNext == 0L
+            return DayEventDisplay(
+                event = event,
+                kind = EventKind.REPEAT,
+                days = toNext.toInt(),
+                elapsedDays = elapsed.toInt(),
+                label = if (isToday) "今天" else "还有 $toNext 天",
+                nextDate = format(next),
+                repeatLabel = repeatLabel,
+                sortDate = format(next),
+            )
+        }
+
+        val pastOrFuture = diffDays(anchor, ref).toInt()
+        return when {
+            pastOrFuture == 0 -> DayEventDisplay(
+                event, EventKind.TODAY, 0, 0, "今天",
+                repeatLabel = repeatLabel, sortDate = event.date,
+            )
+            pastOrFuture < 0 -> {
+                val remain = abs(pastOrFuture)
+                DayEventDisplay(
+                    event, EventKind.COUNTDOWN, remain, 0, "还有 $remain 天",
+                    repeatLabel = repeatLabel, sortDate = event.date,
+                )
+            }
+            else -> DayEventDisplay(
+                event, EventKind.ELAPSED, pastOrFuture, pastOrFuture, "已经过 $pastOrFuture 天",
+                repeatLabel = repeatLabel, sortDate = event.date,
+            )
+        }
+    }
+
+    private fun rank(e: DayEventDisplay): Int = when (e.kind) {
+        EventKind.REPEAT, EventKind.TODAY -> 0
+        EventKind.COUNTDOWN -> 1
+        EventKind.ELAPSED -> 2
+    }
+
+    fun sortEvents(list: List<DayEventDisplay>): List<DayEventDisplay> =
+        list.sortedWith(
+            compareByDescending<DayEventDisplay> { it.starred }
+                .thenBy { rank(it) }
+                .thenBy {
+                    if (rank(it) == 2) it.sortDate.reversed() else it.sortDate
+                }
+                .thenBy { it.id }
+        )
+
+    fun pickNearest(list: List<DayEventDisplay>): DayEventDisplay? {
+        if (list.isEmpty()) return null
+        val upcoming = list.filter {
+            (it.kind == EventKind.REPEAT || it.kind == EventKind.COUNTDOWN) && it.days > 0
+        }
+        return upcoming.minByOrNull { it.days } ?: list.first()
+    }
+
+    fun carouselList(list: List<DayEventDisplay>): List<DayEventDisplay> {
+        if (list.isEmpty()) return emptyList()
+        val nearest = pickNearest(list) ?: return list
+        return listOf(nearest) + list.filter { it.id != nearest.id }
+    }
+
+    fun convertDuration(from: LocalDate, to: LocalDate): DurationBreakdown {
+        val start = if (from < to) from else to
+        val end = if (from < to) to else from
+
+        var years = end.year - start.year
+        if (plusYearsFromAnchor(start, years.toLong()) > end) {
+            years--
+        }
+
+        val monthsBeforeRemainder = years * 12
+        var monthsAfterYears = 0
+        while (
+            monthsAfterYears < 1200 &&
+            plusMonthsFromAnchor(
+                start,
+                (monthsBeforeRemainder + monthsAfterYears + 1).toLong(),
+            ) <= end
+        ) {
+            monthsAfterYears++
+        }
+        val months = monthsBeforeRemainder + monthsAfterYears
+        val milestone = plusMonthsFromAnchor(start, months.toLong())
+        val daysAfterMonths = daySpan(milestone, end)
+
+        return DurationBreakdown(
+            days = abs(diffDays(start, end)).toInt(),
+            years = years.coerceAtLeast(0),
+            monthsAfterYears = monthsAfterYears,
+            daysAfterMonthsFromYears = daysAfterMonths,
+            months = months,
+            daysAfterMonths = daysAfterMonths,
+        )
+    }
+
+    private fun joinNonZero(parts: List<Pair<Int, String>>): String =
+        parts.filter { it.first > 0 }.joinToString(" ") { "${it.first} ${it.second}" }
+
+    fun formatDuration(b: DurationBreakdown, unit: DurationUnit): DurationDisplay =
+        when (unit) {
+            DurationUnit.DAY -> DurationDisplay(b.days, "天", "")
+            DurationUnit.MONTH ->
+                if (b.months > 0) {
+                    DurationDisplay(b.months, "月", joinNonZero(listOf(b.daysAfterMonths to "天")))
+                } else {
+                    DurationDisplay(b.daysAfterMonths, "天", "")
+                }
+            DurationUnit.YEAR -> when {
+                b.years > 0 -> DurationDisplay(
+                    b.years, "年",
+                    joinNonZero(listOf(b.monthsAfterYears to "月", b.daysAfterMonthsFromYears to "天")),
+                )
+                b.monthsAfterYears > 0 ->
+                    DurationDisplay(b.monthsAfterYears, "月", joinNonZero(listOf(b.daysAfterMonthsFromYears to "天")))
+                else -> DurationDisplay(b.daysAfterMonthsFromYears, "天", "")
+            }
+        }
+
+    fun detailTargetDate(event: DayEventDisplay): LocalDate =
+        parse(event.nextDate ?: event.date) ?: today()
+
+    fun validateForm(title: String, date: String, unit: RepeatUnit, interval: Int): String? {
+        val t = title.trim()
+        if (t.isEmpty()) return "请填写标题"
+        if (t.length > 30) return "标题不超过 30 字"
+        if (!isValidDate(date)) return "请选择合法日期"
+        if (unit != RepeatUnit.NONE) {
+            val n = interval
+            if (n < 1) return "重复间隔至少为 1"
+            if (n > 999) return "重复间隔过大"
+        }
+        return null
+    }
+
+    private fun floorDiv(a: Long, b: Long): Long {
+        var q = a / b
+        if (a xor b < 0 && q * b != a) q--
+        return q
+    }
+
+    private fun floorMod(a: Long, b: Long): Long = a - floorDiv(a, b) * b
+}

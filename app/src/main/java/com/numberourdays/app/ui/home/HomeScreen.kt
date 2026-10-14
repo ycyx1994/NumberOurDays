@@ -1,17 +1,12 @@
 package com.numberourdays.app.ui.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,9 +40,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,8 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -81,14 +73,6 @@ import com.numberourdays.app.domain.HolidayCalculator
 import com.numberourdays.app.ui.components.DayCountHero
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.components.rememberCurrentDate
-import com.numberourdays.app.ui.theme.Accent
-import com.numberourdays.app.ui.theme.N0
-import com.numberourdays.app.ui.theme.N100
-import com.numberourdays.app.ui.theme.N300
-import com.numberourdays.app.ui.theme.N50
-import com.numberourdays.app.ui.theme.N500
-import com.numberourdays.app.ui.theme.N700
-import com.numberourdays.app.ui.theme.N900
 import com.numberourdays.app.ui.theme.NodCardShape
 import com.numberourdays.app.ui.theme.NodDisplayCount
 import com.numberourdays.app.ui.theme.NodDisplayNumber
@@ -98,13 +82,17 @@ import com.numberourdays.app.ui.theme.HeroCardPadH
 import com.numberourdays.app.ui.theme.HeroCardPadV
 import com.numberourdays.app.ui.theme.HeroPageMarginH
 import com.numberourdays.app.ui.theme.HeroPageMarginTop
-import com.numberourdays.app.ui.theme.HolidayEdge
-import com.numberourdays.app.ui.theme.HolidayTint
 import kotlin.math.absoluteValue
+import com.numberourdays.app.ui.theme.LocalNodBrand
 
 private sealed interface Slide {
     data class Event(val display: DayEventDisplay) : Slide
     data class Holiday(val countdown: HolidayCountdown) : Slide
+}
+
+private fun slideKey(slide: Slide): Any = when (slide) {
+    is Slide.Event -> "e:${slide.display.id}:${slide.display.date}"
+    is Slide.Holiday -> "h:${slide.countdown.period.name}:${slide.countdown.period.start}"
 }
 
 @Composable
@@ -133,40 +121,6 @@ fun HomeScreen(
         }
     }
 
-    // Drag reorder: accumulate delta during the gesture; commit once on drag end
-    // so LazyColumn is not re-sorted mid-gesture (that cancels pointer input).
-    var draggingId by remember { mutableStateOf<String?>(null) }
-    var dragDeltaPx by remember { mutableFloatStateOf(0f) }
-    var dragStartStarIndex by remember { mutableIntStateOf(-1) }
-    val rowHeightPx = with(LocalDensity.current) { 72.dp.toPx() }
-
-    fun onDragStart(id: String) {
-        draggingId = id
-        dragDeltaPx = 0f
-        dragStartStarIndex = displays.filter { it.starred }.indexOfFirst { it.id == id }
-    }
-
-    fun onDragMove(deltaY: Float) {
-        if (draggingId == null) return
-        dragDeltaPx += deltaY
-    }
-
-    fun onDragEnd() {
-        val id = draggingId
-        val from = dragStartStarIndex
-        val deltaY = dragDeltaPx
-        draggingId = null
-        dragDeltaPx = 0f
-        dragStartStarIndex = -1
-        if (id == null || from < 0) return
-        val starred = displays.filter { it.starred }.map { it.id }.toMutableList()
-        if (from !in starred.indices) return
-        val to = DateCalculator.dragTargetIndex(from, starred.lastIndex, deltaY, rowHeightPx)
-        if (to == from) return
-        val moved = starred.removeAt(from)
-        starred.add(to, moved)
-        repo.reorderStars(starred)
-    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -186,24 +140,14 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onOpenAdd,
-                containerColor = Accent,
-                contentColor = N0,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = NodFabShape,
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_event))
             }
         },
     ) { padding ->
-        if (displays.isEmpty() && holiday == null) {
-            EmptyState(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                onAdd = onOpenAdd,
-            )
-            return@Scaffold
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -221,11 +165,19 @@ fun HomeScreen(
                     onClick = onOpenDetail,
                     onOpenHolidays = onOpenHolidays,
                 )
-                Dots(count = slides.size, selected = pagerState.currentPage)
+                // Read currentPage inside Dots (or via derivedStateOf) so swipe
+                // does not recompose the whole HomeScreen column.
+                Dots(count = slides.size, pagerState = pagerState)
             }
             if (holiday != null) {
                 HolidayMiniCard(
                     countdown = holiday,
+                    modifier = Modifier.padding(top = 8.dp),
+                    onClick = onOpenHolidays,
+                )
+            } else {
+                // Keep the holiday entry even when the year has no more vacation blocks.
+                HolidayEmptyCard(
                     modifier = Modifier.padding(top = 8.dp),
                     onClick = onOpenHolidays,
                 )
@@ -240,7 +192,7 @@ fun HomeScreen(
             } else {
                 Text(
                     text = stringResource(R.string.all_events),
-                    color = N500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp,
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
                 )
@@ -251,21 +203,12 @@ fun HomeScreen(
                     contentPadding = PaddingValues(bottom = 96.dp),
                 ) {
                     items(displays, key = { it.id }) { item ->
-                        val isDraggingItem = draggingId == item.id
                         EventRow(
                             item = item,
                             onOpen = { onOpenDetail(item.id) },
                             onToggleStar = { repo.toggleStar(item.id) },
-                            dragEnabled = item.starred,
-                            dragging = isDraggingItem,
-                            dragOffsetPx = if (isDraggingItem) dragDeltaPx else 0f,
-                            onDragStart = { onDragStart(item.id) },
-                            onDrag = { dy -> onDragMove(dy) },
-                            onDragEnd = { onDragEnd() },
                         )
-                        if (!isDraggingItem) {
-                            HorizontalDivider(color = N100, thickness = 1.dp)
-                        }
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
                     }
                 }
             }
@@ -273,23 +216,25 @@ fun HomeScreen(
     }
 }
 
+private val DigitRun = Regex("\\d+")
+
 @Composable
 private fun dayCountAnnotated(label: String): AnnotatedString {
-    val match = Regex("\\d+").find(label)
+    val match = DigitRun.find(label)
     val digitStyle = SpanStyle(
-        color = Accent,
+        color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold,
         fontFamily = NodDisplayCount.fontFamily,
         fontSize = NodDisplayCount.fontSize * 18f / 17f,
     )
     val plainStyle = SpanStyle(
-        color = N700,
+        color = LocalNodBrand.current.n700,
         fontWeight = FontWeight.Normal,
         fontSize = NodDisplayCount.fontSize * 16f / 17f,
     )
     // System CJK bold so "今天" actually thickens (Barlow has no Han glyphs).
     val todayStyle = SpanStyle(
-        color = Accent,
+        color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold,
         fontFamily = FontFamily.Default,
         fontSize = NodDisplayCount.fontSize * 16f / 17f,
@@ -322,29 +267,69 @@ private fun EmptyState(modifier: Modifier = Modifier, onAdd: () -> Unit) {
     ) {
         Text(
             text = stringResource(R.string.empty_title),
-            color = N900,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
         )
         Spacer(Modifier.height(8.dp))
         Text(
             text = stringResource(R.string.empty_desc),
-            color = N500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 13.sp,
         )
         Spacer(Modifier.height(24.dp))
         Text(
             text = stringResource(R.string.empty_action),
-            color = N0,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .width(200.dp)
                 .clip(MaterialTheme.shapes.medium)
-                .background(Accent)
+                .background(MaterialTheme.colorScheme.primary)
                 .clickable(onClick = onAdd)
                 .padding(vertical = 14.dp),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+private fun HolidayEmptyCard(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(NodCardShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, NodCardShape)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.holiday_legal),
+                color = MaterialTheme.colorScheme.outline,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = stringResource(R.string.holiday_none_left),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Text(
+            text = stringResource(R.string.holiday_none_hint),
+            color = MaterialTheme.colorScheme.outline,
+            fontSize = 12.sp,
         )
     }
 }
@@ -359,8 +344,8 @@ private fun HolidayMiniCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(NodCardShape)
-            .background(HolidayTint)
-            .border(1.dp, HolidayEdge, NodCardShape)
+            .background(LocalNodBrand.current.holidayTint)
+            .border(1.dp, LocalNodBrand.current.holidayEdge, NodCardShape)
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -368,14 +353,14 @@ private fun HolidayMiniCard(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(R.string.holiday_legal),
-                color = Accent,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 text = countdown.period.name,
-                color = N900,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -391,7 +376,7 @@ private fun HolidayMiniCard(
                 )
             },
             style = NodDisplayCount,
-            color = Accent,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
@@ -411,6 +396,7 @@ private fun CarouselCard(
     ) {
         HorizontalPager(
             state = pagerState,
+            key = { index -> slides.getOrNull(index)?.let { slideKey(it) } ?: index },
             pageSpacing = 0.dp,
             modifier = Modifier.fillMaxWidth(),
         ) { page ->
@@ -422,10 +408,12 @@ private fun CarouselCard(
     }
 }
 
+private val HeroSuffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp)
+
 @Composable
 private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
     val tag = when {
-        item.repeatLabel != null && item.kind == EventKind.REPEAT -> item.repeatLabel
+        item.repeatLabel != null && item.kind == EventKind.REPEAT -> item.repeatLabel ?: "重复"
         item.kind == EventKind.COUNTDOWN -> "倒数"
         item.kind == EventKind.ELAPSED -> "已过"
         else -> "今天"
@@ -433,7 +421,7 @@ private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(N50)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .defaultMinSize(minHeight = HeroCardMinHeight)
             .clickable { onClick(item.id) }
             .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
@@ -442,13 +430,13 @@ private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
     ) {
         Text(
             text = stringResource(R.string.next_prefix, tag),
-            color = N500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 11.sp,
             textAlign = TextAlign.Center,
         )
         Text(
             text = item.title,
-            color = N900,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 17.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -460,11 +448,11 @@ private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
             value = item.days.toString(),
             suffix = stringResource(R.string.unit_day),
             suffixBottomPadding = 6,
-            suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
+            suffixStyle = HeroSuffixStyle,
         )
         Text(
             text = item.date,
-            color = N500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             maxLines = 1,
@@ -478,7 +466,7 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(HolidayTint)
+            .background(LocalNodBrand.current.holidayTint)
             .defaultMinSize(minHeight = HeroCardMinHeight)
             .clickable(onClick = onOpenHolidays)
             .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
@@ -487,14 +475,14 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
     ) {
         Text(
             text = stringResource(R.string.holiday_next),
-            color = Accent,
+            color = MaterialTheme.colorScheme.primary,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
         Text(
             text = countdown.period.name,
-            color = N900,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 17.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -505,7 +493,7 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
         if (countdown.status == HolidayStatus.ONGOING) {
             Text(
                 text = stringResource(R.string.holiday_ongoing),
-                color = Accent,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 18.dp, bottom = 12.dp),
@@ -515,14 +503,14 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
                 value = countdown.daysUntilStart.toString(),
                 suffix = stringResource(R.string.unit_day),
                 suffixBottomPadding = 6,
-                suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
+                suffixStyle = HeroSuffixStyle,
             )
         }
         Text(
             text = DateCalculator.format(countdown.period.start) +
                 " · " +
                 DateCalculator.format(countdown.period.end),
-            color = N500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             maxLines = 1,
@@ -532,11 +520,13 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
 }
 
 @Composable
-private fun Dots(count: Int, selected: Int) {
+private fun Dots(count: Int, pagerState: androidx.compose.foundation.pager.PagerState) {
     if (count <= 1) {
         Spacer(Modifier.height(12.dp))
         return
     }
+    // Isolate pager reads so only this row recomposes on page change.
+    val selected by remember { derivedStateOf { pagerState.currentPage } }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -557,7 +547,7 @@ private fun Dots(count: Int, selected: Int) {
                     .height(6.dp)
                     .width(width)
                     .clip(RoundedCornerShape(3.dp))
-                    .background(if (active) N700 else N300)
+                    .background(if (active) LocalNodBrand.current.n700 else MaterialTheme.colorScheme.outline)
             )
         }
     }
@@ -568,12 +558,6 @@ private fun EventRow(
     item: DayEventDisplay,
     onOpen: () -> Unit,
     onToggleStar: () -> Unit,
-    dragEnabled: Boolean,
-    dragging: Boolean = false,
-    dragOffsetPx: Float = 0f,
-    onDragStart: () -> Unit = {},
-    onDrag: (Float) -> Unit,
-    onDragEnd: () -> Unit,
 ) {
     val kindLabel = when (item.kind) {
         EventKind.COUNTDOWN -> "倒数"
@@ -581,70 +565,15 @@ private fun EventRow(
         EventKind.TODAY -> "今天"
         EventKind.REPEAT -> "重复"
     }
-    // Paper-card lift: warm surface + hairline border only.
-    // No platform shadowElevation — on settle it left a dark frame when bg faded out.
-    val dragShape = NodCardShape
-    val liftScale by animateFloatAsState(
-        targetValue = if (dragging) 1.015f else 1f,
-        animationSpec = tween(durationMillis = 160),
-        label = "dragLiftScale",
-    )
-    val liftSurface by animateColorAsState(
-        targetValue = if (dragging) N50 else Color.Transparent,
-        animationSpec = tween(durationMillis = 160),
-        label = "dragLiftSurface",
-    )
-    val liftBorder by animateColorAsState(
-        targetValue = if (dragging) N100 else Color.Transparent,
-        animationSpec = tween(durationMillis = 160),
-        label = "dragLiftBorder",
-    )
-    val liftInset by animateDpAsState(
-        targetValue = if (dragging) 2.dp else 0.dp,
-        animationSpec = tween(durationMillis = 160),
-        label = "dragLiftInset",
-    )
-    val liftPad by animateDpAsState(
-        targetValue = if (dragging) 10.dp else 0.dp,
-        animationSpec = tween(durationMillis = 160),
-        label = "dragLiftPad",
-    )
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .padding(horizontal = liftInset)
-            .graphicsLayer {
-                translationY = dragOffsetPx
-                scaleX = liftScale
-                scaleY = liftScale
-                shape = dragShape
-                clip = dragging
-            }
-            .background(color = liftSurface, shape = dragShape)
-            .border(1.dp, liftBorder, dragShape)
-            .then(
-                if (dragEnabled) {
-                    Modifier.pointerInput(item.id) {
-                        detectDragGesturesAfterLongPress(
-                            onDragStart = { onDragStart() },
-                            onDragEnd = { onDragEnd() },
-                            onDragCancel = { onDragEnd() },
-                            onDrag = { change, amount ->
-                                change.consume()
-                                onDrag(amount.y)
-                            },
-                        )
-                    }
-                } else {
-                    Modifier
-                }
-            )
             .clickable(onClick = onOpen)
-            .padding(horizontal = liftPad, vertical = 12.dp),
+            .padding(horizontal = 12.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onToggleStar, modifier = Modifier.size(40.dp)) {
+        IconButton(onClick = onToggleStar, modifier = Modifier.size(48.dp)) {
             Icon(
                 imageVector = if (item.starred) Icons.Rounded.Star else Icons.Outlined.StarOutline,
                 contentDescription = if (item.starred) {
@@ -652,7 +581,7 @@ private fun EventRow(
                 } else {
                     stringResource(R.string.star)
                 },
-                tint = if (item.starred) Accent else N300,
+                tint = if (item.starred) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
             )
         }
         Column(
@@ -662,7 +591,7 @@ private fun EventRow(
         ) {
             Text(
                 text = item.title,
-                color = N900,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 15.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -673,7 +602,7 @@ private fun EventRow(
                     if (item.repeatLabel != null) append(" · ").append(item.repeatLabel)
                     else append(" · ").append(kindLabel)
                 },
-                color = N500,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

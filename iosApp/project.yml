@@ -1,0 +1,39 @@
+name: NumberOurDays
+options:
+  bundleIdPrefix: com.numberourdays
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    CURRENT_PROJECT_VERSION: "3"
+    MARKETING_VERSION: "1.1.0"
+targets:
+  NumberOurDays:
+    type: application
+    platform: iOS
+    sources:
+      - path: NumberOurDays
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.numberourdays.app
+        PRODUCT_NAME: NumberOurDays
+        INFOPLIST_FILE: NumberOurDays/Info.plist
+        GENERATE_INFOPLIST_FILE: false
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/Frameworks"
+        FRAMEWORK_SEARCH_PATHS:
+          - "$(inherited)"
+          - "$(PROJECT_DIR)/../shared/build/xcode-frameworks"
+        SWIFT_OBJC_BRIDGING_HEADER: ""
+        ENABLE_BITCODE: false
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "Apple Development"
+        DEVELOPMENT_TEAM: "XH8FSCQ9WR"
+        ASSETCATALOG_COMPILER_APPICON_NAME: "AppIcon"
+    dependencies:
+      - framework: ../shared/build/xcode-frameworks/Shared.framework
+        embed: true

@@ -22,8 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.numberourdays.app.R
 import com.numberourdays.app.domain.DateCalculator
-import com.numberourdays.app.ui.theme.N900
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 import kotlinx.coroutines.delay
 
 @Composable
@@ -54,7 +53,7 @@ fun NodTopBar(
         title = {
             Text(
                 text = title,
-                color = N900,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -73,7 +72,7 @@ fun NodTopBar(
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = N900,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
             navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             actionIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         ),

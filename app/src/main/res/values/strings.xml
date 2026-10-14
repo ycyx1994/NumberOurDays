@@ -32,6 +32,13 @@
     <string name="test_notification">发送测试通知</string>
     <string name="test_notification_body">测试通知 · 点击打开事件详情</string>
     <string name="test_notification_empty">先添加一条纪念日再测试</string>
+    <string name="nav_anim">页面过渡</string>
+    <string name="nav_anim_fade">淡入淡出</string>
+    <string name="nav_anim_fade_scale">淡入 + 轻微缩放</string>
+    <string name="nav_anim_hint">可在列表进详情时对比手感</string>
+    <string name="test_alarm_one_min">一分钟后提醒（精确闹钟）</string>
+    <string name="test_alarm_one_min_done">已排定，约 60 秒后通知</string>
+    <string name="test_alarm_one_min_need_exact">无精确闹钟权限，通知可能延迟</string>
     <string name="backup_section">备份</string>
     <string name="import_section">导入</string>
     <string name="danger_section">危险操作</string>
@@ -72,6 +79,8 @@
     <string name="holiday_ongoing">假期中</string>
     <string name="holiday_today">今天放假</string>
     <string name="holiday_countdown">还有 %1$d 天</string>
+    <string name="holiday_none_left">今年没有节假日咯😭</string>
+    <string name="holiday_none_hint">点我查看放假安排</string>
     <string name="holiday_next">下一个 · 法定假日</string>
     <string name="holiday_list_title">法定假日</string>
     <string name="holiday_year_title">%1$d 年法定节假日</string>
@@ -97,6 +106,10 @@
     <string name="remind_off">未开启</string>
     <string name="remind_on">已开启 · %1$02d:%2$02d</string>
     <string name="notif_channel_name">纪念日提醒</string>
+    <string name="exact_alarm_title">需要精确闹钟权限</string>
+    <string name="exact_alarm_message">澎湃 OS / Android 12+ 需允许「精确闹钟」，提醒才能准点弹出。是否去设置？</string>
+    <string name="exact_alarm_go">去设置</string>
+    <string name="exact_alarm_skip">稍后</string>
     <string name="notif_body">今天 · %1$s</string>
     <string name="notif_permission_needed">请允许通知，才能在目标日提醒你</string>
     <string name="event_missing">事件不存在</string>

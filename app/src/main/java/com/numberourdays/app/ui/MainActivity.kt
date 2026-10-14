@@ -11,15 +11,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +31,7 @@ import com.numberourdays.app.ui.detail.DetailScreen
 import com.numberourdays.app.ui.edit.EditScreen
 import com.numberourdays.app.ui.holiday.HolidayListScreen
 import com.numberourdays.app.ui.home.HomeScreen
+import com.numberourdays.app.ui.settings.NavAnimPrefs
 import com.numberourdays.app.ui.settings.SettingsScreen
 import com.numberourdays.app.ui.theme.NumberOurDaysTheme
 import com.numberourdays.app.widget.HolidayWidgetReceiver
@@ -107,20 +109,35 @@ private fun NodApp(
         }
     }
 
+    val animStyle = NavAnimPrefs.style(LocalContext.current)
     NavHost(
         navController = nav,
         startDestination = "home",
+        // Two selectable styles: pure fade (smoother on HyperOS) or fade+light scale.
         enterTransition = {
-            slideInHorizontally(tween(200)) { it / 4 } + fadeIn(tween(200))
+            fadeIn(tween(130)) +
+                if (animStyle == NavAnimPrefs.FADE_SCALE) {
+                    scaleIn(initialScale = 0.92f, animationSpec = tween(130))
+                } else {
+                    androidx.compose.animation.EnterTransition.None
+                }
         },
-        exitTransition = {
-            slideOutHorizontally(tween(200)) { -it / 8 } + fadeOut(tween(150))
-        },
+        exitTransition = { fadeOut(tween(90)) },
         popEnterTransition = {
-            slideInHorizontally(tween(200)) { -it / 8 } + fadeIn(tween(150))
+            fadeIn(tween(130)) +
+                if (animStyle == NavAnimPrefs.FADE_SCALE) {
+                    scaleIn(initialScale = 0.94f, animationSpec = tween(130))
+                } else {
+                    androidx.compose.animation.EnterTransition.None
+                }
         },
         popExitTransition = {
-            slideOutHorizontally(tween(200)) { it / 4 } + fadeOut(tween(200))
+            fadeOut(tween(90)) +
+                if (animStyle == NavAnimPrefs.FADE_SCALE) {
+                    scaleOut(targetScale = 0.94f, animationSpec = tween(90))
+                } else {
+                    androidx.compose.animation.ExitTransition.None
+                }
         },
     ) {
         composable("home") {
@@ -137,6 +154,11 @@ private fun NodApp(
         composable(
             route = "detail/{id}",
             arguments = listOf(navArgument("id") { type = NavType.StringType }),
+            // Destination is layout-heavy; keep transition to opacity only.
+            enterTransition = { fadeIn(tween(120)) },
+            exitTransition = { fadeOut(tween(80)) },
+            popEnterTransition = { fadeIn(tween(120)) },
+            popExitTransition = { fadeOut(tween(80)) },
         ) { entry ->
             val id = entry.arguments?.getString("id").orEmpty()
             DetailScreen(
