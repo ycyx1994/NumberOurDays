@@ -129,7 +129,6 @@ fun EditScreen(
     var remindMinute by rememberSaveable { mutableStateOf((existing?.remindMinute ?: 0).toString()) }
     var showExactAlarmDialog by rememberSaveable { mutableStateOf(false) }
     var errorText by rememberSaveable { mutableStateOf<String?>(null) }
-    var showDelete by rememberSaveable { mutableStateOf(false) }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     var showTimePicker by rememberSaveable { mutableStateOf(false) }
 
@@ -451,39 +450,8 @@ fun EditScreen(
                 Text(stringResource(R.string.save), fontSize = 14.sp)
             }
 
-            if (existing != null) {
-                Spacer(Modifier.height(16.dp))
-                OutlinedButton(
-                    onClick = { showDelete = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = NodButtonShape,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                ) {
-                    Text(stringResource(R.string.delete), fontSize = 14.sp)
-                }
-            }
             Spacer(Modifier.height(40.dp))
         }
-    }
-
-    if (showDelete && existing != null) {
-        AlertDialog(
-            onDismissRequest = { showDelete = false },
-            title = { Text("删除纪念日") },
-            text = { Text("确定删除「${existing.title}」？") },
-            confirmButton = {
-                TextButton(onClick = {
-                    repo.remove(existing.id)
-                    showDelete = false
-                    onSaved()
-                }) { Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDelete = false }) { Text("取消") }
-            },
-        )
     }
 
     if (showExactAlarmDialog) {
