@@ -1,0 +1,28 @@
+<view class="page" wx:if="{{display}}">
+  <view class="card hero">
+    <view class="tag">目标</view>
+    <view class="title">{{display.title}}</view>
+    <view class="days">{{display.days}}<text class="unit">天</text></view>
+    <view class="date">{{display.date}}</view>
+  </view>
+
+  <view class="units">
+    <view class="chip {{unit === 'DAY' ? 'on' : ''}}" data-unit="DAY" bindtap="setUnit">天</view>
+    <view class="chip {{unit === 'MONTH' ? 'on' : ''}}" data-unit="MONTH" bindtap="setUnit">月</view>
+    <view class="chip {{unit === 'YEAR' ? 'on' : ''}}" data-unit="YEAR" bindtap="setUnit">年</view>
+  </view>
+
+  <view class="card meta">
+    <view class="row"><text>重复</text><text class="v">{{display.repeatLabel || '不重复'}}</text></view>
+    <view class="row" wx:if="{{display.nextDate}}"><text>下一次</text><text class="v">{{display.nextDate}}</text></view>
+    <view class="row"><text>已过</text><text class="v">{{elapsedText}}</text></view>
+    <view class="row"><text>状态</text><text class="v">{{display.label}}</text></view>
+    <view class="row"><text>备注</text><text class="v">{{display.note || '—'}}</text></view>
+  </view>
+
+  <view class="actions">
+    <view class="btn-primary" bindtap="onEdit">编辑</view>
+    <view class="btn-danger" bindtap="onDelete">删除</view>
+  </view>
+</view>
+<view wx:else class="empty">事件不存在</view>

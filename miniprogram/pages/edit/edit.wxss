@@ -1,0 +1,12 @@
+.page { padding: 24rpx 32rpx 48rpx; }
+.label { color: #8a8175; font-size: 24rpx; margin: 24rpx 0 12rpx; }
+.input {
+  background: #faf7f2; border-radius: 12rpx; padding: 20rpx 24rpx; font-size: 28rpx;
+}
+.picker { color: #1c1916; }
+.textarea {
+  width: 100%; box-sizing: border-box; min-height: 140rpx;
+  background: #faf7f2; border-radius: 12rpx; padding: 20rpx 24rpx; font-size: 28rpx;
+}
+.error { color: #d4553a; margin: 16rpx 0; font-size: 24rpx; }
+.btn-primary { margin-top: 40rpx; }

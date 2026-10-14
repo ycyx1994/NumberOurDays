@@ -1,0 +1,6 @@
+.page { padding: 24rpx 32rpx 48rpx; }
+.label { color: #8a8175; font-size: 24rpx; margin: 28rpx 0 12rpx; }
+.count { font-size: 32rpx; font-weight: 600; }
+.msg { margin-top: 24rpx; color: #8a8175; font-size: 24rpx; }
+.foot { margin-top: 64rpx; color: #c9c0b2; font-size: 22rpx; text-align: center; }
+.btn-primary, .btn-danger { margin-top: 16rpx; }

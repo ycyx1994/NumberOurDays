@@ -1,0 +1,23 @@
+<view class="page">
+  <view class="hero card" wx:if="{{displays.length}}">
+    <view class="hero-tag">下一个 · {{displays[0].label}}</view>
+    <view class="hero-title">{{displays[0].title}}</view>
+    <view class="hero-days">{{displays[0].days}}<text class="hero-unit">天</text></view>
+    <view class="hero-date">{{displays[0].date}}</view>
+  </view>
+
+  <view class="section-title">全部纪念日</view>
+  <view class="list">
+    <view class="row" wx:for="{{displays}}" wx:key="id" data-id="{{item.id}}" bindtap="onOpen">
+      <view class="row-main">
+        <view class="row-title">{{item.starred ? '★ ' : ''}}{{item.title}}</view>
+        <view class="row-sub">{{item.date}} · {{item.kind === 'ELAPSED' ? '已过' : (item.repeatLabel || '倒数')}}</view>
+      </view>
+      <view class="row-label">{{item.label}}</view>
+    </view>
+    <view wx:if="{{!displays.length}}" class="empty">还没有纪念日，点右下角添加</view>
+  </view>
+
+  <view class="fab" bindtap="onAdd">＋</view>
+  <view class="settings-btn" bindtap="onSettings">⚙</view>
+</view>
