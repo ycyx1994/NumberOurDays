@@ -11,15 +11,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +31,7 @@ import com.numberourdays.app.ui.detail.DetailScreen
 import com.numberourdays.app.ui.edit.EditScreen
 import com.numberourdays.app.ui.holiday.HolidayListScreen
 import com.numberourdays.app.ui.home.HomeScreen
+import com.numberourdays.app.ui.settings.NavAnimPrefs
 import com.numberourdays.app.ui.settings.SettingsScreen
 import com.numberourdays.app.ui.theme.NumberOurDaysTheme
 import com.numberourdays.app.widget.HolidayWidgetReceiver
@@ -107,15 +109,36 @@ private fun NodApp(
         }
     }
 
+    val animStyle = NavAnimPrefs.style(LocalContext.current)
     NavHost(
         navController = nav,
         startDestination = "home",
-        // Fade-only: sliding the whole destination tree (esp. detail text) drops
-        // frames mid-transition while both screens are composed.
-        enterTransition = { fadeIn(tween(130)) },
+        // Two selectable styles: pure fade (smoother on HyperOS) or fade+light scale.
+        enterTransition = {
+            fadeIn(tween(130)) +
+                if (animStyle == NavAnimPrefs.FADE_SCALE) {
+                    scaleIn(initialScale = 0.92f, animationSpec = tween(130))
+                } else {
+                    androidx.compose.animation.EnterTransition.None
+                }
+        },
         exitTransition = { fadeOut(tween(90)) },
-        popEnterTransition = { fadeIn(tween(130)) },
-        popExitTransition = { fadeOut(tween(90)) },
+        popEnterTransition = {
+            fadeIn(tween(130)) +
+                if (animStyle == NavAnimPrefs.FADE_SCALE) {
+                    scaleIn(initialScale = 0.94f, animationSpec = tween(130))
+                } else {
+                    androidx.compose.animation.EnterTransition.None
+                }
+        },
+        popExitTransition = {
+            fadeOut(tween(90)) +
+                if (animStyle == NavAnimPrefs.FADE_SCALE) {
+                    scaleOut(targetScale = 0.94f, animationSpec = tween(90))
+                } else {
+                    androidx.compose.animation.ExitTransition.None
+                }
+        },
     ) {
         composable("home") {
             HomeScreen(

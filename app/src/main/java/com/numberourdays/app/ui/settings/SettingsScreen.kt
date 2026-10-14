@@ -71,6 +71,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var confirmClear by rememberSaveable { mutableStateOf(false) }
     var pasteAdvanced by rememberSaveable { mutableStateOf(false) }
     var showDebug by rememberSaveable { mutableStateOf(false) }
+    var navAnimStyle by rememberSaveable { mutableStateOf(NavAnimPrefs.style(context)) }
     var titleClicks by rememberSaveable { mutableStateOf(0) }
     var pendingFileImport by remember { mutableStateOf<List<DayEvent>?>(null) }
     var pendingFileImportNote by remember { mutableStateOf<String?>(null) }
@@ -223,6 +224,36 @@ fun SettingsScreen(onBack: () -> Unit) {
                         context.getString(R.string.test_alarm_one_min_need_exact)
                     }
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            SectionLabel(stringResource(R.string.nav_anim))
+            Text(stringResource(R.string.nav_anim_hint), color = N500, fontSize = 12.sp)
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                val options = listOf(
+                    NavAnimPrefs.FADE to stringResource(R.string.nav_anim_fade),
+                    NavAnimPrefs.FADE_SCALE to stringResource(R.string.nav_anim_fade_scale),
+                )
+                options.forEach { (key, label) ->
+                    val selected = navAnimStyle == key
+                    Text(
+                        label,
+                        color = if (selected) N0 else N700,
+                        fontSize = 13.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(if (selected) Accent else N50)
+                            .clickable {
+                                navAnimStyle = key
+                                NavAnimPrefs.setStyle(context, key)
+                                message = label
+                            }
+                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                    )
                 }
             }
             SectionLabel(stringResource(R.string.danger_section))
