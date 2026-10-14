@@ -1,0 +1,377 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0CAE3A2D457A7BFD3FDED1D2 /* Shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FAE42A66C08C9B0FED3EAC97 /* Shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		17AF59C0F1E9A271E778E6D0 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A767E278549D7A56529AF79D /* EditView.swift */; };
+		4F4B28B983CF133740820A53 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E49B8C4898F6EACFAE64641 /* Theme.swift */; };
+		5493C4CC8FDB1E69B44B6327 /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0019E941D823C59415EA85 /* EventStore.swift */; };
+		65DB0896CD296DCB4E0CEFB5 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A8A5F9D637EB61BF45C21C /* DetailView.swift */; };
+		7F3701BA9BA6CCA6BCBBCA6A /* NumberOurDaysApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD0C88892119D4304E81C05D /* NumberOurDaysApp.swift */; };
+		A12F4E929E2ED40A1712DC45 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7D0C2CA21D7A2D2C6F83BDB /* SettingsView.swift */; };
+		E1B939660DFD6C2FFD068121 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE42A66C08C9B0FED3EAC97 /* Shared.framework */; };
+		FC0959408C54700024DE0628 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104AD0CB9D5DFA1B4F0B15DC /* HomeView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C33FD2C46D2F059264F7D07E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0CAE3A2D457A7BFD3FDED1D2 /* Shared.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		00873D9D2DA2EE0F3E85B761 /* NumberOurDays.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NumberOurDays.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0BF918FC6CE6987E0C93CDCB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		104AD0CB9D5DFA1B4F0B15DC /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		4E49B8C4898F6EACFAE64641 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		76A8A5F9D637EB61BF45C21C /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		A767E278549D7A56529AF79D /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
+		BD0C88892119D4304E81C05D /* NumberOurDaysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberOurDaysApp.swift; sourceTree = "<group>"; };
+		CF0019E941D823C59415EA85 /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
+		F7D0C2CA21D7A2D2C6F83BDB /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		FAE42A66C08C9B0FED3EAC97 /* Shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Shared.framework; path = "../shared/build/xcode-frameworks/Shared.framework"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D58A51DEB0DE9A79CB01BDA4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E1B939660DFD6C2FFD068121 /* Shared.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0C406D82EC139360B69F1EF2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				FAE42A66C08C9B0FED3EAC97 /* Shared.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		32797F5C0B6CCB3A7D2CAA0B = {
+			isa = PBXGroup;
+			children = (
+				BFD753A3A3F30CFB1D5FE451 /* NumberOurDays */,
+				0C406D82EC139360B69F1EF2 /* Frameworks */,
+				FF5DBF624C261140A0A71880 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BFD753A3A3F30CFB1D5FE451 /* NumberOurDays */ = {
+			isa = PBXGroup;
+			children = (
+				76A8A5F9D637EB61BF45C21C /* DetailView.swift */,
+				A767E278549D7A56529AF79D /* EditView.swift */,
+				CF0019E941D823C59415EA85 /* EventStore.swift */,
+				104AD0CB9D5DFA1B4F0B15DC /* HomeView.swift */,
+				0BF918FC6CE6987E0C93CDCB /* Info.plist */,
+				BD0C88892119D4304E81C05D /* NumberOurDaysApp.swift */,
+				F7D0C2CA21D7A2D2C6F83BDB /* SettingsView.swift */,
+				4E49B8C4898F6EACFAE64641 /* Theme.swift */,
+			);
+			path = NumberOurDays;
+			sourceTree = "<group>";
+		};
+		FF5DBF624C261140A0A71880 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				00873D9D2DA2EE0F3E85B761 /* NumberOurDays.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		57DD000CD1CB2DD54FE425C5 /* NumberOurDays */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CFACA1934562696216C73AEE /* Build configuration list for PBXNativeTarget "NumberOurDays" */;
+			buildPhases = (
+				EA8399B7D1C6BBAB1F279F01 /* Sources */,
+				D58A51DEB0DE9A79CB01BDA4 /* Frameworks */,
+				C33FD2C46D2F059264F7D07E /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NumberOurDays;
+			packageProductDependencies = (
+			);
+			productName = NumberOurDays;
+			productReference = 00873D9D2DA2EE0F3E85B761 /* NumberOurDays.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4ABFDD7C89CE963E7D69AD8D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					57DD000CD1CB2DD54FE425C5 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 535ADCE6D2605F43DB6C732E /* Build configuration list for PBXProject "NumberOurDays" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 32797F5C0B6CCB3A7D2CAA0B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = FF5DBF624C261140A0A71880 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				57DD000CD1CB2DD54FE425C5 /* NumberOurDays */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EA8399B7D1C6BBAB1F279F01 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65DB0896CD296DCB4E0CEFB5 /* DetailView.swift in Sources */,
+				17AF59C0F1E9A271E778E6D0 /* EditView.swift in Sources */,
+				5493C4CC8FDB1E69B44B6327 /* EventStore.swift in Sources */,
+				FC0959408C54700024DE0628 /* HomeView.swift in Sources */,
+				7F3701BA9BA6CCA6BCBBCA6A /* NumberOurDaysApp.swift in Sources */,
+				A12F4E929E2ED40A1712DC45 /* SettingsView.swift in Sources */,
+				4F4B28B983CF133740820A53 /* Theme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0BA914B2D5054037F7906AEC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/../shared/build/xcode-frameworks",
+					"\"../shared/build/xcode-frameworks\"",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = NumberOurDays/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.numberourdays.app;
+				PRODUCT_NAME = NumberOurDays;
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0FDBE06379D04F28A52E334C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/../shared/build/xcode-frameworks",
+					"\"../shared/build/xcode-frameworks\"",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = NumberOurDays/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.numberourdays.app;
+				PRODUCT_NAME = NumberOurDays;
+				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		2B6D6DF02F8112955DBCCC98 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 3;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E22E34EFFAA27A9C607CD652 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 3;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		535ADCE6D2605F43DB6C732E /* Build configuration list for PBXProject "NumberOurDays" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2B6D6DF02F8112955DBCCC98 /* Debug */,
+				E22E34EFFAA27A9C607CD652 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CFACA1934562696216C73AEE /* Build configuration list for PBXNativeTarget "NumberOurDays" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0BA914B2D5054037F7906AEC /* Debug */,
+				0FDBE06379D04F28A52E334C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4ABFDD7C89CE963E7D69AD8D /* Project object */;
+}

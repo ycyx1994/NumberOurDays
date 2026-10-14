@@ -1,0 +1,147 @@
+import SwiftUI
+import Shared
+
+struct DetailView: View {
+    @ObservedObject var store: EventStore
+    let eventId: String
+    @State private var unit: DurationUnit = .day
+    @State private var elapsedUnit: DurationUnit = .day
+    @State private var showEdit = false
+
+    private var event: DayEvent? { store.event(id: eventId) }
+
+    var body: some View {
+        ScrollView {
+            if let event {
+                let d = store.display(for: event)
+                VStack(alignment: .leading, spacing: 16) {
+                    hero(d)
+
+                    HStack(spacing: 8) {
+                        unitChip("天", .day)
+                        unitChip("月", .month)
+                        unitChip("年", .year)
+                    }
+                    .frame(maxWidth: .infinity)
+
+                    VStack(spacing: 0) {
+                        metaRow("重复", d.repeatLabel ?? "不重复")
+                        if let next = d.nextDate {
+                            metaRow("下一次", next)
+                        }
+                        metaRow("已过", elapsedText(d))
+                        metaRow("状态", d.label)
+                        metaRow(
+                            "提醒",
+                            d.remindEnabled
+                                ? "已开 · \(d.remindHour):\(String(format: "%02d", d.remindMinute))"
+                                : "未开启"
+                        )
+                        if let note = d.note, !note.isEmpty {
+                            metaRow("备注", note)
+                        }
+                    }
+                    .background(NodTheme.n50)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    Button(role: .destructive) {
+                        store.remove(id: eventId)
+                    } label: {
+                        Text("删除")
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(NodTheme.n50)
+                            .foregroundStyle(NodTheme.accent)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                }
+                .padding(16)
+            } else {
+                Text("事件不存在")
+                    .foregroundStyle(NodTheme.n500)
+                    .padding(24)
+            }
+        }
+        .background(NodTheme.n0)
+        .navigationTitle(event?.title ?? "详情")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("编辑") { showEdit = true }
+            }
+        }
+        .sheet(isPresented: $showEdit) {
+            EditView(store: store, eventId: eventId)
+        }
+    }
+
+    private func hero(_ d: DayEventDisplay) -> some View {
+        VStack(spacing: 8) {
+            Text("目标")
+                .font(.system(size: 11))
+                .foregroundStyle(NodTheme.n500)
+            Text(d.title)
+                .font(.system(size: 17, weight: .bold))
+                .foregroundStyle(NodTheme.n900)
+            Text("\(durationValue(d))")
+                .font(.system(size: 52, weight: .bold, design: .rounded))
+                .foregroundStyle(NodTheme.accent)
+            Text(d.date)
+                .font(.system(size: 12))
+                .foregroundStyle(NodTheme.n500)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(20)
+        .background(NodTheme.n50)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func durationValue(_ d: DayEventDisplay) -> Int {
+        let target = DateCalculator.shared.detailTargetDate(event: d)
+        let breakdown = DateCalculator.shared.convertDuration(
+            from: DateCalculator.shared.today(),
+            to: target
+        )
+        let shown = DateCalculator.shared.formatDuration(b: breakdown, unit: unit)
+        return Int(shown.value)
+    }
+
+    private func elapsedText(_ d: DayEventDisplay) -> String {
+        let anchor = DateCalculator.shared.parse(text: d.date) ?? DateCalculator.shared.today()
+        let today = DateCalculator.shared.today()
+        let bd = DateCalculator.shared.convertDuration(from: anchor, to: today)
+        let shown = DateCalculator.shared.formatDuration(b: bd, unit: elapsedUnit)
+        let rest = shown.rest.isEmpty ? "" : " \(shown.rest)"
+        return "\(shown.value) \(shown.unitLabel)\(rest)"
+    }
+
+    private func unitChip(_ title: String, _ value: DurationUnit) -> some View {
+        Button {
+            unit = value
+            elapsedUnit = value
+        } label: {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(unit == value ? NodTheme.accent : NodTheme.n50)
+                .foregroundStyle(unit == value ? NodTheme.n0 : NodTheme.n700)
+                .clipShape(Capsule())
+        }
+    }
+
+    private func metaRow(_ label: String, _ value: String) -> some View {
+        HStack {
+            Text(label)
+                .foregroundStyle(NodTheme.n500)
+                .font(.system(size: 13))
+            Spacer()
+            Text(value)
+                .foregroundStyle(NodTheme.n900)
+                .font(.system(size: 14))
+                .multilineTextAlignment(.trailing)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+    }
+}

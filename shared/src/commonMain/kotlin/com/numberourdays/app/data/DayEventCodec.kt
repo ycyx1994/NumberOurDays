@@ -153,7 +153,10 @@ object DayEventCodec {
         val keyToId = HashMap<String, String>()
         local.forEach { l ->
             map[l.id] = l
-            keyToId.putIfAbsent(naturalKey(l), l.id)
+            val key = naturalKey(l)
+            if (!keyToId.containsKey(key)) {
+                keyToId[key] = l.id
+            }
         }
         incoming.forEach { r ->
             val l = map[r.id] ?: keyToId[naturalKey(r)]?.let { map[it] }
