@@ -7,6 +7,8 @@ struct DetailView: View {
     @State private var unit: DurationUnit = .day
     @State private var elapsedUnit: DurationUnit = .day
     @State private var showEdit = false
+    @State private var showDeleteConfirm = false
+    @Environment(\.dismiss) private var dismiss
 
     private var event: DayEvent? { store.event(id: eventId) }
 
@@ -45,7 +47,7 @@ struct DetailView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
 
                     Button(role: .destructive) {
-                        store.remove(id: eventId)
+                        showDeleteConfirm = true
                     } label: {
                         Text("删除")
                             .frame(maxWidth: .infinity)
@@ -53,6 +55,13 @@ struct DetailView: View {
                             .background(NodTheme.n50)
                             .foregroundStyle(NodTheme.accent)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                    .confirmationDialog("删除后无法恢复，确定删除吗？", isPresented: $showDeleteConfirm, titleVisibility: .visible) {
+                        Button("删除", role: .destructive) {
+                            store.remove(id: eventId)
+                            dismiss()
+                        }
+                        Button("取消", role: .cancel) {}
                     }
                 }
                 .padding(16)

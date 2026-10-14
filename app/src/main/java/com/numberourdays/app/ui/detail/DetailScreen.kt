@@ -28,6 +28,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -76,6 +81,7 @@ fun DetailScreen(
     var elapsedUnit by rememberSaveable { mutableStateOf(DurationUnit.DAY.name) }
     val unitEnum = DurationUnit.valueOf(unit)
     val elapsedEnum = DurationUnit.valueOf(elapsedUnit)
+    var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -83,6 +89,14 @@ fun DetailScreen(
             NodTopBar(
                 title = event?.title?.takeIf { it.isNotBlank() } ?: stringResource(R.string.detail),
                 onBack = onBack,
+                actions = {
+                    IconButton(onClick = { onEdit(eventId) }) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.edit),
+                        )
+                    }
+                },
             )
         },
     ) { padding ->
@@ -254,39 +268,45 @@ fun DetailScreen(
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
-            }
 
-            // Right-side floating actions (same FAB size as home), stacked
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                FloatingActionButton(
-                    onClick = { onEdit(event.id) },
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = LocalNodBrand.current.n700,
-                    shape = NodFabShape,
+                // Delete footer (confirm first) — matches iOS detail
+                Spacer(Modifier.height(16.dp))
+                OutlinedButton(
+                    onClick = { showDeleteConfirm = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                    ),
                 ) {
-                    Icon(
-                        Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.edit),
-                    )
+                    Text(stringResource(R.string.delete))
                 }
-                FloatingActionButton(
-                    onClick = { repo.toggleStar(event.id) },
-                    containerColor = if (d.starred) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (d.starred) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
-                    shape = NodFabShape,
-                ) {
-                    Icon(
-                        imageVector = if (d.starred) Icons.Rounded.Star else Icons.Outlined.StarOutline,
-                        contentDescription = stringResource(if (d.starred) R.string.unstar else R.string.star),
-                    )
-                }
+                Spacer(Modifier.height(24.dp))
             }
         }
+    }
+
+    if (showDeleteConfirm) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = false },
+            title = { Text(stringResource(R.string.delete)) },
+            text = { Text(stringResource(R.string.delete_confirm_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDeleteConfirm = false
+                    repo.remove(eventId)
+                    onBack()
+                }) {
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
     }
 }
 

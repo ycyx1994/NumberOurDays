@@ -118,4 +118,6 @@
     <string name="nothing_export">暂无数据可导出</string>
     <string name="copied">已复制到剪贴板</string>
     <string name="cleared">已清空本地数据</string>
+  <string name="cancel">取消</string>
+  <string name="delete_confirm_message">删除后无法恢复，确定删除这条纪念日吗？</string>
 </resources>

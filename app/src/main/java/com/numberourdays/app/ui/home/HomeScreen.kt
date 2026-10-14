@@ -142,7 +142,7 @@ fun HomeScreen(
                 onClick = onOpenAdd,
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = NodFabShape,
+                shape = CircleShape,
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_event))
             }
