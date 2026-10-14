@@ -198,16 +198,6 @@ fun HomeScreen(
             }
         },
     ) { padding ->
-        if (displays.isEmpty() && holiday == null) {
-            EmptyState(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                onAdd = onOpenAdd,
-            )
-            return@Scaffold
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -232,6 +222,12 @@ fun HomeScreen(
             if (holiday != null) {
                 HolidayMiniCard(
                     countdown = holiday,
+                    modifier = Modifier.padding(top = 8.dp),
+                    onClick = onOpenHolidays,
+                )
+            } else {
+                // Keep the holiday entry even when the year has no more vacation blocks.
+                HolidayEmptyCard(
                     modifier = Modifier.padding(top = 8.dp),
                     onClick = onOpenHolidays,
                 )
@@ -353,6 +349,46 @@ private fun EmptyState(modifier: Modifier = Modifier, onAdd: () -> Unit) {
                 .clickable(onClick = onAdd)
                 .padding(vertical = 14.dp),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+private fun HolidayEmptyCard(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(NodCardShape)
+            .background(HolidayTint)
+            .border(1.dp, HolidayEdge, NodCardShape)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.holiday_legal),
+                color = Accent,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                text = stringResource(R.string.holiday_none_left),
+                color = N900,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Text(
+            text = stringResource(R.string.holiday_none_hint),
+            color = Accent,
+            fontSize = 12.sp,
         )
     }
 }

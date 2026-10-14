@@ -79,6 +79,8 @@
     <string name="holiday_ongoing">假期中</string>
     <string name="holiday_today">今天放假</string>
     <string name="holiday_countdown">还有 %1$d 天</string>
+    <string name="holiday_none_left">今年已经没有假期惹😭</string>
+    <string name="holiday_none_hint">点我查看放假安排</string>
     <string name="holiday_next">下一个 · 法定假日</string>
     <string name="holiday_list_title">法定假日</string>
     <string name="holiday_year_title">%1$d 年法定节假日</string>
