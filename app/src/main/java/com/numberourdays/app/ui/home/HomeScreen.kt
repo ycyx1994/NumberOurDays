@@ -2,13 +2,11 @@ package com.numberourdays.app.ui.home
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,8 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,9 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -128,40 +121,6 @@ fun HomeScreen(
         }
     }
 
-    // Drag reorder: accumulate delta during the gesture; commit once on drag end
-    // so LazyColumn is not re-sorted mid-gesture (that cancels pointer input).
-    var draggingId by remember { mutableStateOf<String?>(null) }
-    var dragDeltaPx by remember { mutableFloatStateOf(0f) }
-    var dragStartStarIndex by remember { mutableIntStateOf(-1) }
-    val rowHeightPx = with(LocalDensity.current) { 72.dp.toPx() }
-
-    fun onDragStart(id: String) {
-        draggingId = id
-        dragDeltaPx = 0f
-        dragStartStarIndex = displays.filter { it.starred }.indexOfFirst { it.id == id }
-    }
-
-    fun onDragMove(deltaY: Float) {
-        if (draggingId == null) return
-        dragDeltaPx += deltaY
-    }
-
-    fun onDragEnd() {
-        val id = draggingId
-        val from = dragStartStarIndex
-        val deltaY = dragDeltaPx
-        draggingId = null
-        dragDeltaPx = 0f
-        dragStartStarIndex = -1
-        if (id == null || from < 0) return
-        val starred = displays.filter { it.starred }.map { it.id }.toMutableList()
-        if (from !in starred.indices) return
-        val to = DateCalculator.dragTargetIndex(from, starred.lastIndex, deltaY, rowHeightPx)
-        if (to == from) return
-        val moved = starred.removeAt(from)
-        starred.add(to, moved)
-        repo.reorderStars(starred)
-    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -244,21 +203,12 @@ fun HomeScreen(
                     contentPadding = PaddingValues(bottom = 96.dp),
                 ) {
                     items(displays, key = { it.id }) { item ->
-                        val isDraggingItem = draggingId == item.id
                         EventRow(
                             item = item,
                             onOpen = { onOpenDetail(item.id) },
                             onToggleStar = { repo.toggleStar(item.id) },
-                            dragEnabled = item.starred,
-                            dragging = isDraggingItem,
-                            dragOffsetPx = if (isDraggingItem) dragDeltaPx else 0f,
-                            onDragStart = { onDragStart(item.id) },
-                            onDrag = { dy -> onDragMove(dy) },
-                            onDragEnd = { onDragEnd() },
                         )
-                        if (!isDraggingItem) {
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
-                        }
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
                     }
                 }
             }
@@ -608,12 +558,6 @@ private fun EventRow(
     item: DayEventDisplay,
     onOpen: () -> Unit,
     onToggleStar: () -> Unit,
-    dragEnabled: Boolean,
-    dragging: Boolean = false,
-    dragOffsetPx: Float = 0f,
-    onDragStart: () -> Unit = {},
-    onDrag: (Float) -> Unit,
-    onDragEnd: () -> Unit,
 ) {
     val kindLabel = when (item.kind) {
         EventKind.COUNTDOWN -> "倒数"
@@ -621,62 +565,12 @@ private fun EventRow(
         EventKind.TODAY -> "今天"
         EventKind.REPEAT -> "重复"
     }
-    // Paper-card lift: one scalar (0..1) drives scale/surface/border/inset.
-    // Five parallel animate*AsState engines recomposed every list row on start/end.
-    val dragShape = NodCardShape
-    val lift by animateFloatAsState(
-        targetValue = if (dragging) 1f else 0f,
-        animationSpec = tween(durationMillis = 140),
-        label = "dragLift",
-    )
-    val liftScale = 1f + 0.015f * lift
-    val liftSurface = lerp(Color.Transparent, MaterialTheme.colorScheme.surfaceVariant, lift)
-    val liftBorder = lerp(Color.Transparent, MaterialTheme.colorScheme.outlineVariant, lift)
-    val liftInset = 2.dp * lift
-    val liftPad = 10.dp * lift
-    val showLift = lift > 0f
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .padding(horizontal = liftInset)
-            .graphicsLayer {
-                translationY = dragOffsetPx
-                if (showLift) {
-                    scaleX = liftScale
-                    scaleY = liftScale
-                    shape = dragShape
-                    clip = dragging
-                }
-            }
-            .then(
-                if (showLift) {
-                    Modifier
-                        .background(color = liftSurface, shape = dragShape)
-                        .border(1.dp, liftBorder, dragShape)
-                } else {
-                    Modifier
-                }
-            )
-            .then(
-                if (dragEnabled) {
-                    Modifier.pointerInput(item.id) {
-                        detectDragGesturesAfterLongPress(
-                            onDragStart = { onDragStart() },
-                            onDragEnd = { onDragEnd() },
-                            onDragCancel = { onDragEnd() },
-                            onDrag = { change, amount ->
-                                change.consume()
-                                onDrag(amount.y)
-                            },
-                        )
-                    }
-                } else {
-                    Modifier
-                }
-            )
             .clickable(onClick = onOpen)
-            .padding(horizontal = liftPad, vertical = 12.dp),
+            .padding(horizontal = 12.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(onClick = onToggleStar, modifier = Modifier.size(48.dp)) {
