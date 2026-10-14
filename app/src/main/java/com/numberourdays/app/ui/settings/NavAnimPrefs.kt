@@ -12,7 +12,7 @@ object NavAnimPrefs {
 
     fun style(context: Context): String =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
-            .getString(KEY, FADE) ?: FADE
+            .getString(KEY, FADE_SCALE) ?: FADE_SCALE
 
     fun setStyle(context: Context, style: String) {
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
