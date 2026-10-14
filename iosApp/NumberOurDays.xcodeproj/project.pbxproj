@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0CAE3A2D457A7BFD3FDED1D2 /* Shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FAE42A66C08C9B0FED3EAC97 /* Shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		17AF59C0F1E9A271E778E6D0 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A767E278549D7A56529AF79D /* EditView.swift */; };
+		4CE28A16EABB9203EC4735EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1111CCD32DC1FC8AB6468985 /* Assets.xcassets */; };
 		4F4B28B983CF133740820A53 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E49B8C4898F6EACFAE64641 /* Theme.swift */; };
 		5493C4CC8FDB1E69B44B6327 /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0019E941D823C59415EA85 /* EventStore.swift */; };
 		65DB0896CD296DCB4E0CEFB5 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A8A5F9D637EB61BF45C21C /* DetailView.swift */; };
@@ -36,6 +37,7 @@
 		00873D9D2DA2EE0F3E85B761 /* NumberOurDays.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = NumberOurDays.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0BF918FC6CE6987E0C93CDCB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		104AD0CB9D5DFA1B4F0B15DC /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		1111CCD32DC1FC8AB6468985 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4E49B8C4898F6EACFAE64641 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		76A8A5F9D637EB61BF45C21C /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		A767E278549D7A56529AF79D /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 		BFD753A3A3F30CFB1D5FE451 /* NumberOurDays */ = {
 			isa = PBXGroup;
 			children = (
+				1111CCD32DC1FC8AB6468985 /* Assets.xcassets */,
 				76A8A5F9D637EB61BF45C21C /* DetailView.swift */,
 				A767E278549D7A56529AF79D /* EditView.swift */,
 				CF0019E941D823C59415EA85 /* EventStore.swift */,
@@ -105,6 +108,7 @@
 			buildConfigurationList = CFACA1934562696216C73AEE /* Build configuration list for PBXNativeTarget "NumberOurDays" */;
 			buildPhases = (
 				EA8399B7D1C6BBAB1F279F01 /* Sources */,
+				FD59C01C85FB695994CC692B /* Resources */,
 				D58A51DEB0DE9A79CB01BDA4 /* Frameworks */,
 				C33FD2C46D2F059264F7D07E /* Embed Frameworks */,
 			);
@@ -129,7 +133,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					57DD000CD1CB2DD54FE425C5 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = XH8FSCQ9WR;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -153,6 +157,17 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		FD59C01C85FB695994CC692B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4CE28A16EABB9203EC4735EC /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		EA8399B7D1C6BBAB1F279F01 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -175,9 +190,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = XH8FSCQ9WR;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -202,9 +217,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = XH8FSCQ9WR;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

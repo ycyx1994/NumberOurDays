@@ -31,7 +31,9 @@ targets:
         SWIFT_OBJC_BRIDGING_HEADER: ""
         ENABLE_BITCODE: false
         CODE_SIGN_STYLE: Automatic
-        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_IDENTITY: "Apple Development"
+        DEVELOPMENT_TEAM: "XH8FSCQ9WR"
+        ASSETCATALOG_COMPILER_APPICON_NAME: "AppIcon"
     dependencies:
       - framework: ../shared/build/xcode-frameworks/Shared.framework
         embed: true
