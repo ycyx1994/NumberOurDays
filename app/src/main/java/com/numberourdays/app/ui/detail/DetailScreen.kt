@@ -78,9 +78,7 @@ fun DetailScreen(
     val today = rememberCurrentDate()
 
     var unit by rememberSaveable { mutableStateOf(DurationUnit.DAY.name) }
-    var elapsedUnit by rememberSaveable { mutableStateOf(DurationUnit.DAY.name) }
     val unitEnum = DurationUnit.valueOf(unit)
-    val elapsedEnum = DurationUnit.valueOf(elapsedUnit)
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
@@ -214,41 +212,19 @@ fun DetailScreen(
                     MetaRow(stringResource(R.string.label_repeat), d.repeatLabel ?: stringResource(R.string.not_repeat))
                     d.nextDate?.let { MetaRow(stringResource(R.string.label_next), it) }
 
-                    val elapsedShown = remember(d, today, elapsedEnum) {
+                    val elapsedShown = remember(d, today, unitEnum) {
                         val elapsedBd = DateCalculator.convertDuration(
                             DateCalculator.parse(d.date) ?: today,
                             today,
                         )
-                        DateCalculator.formatDuration(elapsedBd, elapsedEnum)
+                        DateCalculator.formatDuration(elapsedBd, unitEnum)
                     }
                     val elapsedText = listOf("${elapsedShown.value} ${elapsedShown.unitLabel}", elapsedShown.rest)
                         .filter { it.isNotBlank() }
                         .joinToString(" ")
-                    val elapsedUnitLabel = when (elapsedEnum) {
-                        DurationUnit.DAY -> stringResource(R.string.unit_day)
-                        DurationUnit.MONTH -> stringResource(R.string.unit_month)
-                        DurationUnit.YEAR -> stringResource(R.string.unit_year)
-                    }
                     MetaRow(
                         label = stringResource(R.string.label_elapsed),
                         value = elapsedText,
-                        trailing = {
-                            Text(
-                                text = elapsedUnitLabel,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier
-                                    .padding(start = 8.dp)
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                                    .clickable {
-                                        val order = listOf(DurationUnit.DAY, DurationUnit.MONTH, DurationUnit.YEAR)
-                                        elapsedUnit = order[(order.indexOf(elapsedEnum) + 1) % order.size].name
-                                    }
-                                    .padding(horizontal = 8.dp, vertical = 3.dp),
-                            )
-                        },
                     )
                     MetaRow(stringResource(R.string.label_status), d.label)
                     MetaRow(

@@ -5,7 +5,6 @@ struct DetailView: View {
     @ObservedObject var store: EventStore
     let eventId: String
     @State private var unit: DurationUnit = .day
-    @State private var elapsedUnit: DurationUnit = .day
     @State private var showEdit = false
     @State private var showDeleteConfirm = false
     @Environment(\.dismiss) private var dismiss
@@ -85,16 +84,25 @@ struct DetailView: View {
     }
 
     private func hero(_ d: DayEventDisplay) -> some View {
-        VStack(spacing: 8) {
+        let duration = durationParts(d)
+        return VStack(spacing: 8) {
             Text("目标")
                 .font(.system(size: 11))
                 .foregroundStyle(NodTheme.n500)
             Text(d.title)
                 .font(.system(size: 17, weight: .bold))
                 .foregroundStyle(NodTheme.n900)
-            Text("\(durationValue(d))")
-                .font(.system(size: 52, weight: .bold, design: .rounded))
-                .foregroundStyle(NodTheme.accent)
+            // Big number + remaining "X 月 X 天" like Android DayCountHero
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text("\(duration.value)")
+                    .font(.system(size: 52, weight: .bold, design: .rounded))
+                    .foregroundStyle(NodTheme.accent)
+                if !duration.suffix.isEmpty {
+                    Text(duration.suffix)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(NodTheme.n700)
+                }
+            }
             Text(d.date)
                 .font(.system(size: 12))
                 .foregroundStyle(NodTheme.n500)
@@ -105,21 +113,23 @@ struct DetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    private func durationValue(_ d: DayEventDisplay) -> Int {
+    private func durationParts(_ d: DayEventDisplay) -> (value: Int, suffix: String) {
         let target = DateCalculator.shared.detailTargetDate(event: d)
         let breakdown = DateCalculator.shared.convertDuration(
             from: DateCalculator.shared.today(),
             to: target
         )
         let shown = DateCalculator.shared.formatDuration(b: breakdown, unit: unit)
-        return Int(shown.value)
+        var parts: [String] = [shown.unitLabel, shown.rest].filter { !$0.isEmpty }
+        return (Int(shown.value), parts.joined(separator: " "))
     }
 
     private func elapsedText(_ d: DayEventDisplay) -> String {
         let anchor = DateCalculator.shared.parse(text: d.date) ?? DateCalculator.shared.today()
         let today = DateCalculator.shared.today()
         let bd = DateCalculator.shared.convertDuration(from: anchor, to: today)
-        let shown = DateCalculator.shared.formatDuration(b: bd, unit: elapsedUnit)
+        // Follow the same unit as the hero chips (no separate elapsed switch).
+        let shown = DateCalculator.shared.formatDuration(b: bd, unit: unit)
         let rest = shown.rest.isEmpty ? "" : " \(shown.rest)"
         return "\(shown.value) \(shown.unitLabel)\(rest)"
     }
@@ -127,7 +137,6 @@ struct DetailView: View {
     private func unitChip(_ title: String, _ value: DurationUnit) -> some View {
         Button {
             unit = value
-            elapsedUnit = value
         } label: {
             Text(title)
                 .font(.system(size: 13, weight: .semibold))
