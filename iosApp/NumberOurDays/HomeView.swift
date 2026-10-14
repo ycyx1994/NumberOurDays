@@ -6,8 +6,25 @@ struct HomeView: View {
     @State private var path = NavigationPath()
     @State private var showSettings = false
     @State private var showAdd = false
+    @State private var showHolidays = false
 
     private var displays: [DayEventDisplay] { store.sortedDisplays() }
+
+    private var holidayCountdown: HolidayCountdown? {
+        HolidayCalculator.shared.nextOrOngoing(
+            periods: LegalHolidays.shared.periods(),
+            today: DateCalculator.shared.today(),
+        )
+    }
+
+    private var holidayEntry: some View {
+        Button {
+            showHolidays = true
+        } label: {
+            HolidayEntryCard(countdown: holidayCountdown)
+        }
+        .buttonStyle(.plain)
+    }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -36,6 +53,9 @@ struct HomeView: View {
                         }
                         .frame(maxWidth: .infinity)
                     }
+
+                    holidayEntry
+                        .padding(.top, 8)
 
                     Text("全部纪念日")
                         .font(.system(size: 13))
