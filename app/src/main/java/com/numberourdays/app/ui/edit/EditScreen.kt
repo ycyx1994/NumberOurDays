@@ -52,6 +52,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -128,7 +129,6 @@ fun EditScreen(
     var remindMinute by rememberSaveable { mutableStateOf((existing?.remindMinute ?: 0).toString()) }
     var showExactAlarmDialog by rememberSaveable { mutableStateOf(false) }
     var errorText by rememberSaveable { mutableStateOf<String?>(null) }
-    var showDelete by rememberSaveable { mutableStateOf(false) }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     var showTimePicker by rememberSaveable { mutableStateOf(false) }
 
@@ -233,25 +233,49 @@ fun EditScreen(
             }
 
             if (repeatOn) {
-                // Single compact row: 每 [− n +] unit chips
+                Spacer(Modifier.height(10.dp))
+                // Interval: label on its own row, stepper wide and easy to tap
+                Text(
+                    text = stringResource(R.string.repeat_every),
+                    color = LocalNodBrand.current.n700,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(bottom = 6.dp),
+                )
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp, bottom = 4.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Text(stringResource(R.string.repeat_every), color = LocalNodBrand.current.n700, fontSize = 13.sp)
                     StepButton(label = "−", onClick = { repeatInterval = (repeatInterval - 1).coerceAtLeast(1) })
                     Text(
                         text = repeatInterval.toString(),
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 14.sp,
-                        modifier = Modifier.widthIn(min = 22.dp),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .widthIn(min = 40.dp)
+                            .padding(horizontal = 8.dp),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     )
                     StepButton(label = "+", onClick = { repeatInterval = (repeatInterval + 1).coerceAtMost(999) })
-                    Spacer(Modifier.width(2.dp))
+                    Text(
+                        text = stringResource(R.string.repeat_interval_unit),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 13.sp,
+                    )
+                }
+                Spacer(Modifier.height(12.dp))
+                // Unit chips on their own row so they are not crushed
+                Text(
+                    text = stringResource(R.string.repeat_unit_label),
+                    color = LocalNodBrand.current.n700,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(bottom = 6.dp),
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     listOf(
                         RepeatUnit.DAY to stringResource(R.string.unit_day),
                         RepeatUnit.WEEK to "周",
@@ -261,8 +285,16 @@ fun EditScreen(
                         FilterChip(
                             selected = repeatUnitName == unit.name,
                             onClick = { repeatUnitName = unit.name },
-                            label = { Text(label, fontSize = 12.sp) },
-                            modifier = Modifier.height(32.dp),
+                            label = {
+                                Text(
+                                    label,
+                                    fontSize = 13.sp,
+                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                )
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(40.dp),
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MaterialTheme.colorScheme.primary,
                                 selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
@@ -272,6 +304,7 @@ fun EditScreen(
                         )
                     }
                 }
+                Spacer(Modifier.height(4.dp))
             }
 
             Spacer(Modifier.height(4.dp))
@@ -417,39 +450,8 @@ fun EditScreen(
                 Text(stringResource(R.string.save), fontSize = 14.sp)
             }
 
-            if (existing != null) {
-                Spacer(Modifier.height(16.dp))
-                OutlinedButton(
-                    onClick = { showDelete = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = NodButtonShape,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-                ) {
-                    Text(stringResource(R.string.delete), fontSize = 14.sp)
-                }
-            }
             Spacer(Modifier.height(40.dp))
         }
-    }
-
-    if (showDelete && existing != null) {
-        AlertDialog(
-            onDismissRequest = { showDelete = false },
-            title = { Text("删除纪念日") },
-            text = { Text("确定删除「${existing.title}」？") },
-            confirmButton = {
-                TextButton(onClick = {
-                    repo.remove(existing.id)
-                    showDelete = false
-                    onSaved()
-                }) { Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDelete = false }) { Text("取消") }
-            },
-        )
     }
 
     if (showExactAlarmDialog) {

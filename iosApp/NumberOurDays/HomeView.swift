@@ -103,18 +103,94 @@ struct HomeView: View {
                 HolidayListView()
             }
             .overlay(alignment: .bottomTrailing) {
-                Button {
+                GlassAddButton {
                     showAdd = true
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(NodTheme.n0)
-                        .frame(width: 56, height: 56)
-                        .background(NodTheme.accent, in: Circle())
                 }
                 .padding(24)
             }
         }
+    }
+}
+
+/// iOS add FAB: official Liquid Glass on iOS 26+, material fallback below.
+struct GlassAddButton: View {
+    var action: () -> Void
+    @State private var pressed = false
+
+    var body: some View {
+        Button {
+            action()
+        } label: {
+            content
+                .scaleEffect(pressed ? 0.94 : 1)
+                .animation(.spring(response: 0.28, dampingFraction: 0.72), value: pressed)
+        }
+        .buttonStyle(.plain)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in pressed = true }
+                .onEnded { _ in pressed = false }
+        )
+        .accessibilityLabel("添加纪念日")
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if #available(iOS 26.0, *) {
+            Label("添加纪念日", systemImage: "plus")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(.white)
+                .labelStyle(.iconOnly)
+                .frame(width: 60, height: 60)
+                .glassEffect(.regular.tint(NodTheme.accent), in: .circle)
+        } else {
+            legacyGlass
+        }
+    }
+
+    private var legacyGlass: some View {
+        ZStack {
+            Circle()
+                .fill(.ultraThinMaterial)
+                .overlay {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    NodTheme.accent.opacity(0.92),
+                                    NodTheme.accent.opacity(0.72),
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .blendMode(.plusLighter)
+                        .opacity(0.85)
+                }
+                .overlay {
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.55),
+                                    Color.white.opacity(0.08),
+                                    Color.white.opacity(0.28),
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                }
+                .shadow(color: NodTheme.accent.opacity(0.35), radius: pressed ? 4 : 14, y: pressed ? 2 : 8)
+                .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
+
+            Image(systemName: "plus")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.15), radius: 1, y: 0.5)
+        }
+        .frame(width: 60, height: 60)
     }
 }
 
