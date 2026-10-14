@@ -1,14 +1,21 @@
 ---
 feature: weapp-mvp
-status: designed
+status: delivered
 updated: 2026-10-14
 branch: feature/weapp-mvp
-commits: 
+commits: e822612..4f71a0c
 ---
 
 # 原生微信小程序 MVP
 
 ## Report
+
+**What was built** — 主仓新增原生微信小程序 `miniprogram/`（AppID 同旧 Taro：`wxea507de2dccbf14a`），四页：首页 / 详情 / 编辑 / 设置。领域经 `WeappDomain`（Kotlin/JS `@JsExport`）走同一套 `DateCalculator` / `DayEventCodec`；存储为 `wx.setStorage` + 备份 schema v1。假日与推送未做。
+
+**Verification** — `:shared:jvmTest` PASS；`scripts/weapp-smoke.js` PASS（含 tab 标题与 targetDuration）；`:app:assembleDebug` PASS（未伤 Android）。
+
+**Journey log** — 1) ProductionLibrary 产物几乎为空，改用 developmentLibrary +  vendored `@js-joda`。2) 手写 JSON 在 tab/反斜杠标题下会丢列表，改为 kotlinx.serialization DTO。3) 详情已过不能用 `/30` 启发式，必须走 `convertDuration`/`formatDuration`。4) hero 大数字要绑 `target.value` 而非 `display.days`。
+
 
 ## [S1] Problem
 
@@ -78,7 +85,7 @@ shared/               唯一业务源（commonMain → android/ios/js）
 
 ## Tasks
 
-- [ ] T1: `miniprogram/` 工程骨架 + `project.config.json` + 构建脚本拷贝 JS — acceptance: 目录可被微信开发者工具识别；脚本产出 libs（covers: S2）
-- [ ] T2: `domain/adapter.js` 接通 KMP JS（sort/display/codec/validate） — acceptance: Node 冒烟脚本对样例事件算对倒数与 JSON 往返（covers: S2; depends: T1）
-- [ ] T3: 首页 + 详情四页交互与存储 — acceptance: 本地增删改查、排序与详情单位切换行为与契约一致（covers: S2; depends: T2）
-- [ ] T4: 编辑/设置（备份导入导出） — acceptance: 导出 JSON 可被 parseBackup 解析；导入 merge/替换更新列表（covers: S2; depends: T3）
+- [x] T1: `miniprogram/` 工程骨架 + `project.config.json` + 构建脚本拷贝 JS — acceptance: 目录可被微信开发者工具识别；脚本产出 libs（covers: S2）
+- [x] T2: `domain/adapter.js` 接通 KMP JS（sort/display/codec/validate） — acceptance: Node 冒烟脚本对样例事件算对倒数与 JSON 往返（covers: S2; depends: T1）
+- [x] T3: 首页 + 详情四页交互与存储 — acceptance: 本地增删改查、排序与详情单位切换行为与契约一致（covers: S2; depends: T2）
+- [x] T4: 编辑/设置（备份导入导出） — acceptance: 导出 JSON 可被 parseBackup 解析；导入 merge/替换更新列表（covers: S2; depends: T3）

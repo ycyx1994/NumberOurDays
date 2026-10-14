@@ -7,6 +7,7 @@ Page({
     event: null,
     display: null,
     unit: 'DAY',
+    heroValue: 0,
     heroText: '',
     elapsedText: '',
   },
@@ -30,13 +31,14 @@ Page({
     if (!event) return
     const target = domain.targetDuration(event, unit)
     const elapsed = domain.elapsedDuration(event, unit)
+    const heroValue = target && target.value != null ? target.value : (this.data.display ? this.data.display.days : 0)
     const heroText = target
       ? [target.unitLabel, target.rest].filter(Boolean).join(' ')
       : '天'
     const elapsedText = elapsed
       ? [`${elapsed.value} ${elapsed.unitLabel}`, elapsed.rest].filter(Boolean).join(' ')
       : ''
-    this.setData({ heroText, elapsedText })
+    this.setData({ heroValue, heroText, elapsedText })
   },
   setUnit(e) {
     this.setData({ unit: e.currentTarget.dataset.unit }, this.computeUnits)
