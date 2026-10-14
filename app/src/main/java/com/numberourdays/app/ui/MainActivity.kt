@@ -110,18 +110,12 @@ private fun NodApp(
     NavHost(
         navController = nav,
         startDestination = "home",
-        enterTransition = {
-            slideInHorizontally(tween(200)) { it / 4 } + fadeIn(tween(200))
-        },
-        exitTransition = {
-            slideOutHorizontally(tween(200)) { -it / 8 } + fadeOut(tween(150))
-        },
-        popEnterTransition = {
-            slideInHorizontally(tween(200)) { -it / 8 } + fadeIn(tween(150))
-        },
-        popExitTransition = {
-            slideOutHorizontally(tween(200)) { it / 4 } + fadeOut(tween(200))
-        },
+        // Fade-only: sliding the whole destination tree (esp. detail text) drops
+        // frames mid-transition while both screens are composed.
+        enterTransition = { fadeIn(tween(130)) },
+        exitTransition = { fadeOut(tween(90)) },
+        popEnterTransition = { fadeIn(tween(130)) },
+        popExitTransition = { fadeOut(tween(90)) },
     ) {
         composable("home") {
             HomeScreen(
@@ -137,6 +131,11 @@ private fun NodApp(
         composable(
             route = "detail/{id}",
             arguments = listOf(navArgument("id") { type = NavType.StringType }),
+            // Destination is layout-heavy; keep transition to opacity only.
+            enterTransition = { fadeIn(tween(120)) },
+            exitTransition = { fadeOut(tween(80)) },
+            popEnterTransition = { fadeIn(tween(120)) },
+            popExitTransition = { fadeOut(tween(80)) },
         ) { entry ->
             val id = entry.arguments?.getString("id").orEmpty()
             DetailScreen(

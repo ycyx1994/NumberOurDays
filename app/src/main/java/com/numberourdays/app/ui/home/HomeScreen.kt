@@ -1,13 +1,10 @@
 package com.numberourdays.app.ui.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,6 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -56,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -105,6 +104,11 @@ import kotlin.math.absoluteValue
 private sealed interface Slide {
     data class Event(val display: DayEventDisplay) : Slide
     data class Holiday(val countdown: HolidayCountdown) : Slide
+}
+
+private fun slideKey(slide: Slide): Any = when (slide) {
+    is Slide.Event -> "e:${slide.display.id}:${slide.display.date}"
+    is Slide.Holiday -> "h:${slide.countdown.period.name}:${slide.countdown.period.start}"
 }
 
 @Composable
@@ -221,7 +225,9 @@ fun HomeScreen(
                     onClick = onOpenDetail,
                     onOpenHolidays = onOpenHolidays,
                 )
-                Dots(count = slides.size, selected = pagerState.currentPage)
+                // Read currentPage inside Dots (or via derivedStateOf) so swipe
+                // does not recompose the whole HomeScreen column.
+                Dots(count = slides.size, pagerState = pagerState)
             }
             if (holiday != null) {
                 HolidayMiniCard(
@@ -273,9 +279,11 @@ fun HomeScreen(
     }
 }
 
+private val DigitRun = Regex("\\d+")
+
 @Composable
 private fun dayCountAnnotated(label: String): AnnotatedString {
-    val match = Regex("\\d+").find(label)
+    val match = DigitRun.find(label)
     val digitStyle = SpanStyle(
         color = Accent,
         fontWeight = FontWeight.Bold,
@@ -411,6 +419,7 @@ private fun CarouselCard(
     ) {
         HorizontalPager(
             state = pagerState,
+            key = { index -> slides.getOrNull(index)?.let { slideKey(it) } ?: index },
             pageSpacing = 0.dp,
             modifier = Modifier.fillMaxWidth(),
         ) { page ->
@@ -421,6 +430,8 @@ private fun CarouselCard(
         }
     }
 }
+
+private val HeroSuffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp)
 
 @Composable
 private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
@@ -460,7 +471,7 @@ private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
             value = item.days.toString(),
             suffix = stringResource(R.string.unit_day),
             suffixBottomPadding = 6,
-            suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
+            suffixStyle = HeroSuffixStyle,
         )
         Text(
             text = item.date,
@@ -515,7 +526,7 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
                 value = countdown.daysUntilStart.toString(),
                 suffix = stringResource(R.string.unit_day),
                 suffixBottomPadding = 6,
-                suffixStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
+                suffixStyle = HeroSuffixStyle,
             )
         }
         Text(
@@ -532,11 +543,13 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
 }
 
 @Composable
-private fun Dots(count: Int, selected: Int) {
+private fun Dots(count: Int, pagerState: androidx.compose.foundation.pager.PagerState) {
     if (count <= 1) {
         Spacer(Modifier.height(12.dp))
         return
     }
+    // Isolate pager reads so only this row recomposes on page change.
+    val selected by remember { derivedStateOf { pagerState.currentPage } }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -581,34 +594,20 @@ private fun EventRow(
         EventKind.TODAY -> "今天"
         EventKind.REPEAT -> "重复"
     }
-    // Paper-card lift: warm surface + hairline border only.
-    // No platform shadowElevation — on settle it left a dark frame when bg faded out.
+    // Paper-card lift: one scalar (0..1) drives scale/surface/border/inset.
+    // Five parallel animate*AsState engines recomposed every list row on start/end.
     val dragShape = NodCardShape
-    val liftScale by animateFloatAsState(
-        targetValue = if (dragging) 1.015f else 1f,
-        animationSpec = tween(durationMillis = 160),
-        label = "dragLiftScale",
+    val lift by animateFloatAsState(
+        targetValue = if (dragging) 1f else 0f,
+        animationSpec = tween(durationMillis = 140),
+        label = "dragLift",
     )
-    val liftSurface by animateColorAsState(
-        targetValue = if (dragging) N50 else Color.Transparent,
-        animationSpec = tween(durationMillis = 160),
-        label = "dragLiftSurface",
-    )
-    val liftBorder by animateColorAsState(
-        targetValue = if (dragging) N100 else Color.Transparent,
-        animationSpec = tween(durationMillis = 160),
-        label = "dragLiftBorder",
-    )
-    val liftInset by animateDpAsState(
-        targetValue = if (dragging) 2.dp else 0.dp,
-        animationSpec = tween(durationMillis = 160),
-        label = "dragLiftInset",
-    )
-    val liftPad by animateDpAsState(
-        targetValue = if (dragging) 10.dp else 0.dp,
-        animationSpec = tween(durationMillis = 160),
-        label = "dragLiftPad",
-    )
+    val liftScale = 1f + 0.015f * lift
+    val liftSurface = lerp(Color.Transparent, N50, lift)
+    val liftBorder = lerp(Color.Transparent, N100, lift)
+    val liftInset = 2.dp * lift
+    val liftPad = 10.dp * lift
+    val showLift = lift > 0f
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -616,13 +615,22 @@ private fun EventRow(
             .padding(horizontal = liftInset)
             .graphicsLayer {
                 translationY = dragOffsetPx
-                scaleX = liftScale
-                scaleY = liftScale
-                shape = dragShape
-                clip = dragging
+                if (showLift) {
+                    scaleX = liftScale
+                    scaleY = liftScale
+                    shape = dragShape
+                    clip = dragging
+                }
             }
-            .background(color = liftSurface, shape = dragShape)
-            .border(1.dp, liftBorder, dragShape)
+            .then(
+                if (showLift) {
+                    Modifier
+                        .background(color = liftSurface, shape = dragShape)
+                        .border(1.dp, liftBorder, dragShape)
+                } else {
+                    Modifier
+                }
+            )
             .then(
                 if (dragEnabled) {
                     Modifier.pointerInput(item.id) {

@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -104,7 +105,7 @@ fun DetailScreen(
             return@Scaffold
         }
 
-        val d = DateCalculator.computeDisplay(event, today)
+        val d = remember(event, today) { DateCalculator.computeDisplay(event, today) }
         val tag = when {
             d.repeatLabel != null && d.kind == EventKind.REPEAT -> d.repeatLabel.orEmpty()
             d.kind == EventKind.COUNTDOWN -> "倒数"
@@ -150,9 +151,11 @@ fun DetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                     )
 
-                    val target = DateCalculator.detailTargetDate(d)
-                    val breakdown = DateCalculator.convertDuration(today, target)
-                    val shown = DateCalculator.formatDuration(breakdown, unitEnum)
+                    val shown = remember(d, today, unitEnum) {
+                        val target = DateCalculator.detailTargetDate(d)
+                        val breakdown = DateCalculator.convertDuration(today, target)
+                        DateCalculator.formatDuration(breakdown, unitEnum)
+                    }
                     val suffix = listOf(shown.unitLabel, shown.rest)
                         .filter { it.isNotBlank() }
                         .joinToString(" ")
@@ -204,11 +207,13 @@ fun DetailScreen(
                     MetaRow(stringResource(R.string.label_repeat), d.repeatLabel ?: stringResource(R.string.not_repeat))
                     d.nextDate?.let { MetaRow(stringResource(R.string.label_next), it) }
 
-                    val elapsedBd = DateCalculator.convertDuration(
-                        DateCalculator.parse(d.date) ?: today,
-                        today,
-                    )
-                    val elapsedShown = DateCalculator.formatDuration(elapsedBd, elapsedEnum)
+                    val elapsedShown = remember(d, today, elapsedEnum) {
+                        val elapsedBd = DateCalculator.convertDuration(
+                            DateCalculator.parse(d.date) ?: today,
+                            today,
+                        )
+                        DateCalculator.formatDuration(elapsedBd, elapsedEnum)
+                    }
                     val elapsedText = listOf("${elapsedShown.value} ${elapsedShown.unitLabel}", elapsedShown.rest)
                         .filter { it.isNotBlank() }
                         .joinToString(" ")
