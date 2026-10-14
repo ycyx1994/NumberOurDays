@@ -112,7 +112,7 @@ struct HomeView: View {
     }
 }
 
-/// iOS liquid-glass FAB: system material + accent tint + specular rim.
+/// iOS add FAB: official Liquid Glass on iOS 26+, material fallback below.
 struct GlassAddButton: View {
     var action: () -> Void
     @State private var pressed = false
@@ -121,53 +121,9 @@ struct GlassAddButton: View {
         Button {
             action()
         } label: {
-            ZStack {
-                // Frosted glass body
-                Circle()
-                    .fill(.ultraThinMaterial)
-                    .overlay {
-                        // Warm accent wash so it still reads as brand
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        NodTheme.accent.opacity(0.92),
-                                        NodTheme.accent.opacity(0.72),
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .blendMode(.plusLighter)
-                            .opacity(0.85)
-                    }
-                    .overlay {
-                        // Specular glass rim
-                        Circle()
-                            .stroke(
-                                LinearGradient(
-                                    colors: [
-                                        Color.white.opacity(0.55),
-                                        Color.white.opacity(0.08),
-                                        Color.white.opacity(0.28),
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 1
-                            )
-                    }
-                    .shadow(color: NodTheme.accent.opacity(0.35), radius: pressed ? 4 : 14, y: pressed ? 2 : 8)
-                    .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
-
-                Image(systemName: "plus")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .shadow(color: .black.opacity(0.15), radius: 1, y: 0.5)
-            }
-            .frame(width: 60, height: 60)
-            .scaleEffect(pressed ? 0.92 : 1)
-            .animation(.spring(response: 0.28, dampingFraction: 0.7), value: pressed)
+            content
+                .scaleEffect(pressed ? 0.94 : 1)
+                .animation(.spring(response: 0.28, dampingFraction: 0.72), value: pressed)
         }
         .buttonStyle(.plain)
         .simultaneousGesture(
@@ -176,6 +132,65 @@ struct GlassAddButton: View {
                 .onEnded { _ in pressed = false }
         )
         .accessibilityLabel("添加纪念日")
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if #available(iOS 26.0, *) {
+            Label("添加纪念日", systemImage: "plus")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(.white)
+                .labelStyle(.iconOnly)
+                .frame(width: 60, height: 60)
+                .glassEffect(.regular.tint(NodTheme.accent), in: .circle)
+        } else {
+            legacyGlass
+        }
+    }
+
+    private var legacyGlass: some View {
+        ZStack {
+            Circle()
+                .fill(.ultraThinMaterial)
+                .overlay {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    NodTheme.accent.opacity(0.92),
+                                    NodTheme.accent.opacity(0.72),
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .blendMode(.plusLighter)
+                        .opacity(0.85)
+                }
+                .overlay {
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.55),
+                                    Color.white.opacity(0.08),
+                                    Color.white.opacity(0.28),
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1
+                        )
+                }
+                .shadow(color: NodTheme.accent.opacity(0.35), radius: pressed ? 4 : 14, y: pressed ? 2 : 8)
+                .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
+
+            Image(systemName: "plus")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.15), radius: 1, y: 0.5)
+        }
+        .frame(width: 60, height: 60)
     }
 }
 
