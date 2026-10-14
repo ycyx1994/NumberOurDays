@@ -15,6 +15,9 @@ buildscript {
     }
 }
 
-tasks.register("clean", Delete::class) {
-    delete(rootProject.layout.buildDirectory)
+// Kotlin/JS already registers a root-level clean task; do not re-register.
+tasks.matching { it.name == "clean" }.configureEach {
+    if (this is Delete) {
+        delete(rootProject.layout.buildDirectory)
+    }
 }
