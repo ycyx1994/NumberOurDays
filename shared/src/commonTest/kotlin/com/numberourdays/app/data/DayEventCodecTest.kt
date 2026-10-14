@@ -71,6 +71,7 @@ class DayEventCodecTest {
         assertEquals(1, a.repeatInterval)
         assertTrue(a.remindEnabled)
         assertEquals(1000L, a.updatedAt)
+        assertEquals(1L, a.createdAt)
         val b = parsed.first { it.id == "e2" }
         assertNull(b.note)
         assertEquals(RepeatUnit.NONE, b.repeatUnit)
@@ -151,6 +152,40 @@ class DayEventCodecTest {
         val twice = DayEventCodec.merge(once, backup)
         assertEquals(1, once.size)
         assertEquals(1, twice.size)
+    }
+
+    @Test
+    fun merge_sameIdContentChange_updatesNaturalKeyIndex() {
+        val local = listOf(sampleEvent(id = "a", title = "旧标题", date = "2026-01-01", updatedAt = 10L))
+        val renamed = listOf(sampleEvent(id = "a", title = "新标题", date = "2026-01-01", updatedAt = 20L))
+        val afterRename = DayEventCodec.merge(local, renamed)
+        assertEquals(1, afterRename.size)
+        assertEquals("新标题", afterRename[0].title)
+
+        // Incoming row with the NEW natural key but a different id must not duplicate.
+        val sameNewKeyOtherId = listOf(
+            sampleEvent(id = "other", title = "新标题", date = "2026-01-01", updatedAt = 30L),
+        )
+        val merged = DayEventCodec.merge(afterRename, sameNewKeyOtherId)
+        assertEquals(1, merged.size)
+        assertEquals("a", merged[0].id)
+        assertEquals("新标题", merged[0].title)
+
+        // Old natural key must no longer match the renamed event.
+        val oldKeyOtherId = listOf(
+            sampleEvent(id = "stale", title = "旧标题", date = "2026-01-01", updatedAt = 40L),
+        )
+        val withStale = DayEventCodec.merge(afterRename, oldKeyOtherId)
+        assertEquals(2, withStale.size)
+    }
+
+    @Test
+    fun missingTimestamps_defaultToWallClock() {
+        val json = """{"id":"x","title":"t","date":"2026-01-01"}"""
+        val (events, _) = DayEventCodec.parseBackup("""{"events":[$json]}""")
+        assertEquals(1, events.size)
+        assertTrue(events[0].createdAt > 0)
+        assertTrue(events[0].updatedAt > 0)
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.numberourdays.app.data
 
 import com.numberourdays.app.domain.DateCalculator
+import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -9,7 +10,6 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 /**
@@ -40,8 +40,9 @@ object DayEventCodec {
         // Migration default matches legacy org.json optInt("remindHour", 9)
         val remindHour: Int = 9,
         val remindMinute: Int = 0,
-        val createdAt: Long = 0,
-        val updatedAt: Long = 0,
+        // Legacy migrate filled missing timestamps with wall-clock now.
+        val createdAt: Long = Clock.System.now().toEpochMilliseconds(),
+        val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
     )
 
     private fun DayEvent.toDto() = DayEventDto(
@@ -107,7 +108,7 @@ object DayEventCodec {
         val payload = buildJsonObject {
             put("app", "NumberOurDays")
             put("schemaVersion", 1)
-            put("exportedAt", kotlinx.datetime.Clock.System.now().toEpochMilliseconds())
+            put("exportedAt", Clock.System.now().toEpochMilliseconds())
             put("events", buildJsonArray {
                 events.forEach { add(json.parseToJsonElement(json.encodeToString(it.toDto()))) }
             })
@@ -162,8 +163,11 @@ object DayEventCodec {
                     keyToId[naturalKey(r)] = r.id
                 }
                 r.updatedAt >= l.updatedAt -> {
-                    map[l.id] = r.copy(id = l.id)
-                    keyToId[naturalKey(l)] = l.id
+                    val updated = r.copy(id = l.id)
+                    map[l.id] = updated
+                    // Content may rename the natural key; drop the stale index entry.
+                    keyToId.remove(naturalKey(l))
+                    keyToId[naturalKey(updated)] = l.id
                 }
                 else -> {
                     keyToId[naturalKey(l)] = l.id
@@ -175,7 +179,7 @@ object DayEventCodec {
 }
 
 /** Build a stable-ish local id without java.util.UUID. */
-fun createEventId(now: Long = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()): String {
+fun createEventId(now: Long = Clock.System.now().toEpochMilliseconds()): String {
     val ts = now.toString(36)
     val rand = kotlin.random.Random.nextLong(0, 1L shl 40).toString(36)
     return "e_${ts}_$rand"

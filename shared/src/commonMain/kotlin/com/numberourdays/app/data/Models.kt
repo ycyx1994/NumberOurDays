@@ -1,5 +1,7 @@
 package com.numberourdays.app.data
 
+import kotlinx.datetime.Clock
+
 enum class RepeatUnit {
     NONE, DAY, WEEK, MONTH, YEAR;
 
@@ -31,8 +33,8 @@ data class DayEvent(
     val remindEnabled: Boolean = false,
     val remindHour: Int = 8,
     val remindMinute: Int = 0,
-    val createdAt: Long = 0,
-    val updatedAt: Long = 0,
+    val createdAt: Long = Clock.System.now().toEpochMilliseconds(),
+    val updatedAt: Long = Clock.System.now().toEpochMilliseconds(),
 )
 
 data class DayEventDisplay(
