@@ -1,15 +1,13 @@
 package com.numberourdays.app.domain
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class DragReorderTest {
 
     @Test
     fun dragTargetIndex_movesDownByRoundedRows() {
-        // 1.4 rows down → +1
         assertEquals(1, DateCalculator.dragTargetIndex(0, 3, deltaY = 140f, rowHeightPx = 100f))
-        // 1.6 rows down → +2
         assertEquals(2, DateCalculator.dragTargetIndex(0, 3, deltaY = 160f, rowHeightPx = 100f))
     }
 

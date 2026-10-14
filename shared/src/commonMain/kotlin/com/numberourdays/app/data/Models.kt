@@ -31,8 +31,8 @@ data class DayEvent(
     val remindEnabled: Boolean = false,
     val remindHour: Int = 8,
     val remindMinute: Int = 0,
-    val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = System.currentTimeMillis(),
+    val createdAt: Long = 0,
+    val updatedAt: Long = 0,
 )
 
 data class DayEventDisplay(

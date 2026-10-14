@@ -1,6 +1,6 @@
 package com.numberourdays.app.data
 
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /** One State Council vacation block (放假调休区间), inclusive. */
 data class HolidayPeriod(
@@ -28,12 +28,12 @@ object LegalHolidays {
     fun periods(): List<HolidayPeriod> = Y2026
 
     private val Y2026: List<HolidayPeriod> = listOf(
-        HolidayPeriod("元旦", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 3)),
-        HolidayPeriod("春节", LocalDate.of(2026, 2, 15), LocalDate.of(2026, 2, 23)),
-        HolidayPeriod("清明节", LocalDate.of(2026, 4, 4), LocalDate.of(2026, 4, 6)),
-        HolidayPeriod("劳动节", LocalDate.of(2026, 5, 1), LocalDate.of(2026, 5, 5)),
-        HolidayPeriod("端午节", LocalDate.of(2026, 6, 19), LocalDate.of(2026, 6, 21)),
-        HolidayPeriod("中秋节", LocalDate.of(2026, 9, 25), LocalDate.of(2026, 9, 27)),
-        HolidayPeriod("国庆节", LocalDate.of(2026, 10, 1), LocalDate.of(2026, 10, 7)),
+        HolidayPeriod("元旦", LocalDate(2026, 1, 1), LocalDate(2026, 1, 3)),
+        HolidayPeriod("春节", LocalDate(2026, 2, 15), LocalDate(2026, 2, 23)),
+        HolidayPeriod("清明节", LocalDate(2026, 4, 4), LocalDate(2026, 4, 6)),
+        HolidayPeriod("劳动节", LocalDate(2026, 5, 1), LocalDate(2026, 5, 5)),
+        HolidayPeriod("端午节", LocalDate(2026, 6, 19), LocalDate(2026, 6, 21)),
+        HolidayPeriod("中秋节", LocalDate(2026, 9, 25), LocalDate(2026, 9, 27)),
+        HolidayPeriod("国庆节", LocalDate(2026, 10, 1), LocalDate(2026, 10, 7)),
     )
 }

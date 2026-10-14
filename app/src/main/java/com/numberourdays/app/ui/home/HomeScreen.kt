@@ -425,7 +425,7 @@ private fun CarouselCard(
 @Composable
 private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
     val tag = when {
-        item.repeatLabel != null && item.kind == EventKind.REPEAT -> item.repeatLabel
+        item.repeatLabel != null && item.kind == EventKind.REPEAT -> item.repeatLabel ?: "重复"
         item.kind == EventKind.COUNTDOWN -> "倒数"
         item.kind == EventKind.ELAPSED -> "已过"
         else -> "今天"

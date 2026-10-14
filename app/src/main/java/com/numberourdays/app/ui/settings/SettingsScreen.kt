@@ -47,6 +47,7 @@ import com.numberourdays.app.App
 import com.numberourdays.app.R
 import com.numberourdays.app.data.BackupTransfer
 import com.numberourdays.app.data.DayEvent
+import com.numberourdays.app.data.DayEventCodec
 import com.numberourdays.app.notify.NotificationHelper
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.theme.Accent
@@ -84,7 +85,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             Toast.makeText(context, R.string.nothing_export, Toast.LENGTH_SHORT).show()
             return@rememberLauncherForActivityResult
         }
-        val text = repo.serialize(snapshot)
+        val text = DayEventCodec.serialize(snapshot)
         if (BackupTransfer.writeText(context, uri, text)) {
             message = context.getString(R.string.exported_to_file, snapshot.size)
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -102,7 +103,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             message = context.getString(R.string.read_file_failed)
             return@rememberLauncherForActivityResult
         }
-        val (evts, note) = repo.parseBackup(text)
+        val (evts, note) = DayEventCodec.parseBackup(text)
         if (evts.isEmpty()) {
             message = note ?: context.getString(R.string.import_file_empty)
             return@rememberLauncherForActivityResult
@@ -159,7 +160,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                         return@ActionPair
                     }
                     val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    cm.setPrimaryClip(ClipData.newPlainText("NumberOurDays", repo.serialize(events)))
+                    cm.setPrimaryClip(ClipData.newPlainText("NumberOurDays", DayEventCodec.serialize(events)))
                     message = context.getString(R.string.copied)
                     Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
                 },
@@ -184,12 +185,12 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
                 Row(Modifier.padding(top = 8.dp)) {
                     TextButton(onClick = {
-                        val (evts, note) = repo.parseBackup(importText)
+                        val (evts, note) = DayEventCodec.parseBackup(importText)
                         if (evts.isEmpty()) {
                             message = note ?: context.getString(R.string.import_file_empty)
                             return@TextButton
                         }
-                        repo.saveAll(repo.merge(repo.loadEvents(), evts))
+                        repo.saveAll(DayEventCodec.merge(repo.loadEvents(), evts))
                         importText = ""
                         message = context.getString(R.string.import_file_merged, repo.loadEvents().size, note?.let { "，$it" } ?: "")
                     }) { Text(stringResource(R.string.import_merge), color = Accent) }
@@ -242,7 +243,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             confirmButton = {
                 Row {
                     TextButton(onClick = {
-                        repo.saveAll(repo.merge(repo.loadEvents(), incoming))
+                        repo.saveAll(DayEventCodec.merge(repo.loadEvents(), incoming))
                         message = context.getString(R.string.import_file_merged, repo.loadEvents().size, noteSuffix)
                         showFileImportConfirm = false
                         pendingFileImport = null
@@ -273,7 +274,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             text = { Text("将删除本地不在备份中的事件，确定继续？") },
             confirmButton = {
                 TextButton(onClick = {
-                    val (evts, note) = repo.parseBackup(importText)
+                    val (evts, note) = DayEventCodec.parseBackup(importText)
                     if (evts.isEmpty()) {
                         message = note ?: context.getString(R.string.import_file_empty)
                         confirmReplace = false

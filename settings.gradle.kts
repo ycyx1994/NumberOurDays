@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "NumberOurDays"
 include(":app")
+include(":shared")

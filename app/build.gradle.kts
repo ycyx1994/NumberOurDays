@@ -70,13 +70,13 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":shared"))
+
     val composeBom = platform("androidx.compose:compose-bom:2024.10.00")
     implementation(composeBom)
     androidTestImplementation(composeBom)
 
     testImplementation("junit:junit:4.13.2")
-    // Real org.json for local unit tests (android.jar stubs throw)
-    testImplementation("org.json:json:20240303")
 
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.activity:activity-compose:1.9.3")

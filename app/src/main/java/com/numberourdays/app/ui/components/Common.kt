@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.numberourdays.app.R
 import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.ui.theme.N900
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 import kotlinx.coroutines.delay
 
 @Composable

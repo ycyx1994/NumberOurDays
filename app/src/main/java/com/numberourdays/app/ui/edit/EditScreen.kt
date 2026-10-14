@@ -460,7 +460,7 @@ fun EditScreen(
         val initialMillis = remember(parsed) {
             Calendar.getInstance(utc).apply {
                 clear()
-                set(parsed.year, parsed.monthValue - 1, parsed.dayOfMonth)
+                set(parsed.year, parsed.monthNumber - 1, parsed.dayOfMonth)
             }.timeInMillis
         }
         val datePickerState = rememberDatePickerState(

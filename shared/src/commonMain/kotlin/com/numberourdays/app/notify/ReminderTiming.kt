@@ -2,11 +2,17 @@ package com.numberourdays.app.notify
 
 import com.numberourdays.app.data.RepeatUnit
 import com.numberourdays.app.domain.DateCalculator
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.ZoneOffset
 import kotlin.math.max
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 
 /** Pure timing rules for day-of reminders at a configurable wall-clock time. */
 object ReminderTiming {
@@ -20,24 +26,26 @@ object ReminderTiming {
         anchorDate: String,
         unit: RepeatUnit,
         interval: Int,
-        now: Long = System.currentTimeMillis(),
+        now: Long = Clock.System.now().toEpochMilliseconds(),
         hourOfDay: Int = HOUR_OF_DAY,
         minuteOfHour: Int = 0,
-        zone: ZoneId = ZoneId.systemDefault(),
+        zone: TimeZone = TimeZone.currentSystemDefault(),
         notBefore: Long = now,
     ): Long? {
         val anchor = DateCalculator.parse(anchorDate) ?: return null
-        val zonedNow = Instant.ofEpochMilli(now).atZone(zone)
-        val today = zonedNow.toLocalDate()
+        val zonedNow = Instant.fromEpochMilliseconds(now).toLocalDateTime(zone)
+        val today = zonedNow.date
         val step = max(1, interval)
 
         val target: LocalDate = if (unit == RepeatUnit.NONE) {
-            if (anchor.isBefore(today)) return null
+            if (anchor < today) return null
             anchor
         } else {
             var candidate = DateCalculator.resolveNextDate(anchorDate, unit, step, today)
             if (atHour(candidate, hourOfDay, minuteOfHour, zone) <= notBefore) {
-                candidate = DateCalculator.resolveNextDate(anchorDate, unit, step, today.plusDays(1))
+                candidate = DateCalculator.resolveNextDate(
+                    anchorDate, unit, step, today.plus(DatePeriod(days = 1)),
+                )
             }
             candidate
         }
@@ -47,8 +55,8 @@ object ReminderTiming {
         return fireAt
     }
 
-    private fun atHour(date: LocalDate, hourOfDay: Int, minuteOfHour: Int, zone: ZoneId): Long =
-        date.atTime(hourOfDay, minuteOfHour).atZone(zone).toInstant().toEpochMilli()
+    private fun atHour(date: LocalDate, hourOfDay: Int, minuteOfHour: Int, zone: TimeZone): Long =
+        LocalDateTime(date, LocalTime(hourOfDay, minuteOfHour)).toInstant(zone).toEpochMilliseconds()
 
     /** Debug helper: same as [nextReminderMillis] but in UTC for tests. */
     fun nextReminderMillisUtc(
@@ -66,7 +74,7 @@ object ReminderTiming {
         now = now,
         hourOfDay = hourOfDay,
         minuteOfHour = minuteOfHour,
-        zone = ZoneOffset.UTC,
+        zone = TimeZone.UTC,
         notBefore = notBefore,
     )
 }

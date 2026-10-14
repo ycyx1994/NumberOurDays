@@ -1,13 +1,13 @@
 package com.numberourdays.app.data
 
-import java.time.LocalDate
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import kotlinx.datetime.LocalDate
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
-class BackupTransferTest {
+class DayEventCodecTest {
 
     private fun sampleEvent(
         id: String = "e1",
@@ -36,7 +36,7 @@ class BackupTransferTest {
 
     @Test
     fun defaultBackupFileName_usesBasicIsoDate() {
-        val name = BackupTransfer.defaultBackupFileName(LocalDate.of(2026, 9, 21))
+        val name = BackupNaming.defaultBackupFileName(LocalDate(2026, 9, 21))
         assertEquals("numberourdays-backup-20260921.json", name)
     }
 
@@ -107,7 +107,7 @@ class BackupTransferTest {
         assertEquals(1, merged.size)
         assertEquals("新", merged[0].title)
 
-        val olderIncoming = listOf(sampleEvent(id = "a", title="更旧", updatedAt=50L))
+        val olderIncoming = listOf(sampleEvent(id = "a", title = "更旧", updatedAt = 50L))
         val kept = DayEventCodec.merge(local, olderIncoming)
         assertEquals("旧", kept[0].title)
     }

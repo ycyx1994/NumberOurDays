@@ -1,16 +1,16 @@
 package com.numberourdays.app.domain
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class DurationBreakdownTest {
 
     @Test
     fun monthEnd_toSameDayNextMonth_countsOneMonth() {
         val result = DateCalculator.convertDuration(
-            LocalDate.of(2026, 1, 31),
-            LocalDate.of(2026, 2, 28),
+            LocalDate(2026, 1, 31),
+            LocalDate(2026, 2, 28),
         )
 
         assertEquals(1, result.monthsAfterYears)
@@ -21,8 +21,8 @@ class DurationBreakdownTest {
     @Test
     fun monthEnd_toSameDayInMarch_countsTwoMonths() {
         val result = DateCalculator.convertDuration(
-            LocalDate.of(2026, 1, 31),
-            LocalDate.of(2026, 3, 31),
+            LocalDate(2026, 1, 31),
+            LocalDate(2026, 3, 31),
         )
 
         assertEquals(2, result.monthsAfterYears)
@@ -34,8 +34,8 @@ class DurationBreakdownTest {
     @Test
     fun leapDay_anniversary_countsOneYear() {
         val result = DateCalculator.convertDuration(
-            LocalDate.of(2024, 2, 29),
-            LocalDate.of(2025, 2, 28),
+            LocalDate(2024, 2, 29),
+            LocalDate(2025, 2, 28),
         )
 
         assertEquals(1, result.years)
@@ -47,8 +47,8 @@ class DurationBreakdownTest {
     @Test
     fun monthEnd_afterYearPlusMonths_keepsAnchorMilestones() {
         val result = DateCalculator.convertDuration(
-            LocalDate.of(2026, 1, 31),
-            LocalDate.of(2027, 3, 31),
+            LocalDate(2026, 1, 31),
+            LocalDate(2027, 3, 31),
         )
 
         assertEquals(1, result.years)

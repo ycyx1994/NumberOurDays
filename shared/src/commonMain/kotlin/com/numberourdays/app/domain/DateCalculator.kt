@@ -7,24 +7,25 @@ import com.numberourdays.app.data.DurationDisplay
 import com.numberourdays.app.data.DurationUnit
 import com.numberourdays.app.data.EventKind
 import com.numberourdays.app.data.RepeatUnit
-import java.time.LocalDate
-import java.time.YearMonth
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
 
 object DateCalculator {
-    private val FMT: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+    fun today(): LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
-    fun today(): LocalDate = LocalDate.now()
-
-    fun format(date: LocalDate): String = date.format(FMT)
+    fun format(date: LocalDate): String = date.toString()
 
     fun parse(text: String?): LocalDate? = runCatching {
-        LocalDate.parse(text, FMT)
+        LocalDate.parse(text ?: return@runCatching null)
     }.getOrNull()
 
     fun isValidDate(text: String?): Boolean {
@@ -33,7 +34,11 @@ object DateCalculator {
     }
 
     fun diffDays(from: LocalDate, to: LocalDate): Long =
-        ChronoUnit.DAYS.between(from, to)
+        (to.toEpochDays() - from.toEpochDays()).toLong()
+
+    /** Inclusive-free day count helper used by month-length math. */
+    fun daySpan(from: LocalDate, to: LocalDate): Int =
+        to.toEpochDays() - from.toEpochDays()
 
     fun formatRepeatLabel(unit: RepeatUnit, interval: Int): String? {
         if (unit == RepeatUnit.NONE) return null
@@ -60,13 +65,13 @@ object DateCalculator {
         val step = max(1, interval)
         var n = 0
         var guard = 0
-        while (next.isBefore(ref) && guard < 20000) {
+        while (next < ref && guard < 20000) {
             n += 1
             next = when (unit) {
-                RepeatUnit.DAY -> anchor.plusDays(n.toLong() * step)
-                RepeatUnit.WEEK -> anchor.plusWeeks(n.toLong() * step)
-                RepeatUnit.MONTH -> plusMonthsFromAnchor(anchor, n.toLong() * step)
-                RepeatUnit.YEAR -> plusYearsFromAnchor(anchor, n.toLong() * step)
+                RepeatUnit.DAY -> anchor.plus(DatePeriod(days = n * step))
+                RepeatUnit.WEEK -> anchor.plus(DatePeriod(days = n * step * 7))
+                RepeatUnit.MONTH -> plusMonthsFromAnchor(anchor, (n.toLong() * step))
+                RepeatUnit.YEAR -> plusYearsFromAnchor(anchor, (n.toLong() * step))
                 RepeatUnit.NONE -> next
             }
             guard++
@@ -76,16 +81,24 @@ object DateCalculator {
 
     /** anchor + months, keeping day-of-month when the target month allows it. */
     fun plusMonthsFromAnchor(anchor: LocalDate, monthsToAdd: Long): LocalDate {
-        val ym = YearMonth.from(anchor).plusMonths(monthsToAdd)
-        val day = min(anchor.dayOfMonth, ym.lengthOfMonth())
-        return ym.atDay(day)
+        val monthIndex = anchor.year * 12L + (anchor.monthNumber - 1) + monthsToAdd
+        val year = floorDiv(monthIndex, 12L).toInt()
+        val month = floorMod(monthIndex, 12L).toInt() + 1
+        val day = min(anchor.dayOfMonth, daysInMonth(year, month))
+        return LocalDate(year, month, day)
     }
 
     /** anchor + years; 2/29 falls on 2/28 in non-leap target years. */
     fun plusYearsFromAnchor(anchor: LocalDate, yearsToAdd: Long): LocalDate {
-        val year = (anchor.year + yearsToAdd.toInt())
-        val day = min(anchor.dayOfMonth, YearMonth.of(year, anchor.month).lengthOfMonth())
-        return LocalDate.of(year, anchor.month, day)
+        val year = anchor.year + yearsToAdd.toInt()
+        val day = min(anchor.dayOfMonth, daysInMonth(year, anchor.monthNumber))
+        return LocalDate(year, anchor.monthNumber, day)
+    }
+
+    fun daysInMonth(year: Int, monthNumber: Int): Int {
+        val nextYear = if (monthNumber == 12) year + 1 else year
+        val nextMonth = if (monthNumber == 12) 1 else monthNumber + 1
+        return daySpan(LocalDate(year, monthNumber, 1), LocalDate(nextYear, nextMonth, 1))
     }
 
     fun computeDisplay(event: DayEvent, ref: LocalDate = today()): DayEventDisplay {
@@ -175,11 +188,11 @@ object DateCalculator {
     }
 
     fun convertDuration(from: LocalDate, to: LocalDate): DurationBreakdown {
-        val start = if (from.isBefore(to)) from else to
-        val end = if (from.isBefore(to)) to else from
+        val start = if (from < to) from else to
+        val end = if (from < to) to else from
 
         var years = end.year - start.year
-        if (plusYearsFromAnchor(start, years.toLong()).isAfter(end)) {
+        if (plusYearsFromAnchor(start, years.toLong()) > end) {
             years--
         }
 
@@ -187,16 +200,16 @@ object DateCalculator {
         var monthsAfterYears = 0
         while (
             monthsAfterYears < 1200 &&
-            !plusMonthsFromAnchor(
+            plusMonthsFromAnchor(
                 start,
                 (monthsBeforeRemainder + monthsAfterYears + 1).toLong(),
-            ).isAfter(end)
+            ) <= end
         ) {
             monthsAfterYears++
         }
         val months = monthsBeforeRemainder + monthsAfterYears
         val milestone = plusMonthsFromAnchor(start, months.toLong())
-        val daysAfterMonths = ChronoUnit.DAYS.between(milestone, end).toInt()
+        val daysAfterMonths = daySpan(milestone, end)
 
         return DurationBreakdown(
             days = abs(diffDays(start, end)).toInt(),
@@ -246,4 +259,12 @@ object DateCalculator {
         }
         return null
     }
+
+    private fun floorDiv(a: Long, b: Long): Long {
+        var q = a / b
+        if (a xor b < 0 && q * b != a) q--
+        return q
+    }
+
+    private fun floorMod(a: Long, b: Long): Long = a - floorDiv(a, b) * b
 }

@@ -1,13 +1,16 @@
 package com.numberourdays.app.notify
 
 import com.numberourdays.app.data.RepeatUnit
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Test
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 
 class ReminderTimingTest {
 
@@ -19,13 +22,12 @@ class ReminderTimingTest {
         dayOfMonth: Int,
         hour: Int = 0,
         minute: Int = 0,
-    ): Long = LocalDateTime.of(year, month, dayOfMonth, hour, minute)
-        .toInstant(ZoneOffset.UTC)
-        .toEpochMilli()
+    ): Long = LocalDateTime(LocalDate(year, month, dayOfMonth), LocalTime(hour, minute))
+        .toInstant(TimeZone.UTC)
+        .toEpochMilliseconds()
 
     @Test
     fun none_schedulesSameDayNineAm() {
-        // now = 2026-09-21 08:00 UTC → fire 09:00 same day
         val now = utcMillis(2026, 9, 21, 8, 0)
         val expected = utcMillis(2026, 9, 21, 9, 0)
         val at = ReminderTiming.nextReminderMillisUtc(
@@ -63,7 +65,6 @@ class ReminderTimingTest {
 
     @Test
     fun week_repeat_afterFire_movesToNextWeek() {
-        // Fired on Saturday 2026-09-26 09:00; afterFire should schedule 2026-10-03 09:00
         val firedAt = utcMillis(2026, 9, 26, 9, 0)
         val at = ReminderTiming.nextReminderMillisUtc(
             anchorDate = "2026-09-26",
@@ -125,5 +126,11 @@ class ReminderTimingTest {
             hourOfDay = 20,
         )
         assertNull(at)
+    }
+
+    @Test
+    fun unusedInstantHelper_compiles() {
+        // keep Instant import used on all targets
+        assertEquals(0L, Instant.fromEpochMilliseconds(0).toEpochMilliseconds())
     }
 }

@@ -3,8 +3,7 @@ package com.numberourdays.app.domain
 import com.numberourdays.app.data.HolidayCountdown
 import com.numberourdays.app.data.HolidayPeriod
 import com.numberourdays.app.data.HolidayStatus
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
+import kotlinx.datetime.LocalDate
 
 /**
  * Picks the nearest legal-holiday vacation:
@@ -21,7 +20,7 @@ object HolidayCalculator {
         periods: List<HolidayPeriod>,
         today: LocalDate,
     ): HolidayCountdown? {
-        val ongoing = periods.find { !today.isBefore(it.start) && !today.isAfter(it.end) }
+        val ongoing = periods.find { today >= it.start && today <= it.end }
         if (ongoing != null) {
             return HolidayCountdown(
                 period = ongoing,
@@ -31,10 +30,10 @@ object HolidayCalculator {
             )
         }
         val upcoming = periods
-            .filter { it.start.isAfter(today) }
+            .filter { it.start > today }
             .minByOrNull { it.start }
             ?: return null
-        val days = ChronoUnit.DAYS.between(today, upcoming.start).toInt()
+        val days = DateCalculator.daySpan(today, upcoming.start)
         return HolidayCountdown(
             period = upcoming,
             status = HolidayStatus.UPCOMING,
@@ -53,15 +52,15 @@ object HolidayCalculator {
         today: LocalDate,
     ): List<HolidayListRow> {
         return periods.map { p ->
-            val ongoing = !today.isBefore(p.start) && !today.isAfter(p.end)
-            val past = p.end.isBefore(today)
-            val days = ChronoUnit.DAYS.between(today, p.start).toInt()
+            val ongoing = today >= p.start && today <= p.end
+            val past = p.end < today
+            val days = DateCalculator.daySpan(today, p.start)
             HolidayListRow(
                 period = p,
                 ongoing = ongoing,
                 past = past,
                 daysUntilStart = days,
-                daysPastEnd = if (past) ChronoUnit.DAYS.between(p.end, today).toInt() else 0,
+                daysPastEnd = if (past) DateCalculator.daySpan(p.end, today) else 0,
             )
         }.sortedWith(
             compareBy<HolidayListRow> {
@@ -87,5 +86,5 @@ data class HolidayListRow(
     val daysPastEnd: Int = 0,
 ) {
     val vacationDays: Int
-        get() = ChronoUnit.DAYS.between(period.start, period.end).toInt() + 1
+        get() = DateCalculator.daySpan(period.start, period.end) + 1
 }
