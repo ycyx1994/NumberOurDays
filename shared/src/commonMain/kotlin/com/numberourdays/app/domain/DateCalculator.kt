@@ -151,7 +151,8 @@ object DateCalculator {
 
     fun sortEvents(list: List<DayEventDisplay>): List<DayEventDisplay> =
         list.sortedWith(
-            compareBy<DayEventDisplay> { rank(it) }
+            compareByDescending<DayEventDisplay> { it.starred }
+                .thenBy { rank(it) }
                 .thenBy {
                     if (rank(it) == 2) it.sortDate.reversed() else it.sortDate
                 }
