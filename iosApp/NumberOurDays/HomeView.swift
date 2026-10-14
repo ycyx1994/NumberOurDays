@@ -103,18 +103,79 @@ struct HomeView: View {
                 HolidayListView()
             }
             .overlay(alignment: .bottomTrailing) {
-                Button {
+                GlassAddButton {
                     showAdd = true
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(NodTheme.n0)
-                        .frame(width: 56, height: 56)
-                        .background(NodTheme.accent, in: Circle())
                 }
                 .padding(24)
             }
         }
+    }
+}
+
+/// iOS liquid-glass FAB: system material + accent tint + specular rim.
+struct GlassAddButton: View {
+    var action: () -> Void
+    @State private var pressed = false
+
+    var body: some View {
+        Button {
+            action()
+        } label: {
+            ZStack {
+                // Frosted glass body
+                Circle()
+                    .fill(.ultraThinMaterial)
+                    .overlay {
+                        // Warm accent wash so it still reads as brand
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        NodTheme.accent.opacity(0.92),
+                                        NodTheme.accent.opacity(0.72),
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .blendMode(.plusLighter)
+                            .opacity(0.85)
+                    }
+                    .overlay {
+                        // Specular glass rim
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    colors: [
+                                        Color.white.opacity(0.55),
+                                        Color.white.opacity(0.08),
+                                        Color.white.opacity(0.28),
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 1
+                            )
+                    }
+                    .shadow(color: NodTheme.accent.opacity(0.35), radius: pressed ? 4 : 14, y: pressed ? 2 : 8)
+                    .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
+
+                Image(systemName: "plus")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.15), radius: 1, y: 0.5)
+            }
+            .frame(width: 60, height: 60)
+            .scaleEffect(pressed ? 0.92 : 1)
+            .animation(.spring(response: 0.28, dampingFraction: 0.7), value: pressed)
+        }
+        .buttonStyle(.plain)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in pressed = true }
+                .onEnded { _ in pressed = false }
+        )
+        .accessibilityLabel("添加纪念日")
     }
 }
 
