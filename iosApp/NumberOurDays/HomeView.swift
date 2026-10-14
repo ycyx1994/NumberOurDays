@@ -99,6 +99,9 @@ struct HomeView: View {
             .sheet(isPresented: $showAdd) {
                 EditView(store: store, eventId: nil)
             }
+            .sheet(isPresented: $showHolidays) {
+                HolidayListView()
+            }
             .overlay(alignment: .bottomTrailing) {
                 Button {
                     showAdd = true
