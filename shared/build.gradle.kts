@@ -15,6 +15,20 @@ kotlin {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
+    // Kotlin/JS for WeChat mini program (and any JS host). Same commonMain source.
+    js {
+        nodejs {
+            testTask {
+                useMocha { timeout = "10s" }
+            }
+        }
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        binaries.library()
+    }
     listOf(
         iosX64(),
         iosArm64(),
