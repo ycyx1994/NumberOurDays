@@ -80,14 +80,6 @@ import com.numberourdays.app.domain.HolidayCalculator
 import com.numberourdays.app.ui.components.DayCountHero
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.components.rememberCurrentDate
-import com.numberourdays.app.ui.theme.Accent
-import com.numberourdays.app.ui.theme.N0
-import com.numberourdays.app.ui.theme.N100
-import com.numberourdays.app.ui.theme.N300
-import com.numberourdays.app.ui.theme.N50
-import com.numberourdays.app.ui.theme.N500
-import com.numberourdays.app.ui.theme.N700
-import com.numberourdays.app.ui.theme.N900
 import com.numberourdays.app.ui.theme.NodCardShape
 import com.numberourdays.app.ui.theme.NodDisplayCount
 import com.numberourdays.app.ui.theme.NodDisplayNumber
@@ -97,9 +89,8 @@ import com.numberourdays.app.ui.theme.HeroCardPadH
 import com.numberourdays.app.ui.theme.HeroCardPadV
 import com.numberourdays.app.ui.theme.HeroPageMarginH
 import com.numberourdays.app.ui.theme.HeroPageMarginTop
-import com.numberourdays.app.ui.theme.HolidayEdge
-import com.numberourdays.app.ui.theme.HolidayTint
 import kotlin.math.absoluteValue
+import com.numberourdays.app.ui.theme.LocalNodBrand
 
 private sealed interface Slide {
     data class Event(val display: DayEventDisplay) : Slide
@@ -190,8 +181,8 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onOpenAdd,
-                containerColor = Accent,
-                contentColor = N0,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = NodFabShape,
             ) {
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_event))
@@ -242,7 +233,7 @@ fun HomeScreen(
             } else {
                 Text(
                     text = stringResource(R.string.all_events),
-                    color = N500,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp,
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
                 )
@@ -266,7 +257,7 @@ fun HomeScreen(
                             onDragEnd = { onDragEnd() },
                         )
                         if (!isDraggingItem) {
-                            HorizontalDivider(color = N100, thickness = 1.dp)
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 1.dp)
                         }
                     }
                 }
@@ -281,19 +272,19 @@ private val DigitRun = Regex("\\d+")
 private fun dayCountAnnotated(label: String): AnnotatedString {
     val match = DigitRun.find(label)
     val digitStyle = SpanStyle(
-        color = Accent,
+        color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold,
         fontFamily = NodDisplayCount.fontFamily,
         fontSize = NodDisplayCount.fontSize * 18f / 17f,
     )
     val plainStyle = SpanStyle(
-        color = N700,
+        color = LocalNodBrand.current.n700,
         fontWeight = FontWeight.Normal,
         fontSize = NodDisplayCount.fontSize * 16f / 17f,
     )
     // System CJK bold so "今天" actually thickens (Barlow has no Han glyphs).
     val todayStyle = SpanStyle(
-        color = Accent,
+        color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold,
         fontFamily = FontFamily.Default,
         fontSize = NodDisplayCount.fontSize * 16f / 17f,
@@ -326,26 +317,26 @@ private fun EmptyState(modifier: Modifier = Modifier, onAdd: () -> Unit) {
     ) {
         Text(
             text = stringResource(R.string.empty_title),
-            color = N900,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
         )
         Spacer(Modifier.height(8.dp))
         Text(
             text = stringResource(R.string.empty_desc),
-            color = N500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 13.sp,
         )
         Spacer(Modifier.height(24.dp))
         Text(
             text = stringResource(R.string.empty_action),
-            color = N0,
+            color = MaterialTheme.colorScheme.onPrimary,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .width(200.dp)
                 .clip(MaterialTheme.shapes.medium)
-                .background(Accent)
+                .background(MaterialTheme.colorScheme.primary)
                 .clickable(onClick = onAdd)
                 .padding(vertical = 14.dp),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -362,8 +353,8 @@ private fun HolidayEmptyCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(NodCardShape)
-            .background(N50)
-            .border(1.dp, N100, NodCardShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, NodCardShape)
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -371,14 +362,14 @@ private fun HolidayEmptyCard(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(R.string.holiday_legal),
-                color = N300,
+                color = MaterialTheme.colorScheme.outline,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 text = stringResource(R.string.holiday_none_left),
-                color = N500,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -387,7 +378,7 @@ private fun HolidayEmptyCard(
         }
         Text(
             text = stringResource(R.string.holiday_none_hint),
-            color = N300,
+            color = MaterialTheme.colorScheme.outline,
             fontSize = 12.sp,
         )
     }
@@ -403,8 +394,8 @@ private fun HolidayMiniCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(NodCardShape)
-            .background(HolidayTint)
-            .border(1.dp, HolidayEdge, NodCardShape)
+            .background(LocalNodBrand.current.holidayTint)
+            .border(1.dp, LocalNodBrand.current.holidayEdge, NodCardShape)
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -412,14 +403,14 @@ private fun HolidayMiniCard(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(R.string.holiday_legal),
-                color = Accent,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 text = countdown.period.name,
-                color = N900,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -435,7 +426,7 @@ private fun HolidayMiniCard(
                 )
             },
             style = NodDisplayCount,
-            color = Accent,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
@@ -480,7 +471,7 @@ private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(N50)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .defaultMinSize(minHeight = HeroCardMinHeight)
             .clickable { onClick(item.id) }
             .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
@@ -489,13 +480,13 @@ private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
     ) {
         Text(
             text = stringResource(R.string.next_prefix, tag),
-            color = N500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 11.sp,
             textAlign = TextAlign.Center,
         )
         Text(
             text = item.title,
-            color = N900,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 17.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -511,7 +502,7 @@ private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
         )
         Text(
             text = item.date,
-            color = N500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             maxLines = 1,
@@ -525,7 +516,7 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(HolidayTint)
+            .background(LocalNodBrand.current.holidayTint)
             .defaultMinSize(minHeight = HeroCardMinHeight)
             .clickable(onClick = onOpenHolidays)
             .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
@@ -534,14 +525,14 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
     ) {
         Text(
             text = stringResource(R.string.holiday_next),
-            color = Accent,
+            color = MaterialTheme.colorScheme.primary,
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
         )
         Text(
             text = countdown.period.name,
-            color = N900,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 17.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -552,7 +543,7 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
         if (countdown.status == HolidayStatus.ONGOING) {
             Text(
                 text = stringResource(R.string.holiday_ongoing),
-                color = Accent,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 18.dp, bottom = 12.dp),
@@ -569,7 +560,7 @@ private fun HolidaySlide(countdown: HolidayCountdown, onOpenHolidays: () -> Unit
             text = DateCalculator.format(countdown.period.start) +
                 " · " +
                 DateCalculator.format(countdown.period.end),
-            color = N500,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             maxLines = 1,
@@ -606,7 +597,7 @@ private fun Dots(count: Int, pagerState: androidx.compose.foundation.pager.Pager
                     .height(6.dp)
                     .width(width)
                     .clip(RoundedCornerShape(3.dp))
-                    .background(if (active) N700 else N300)
+                    .background(if (active) LocalNodBrand.current.n700 else MaterialTheme.colorScheme.outline)
             )
         }
     }
@@ -639,8 +630,8 @@ private fun EventRow(
         label = "dragLift",
     )
     val liftScale = 1f + 0.015f * lift
-    val liftSurface = lerp(Color.Transparent, N50, lift)
-    val liftBorder = lerp(Color.Transparent, N100, lift)
+    val liftSurface = lerp(Color.Transparent, MaterialTheme.colorScheme.surfaceVariant, lift)
+    val liftBorder = lerp(Color.Transparent, MaterialTheme.colorScheme.outlineVariant, lift)
     val liftInset = 2.dp * lift
     val liftPad = 10.dp * lift
     val showLift = lift > 0f
@@ -688,7 +679,7 @@ private fun EventRow(
             .padding(horizontal = liftPad, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onToggleStar, modifier = Modifier.size(40.dp)) {
+        IconButton(onClick = onToggleStar, modifier = Modifier.size(48.dp)) {
             Icon(
                 imageVector = if (item.starred) Icons.Rounded.Star else Icons.Outlined.StarOutline,
                 contentDescription = if (item.starred) {
@@ -696,7 +687,7 @@ private fun EventRow(
                 } else {
                     stringResource(R.string.star)
                 },
-                tint = if (item.starred) Accent else N300,
+                tint = if (item.starred) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
             )
         }
         Column(
@@ -706,7 +697,7 @@ private fun EventRow(
         ) {
             Text(
                 text = item.title,
-                color = N900,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 15.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -717,7 +708,7 @@ private fun EventRow(
                     if (item.repeatLabel != null) append(" · ").append(item.repeatLabel)
                     else append(" · ").append(kindLabel)
                 },
-                color = N500,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

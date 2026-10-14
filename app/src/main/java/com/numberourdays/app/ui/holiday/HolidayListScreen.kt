@@ -34,18 +34,9 @@ import com.numberourdays.app.domain.HolidayCalculator
 import com.numberourdays.app.domain.HolidayListRow
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.components.rememberCurrentDate
-import com.numberourdays.app.ui.theme.Accent
-import com.numberourdays.app.ui.theme.HolidayEdge
-import com.numberourdays.app.ui.theme.HolidayTint
-import com.numberourdays.app.ui.theme.N0
-import com.numberourdays.app.ui.theme.N100
-import com.numberourdays.app.ui.theme.N300
-import com.numberourdays.app.ui.theme.N50
-import com.numberourdays.app.ui.theme.N500
-import com.numberourdays.app.ui.theme.N700
-import com.numberourdays.app.ui.theme.N900
 import com.numberourdays.app.ui.theme.NodCardShape
 import com.numberourdays.app.ui.theme.NodDisplayCount
+import com.numberourdays.app.ui.theme.LocalNodBrand
 
 @Composable
 fun HolidayListScreen(onBack: () -> Unit) {
@@ -70,7 +61,7 @@ fun HolidayListScreen(onBack: () -> Unit) {
         ) {
             Text(
                 text = stringResource(R.string.holiday_year_title, today.year),
-                color = N500,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
@@ -92,19 +83,19 @@ private fun HolidayRowCard(row: HolidayListRow) {
     val past = row.past
     val ongoing = row.ongoing
     val titleColor = when {
-        past -> N500
-        ongoing -> N900
-        else -> N900
+        past -> MaterialTheme.colorScheme.onSurfaceVariant
+        ongoing -> MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.onSurface
     }
     val surface = when {
-        ongoing -> HolidayTint
-        past -> N50
-        else -> N0
+        ongoing -> LocalNodBrand.current.holidayTint
+        past -> MaterialTheme.colorScheme.surfaceVariant
+        else -> MaterialTheme.colorScheme.background
     }
     val edge = when {
-        ongoing -> HolidayEdge
-        past -> N100
-        else -> N100
+        ongoing -> LocalNodBrand.current.holidayEdge
+        past -> MaterialTheme.colorScheme.outlineVariant
+        else -> MaterialTheme.colorScheme.outlineVariant
     }
     val statusText = when {
         past -> stringResource(R.string.holiday_elapsed, row.daysPastEnd)
@@ -112,9 +103,9 @@ private fun HolidayRowCard(row: HolidayListRow) {
         else -> stringResource(R.string.holiday_countdown, row.daysUntilStart)
     }
     val statusColor = when {
-        past -> N300
-        ongoing -> Accent
-        else -> Accent
+        past -> MaterialTheme.colorScheme.outline
+        ongoing -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.primary
     }
 
     Row(
@@ -142,7 +133,7 @@ private fun HolidayRowCard(row: HolidayListRow) {
                     DateCalculator.format(row.period.end) +
                     " · " +
                     stringResource(R.string.holiday_vacation_days, row.vacationDays),
-                color = if (past) N300 else N500,
+                color = if (past) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

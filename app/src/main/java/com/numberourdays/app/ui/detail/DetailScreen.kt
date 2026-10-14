@@ -52,14 +52,6 @@ import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.ui.components.DayCountHero
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.components.rememberCurrentDate
-import com.numberourdays.app.ui.theme.Accent
-import com.numberourdays.app.ui.theme.N0
-import com.numberourdays.app.ui.theme.N100
-import com.numberourdays.app.ui.theme.N300
-import com.numberourdays.app.ui.theme.N50
-import com.numberourdays.app.ui.theme.N500
-import com.numberourdays.app.ui.theme.N700
-import com.numberourdays.app.ui.theme.N900
 import com.numberourdays.app.ui.theme.NodCardShape
 import com.numberourdays.app.ui.theme.NodFabShape
 import com.numberourdays.app.ui.theme.HeroCardMinHeight
@@ -67,6 +59,7 @@ import com.numberourdays.app.ui.theme.HeroCardPadH
 import com.numberourdays.app.ui.theme.HeroCardPadV
 import com.numberourdays.app.ui.theme.HeroPageMarginH
 import com.numberourdays.app.ui.theme.HeroPageMarginTop
+import com.numberourdays.app.ui.theme.LocalNodBrand
 
 @Composable
 fun DetailScreen(
@@ -96,7 +89,7 @@ fun DetailScreen(
         if (event == null) {
             Text(
                 text = stringResource(R.string.event_missing),
-                color = N500,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
@@ -129,20 +122,20 @@ fun DetailScreen(
                         .fillMaxWidth()
                         .defaultMinSize(minHeight = HeroCardMinHeight)
                         .clip(NodCardShape)
-                        .background(N50)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(horizontal = HeroCardPadH, vertical = HeroCardPadV),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Top,
                 ) {
                     Text(
                         text = stringResource(R.string.next_prefix, tag),
-                        color = N500,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 11.sp,
                         textAlign = TextAlign.Center,
                     )
                     Text(
                         text = d.title,
-                        color = N900,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -168,7 +161,7 @@ fun DetailScreen(
                     // Date line — match home hero
                     Text(
                         text = d.date,
-                        color = N500,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
@@ -228,13 +221,13 @@ fun DetailScreen(
                         trailing = {
                             Text(
                                 text = elapsedUnitLabel,
-                                color = Accent,
+                                color = MaterialTheme.colorScheme.primary,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier
                                     .padding(start = 8.dp)
                                     .clip(RoundedCornerShape(6.dp))
-                                    .background(N50)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .clickable {
                                         val order = listOf(DurationUnit.DAY, DurationUnit.MONTH, DurationUnit.YEAR)
                                         elapsedUnit = order[(order.indexOf(elapsedEnum) + 1) % order.size].name
@@ -254,11 +247,11 @@ fun DetailScreen(
                     )
                     if (!d.note.isNullOrBlank()) {
                         Column(modifier = Modifier.padding(vertical = 14.dp)) {
-                            Text(stringResource(R.string.label_note), color = N500, fontSize = 13.sp)
+                            Text(stringResource(R.string.label_note), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
                             Spacer(Modifier.height(6.dp))
-                            Text(d.note.orEmpty(), color = N700, fontSize = 14.sp)
+                            Text(d.note.orEmpty(), color = LocalNodBrand.current.n700, fontSize = 14.sp)
                         }
-                        HorizontalDivider(color = N100)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
             }
@@ -272,8 +265,8 @@ fun DetailScreen(
             ) {
                 FloatingActionButton(
                     onClick = { onEdit(event.id) },
-                    containerColor = N50,
-                    contentColor = N700,
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = LocalNodBrand.current.n700,
                     shape = NodFabShape,
                 ) {
                     Icon(
@@ -283,8 +276,8 @@ fun DetailScreen(
                 }
                 FloatingActionButton(
                     onClick = { repo.toggleStar(event.id) },
-                    containerColor = if (d.starred) Accent else N50,
-                    contentColor = if (d.starred) N0 else N300,
+                    containerColor = if (d.starred) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (d.starred) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline,
                     shape = NodFabShape,
                 ) {
                     Icon(
@@ -305,14 +298,14 @@ private fun UnitChip(text: String, selected: Boolean, onClick: () -> Unit) {
         label = { Text(text, fontSize = 13.sp) },
         shape = RoundedCornerShape(8.dp),
         colors = FilterChipDefaults.filterChipColors(
-            containerColor = N0,
-            labelColor = N700,
-            selectedContainerColor = Accent,
-            selectedLabelColor = N0,
+            containerColor = MaterialTheme.colorScheme.background,
+            labelColor = LocalNodBrand.current.n700,
+            selectedContainerColor = MaterialTheme.colorScheme.primary,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
         ),
         border = FilterChipDefaults.filterChipBorder(
-            borderColor = N300,
-            selectedBorderColor = Accent,
+            borderColor = MaterialTheme.colorScheme.outline,
+            selectedBorderColor = MaterialTheme.colorScheme.primary,
             enabled = true,
             selected = selected,
         ),
@@ -332,11 +325,11 @@ private fun MetaRow(
                 .padding(vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(label, color = N500, fontSize = 13.sp)
+            Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
             Spacer(Modifier.weight(1f))
-            Text(value, color = N900, fontSize = 14.sp)
+            Text(value, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
             trailing()
         }
-        HorizontalDivider(color = N100)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 }

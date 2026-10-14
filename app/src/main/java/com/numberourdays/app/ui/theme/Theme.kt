@@ -6,6 +6,9 @@ import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -45,6 +48,22 @@ val ErrorRed = Color(0xFFB33A3A)
 /** Soft accent wash so legal-holiday surfaces read different from user cards (N50). */
 val HolidayTint = Color(0xFFF6E4DC)
 val HolidayEdge = Color(0xFFE8B8A8)
+
+/**
+ * Brand slots that have no M3 ColorScheme equivalent.
+ * Prefer [androidx.compose.material3.MaterialTheme.colorScheme] for mapped roles:
+ * N0→background/surface|onPrimary, N50→surfaceVariant, N100→outlineVariant,
+ * N300→outline, N500→onSurfaceVariant, N900→onSurface, Accent→primary,
+ * ErrorRed→error.
+ */
+@Immutable
+data class NodBrandColors(
+    val n700: Color = N700,
+    val holidayTint: Color = HolidayTint,
+    val holidayEdge: Color = HolidayEdge,
+)
+
+val LocalNodBrand = staticCompositionLocalOf { NodBrandColors() }
 
 private val LightColors = lightColorScheme(
     primary = Accent,
@@ -113,10 +132,12 @@ private val NodShapes = Shapes(
 fun NumberOurDaysTheme(
     content: @Composable () -> Unit,
 ) {
-    MaterialTheme(
-        colorScheme = LightColors,
-        typography = NodTypography,
-        shapes = NodShapes,
-        content = content,
-    )
+    CompositionLocalProvider(LocalNodBrand provides NodBrandColors()) {
+        MaterialTheme(
+            colorScheme = LightColors,
+            typography = NodTypography,
+            shapes = NodShapes,
+            content = content,
+        )
+    }
 }

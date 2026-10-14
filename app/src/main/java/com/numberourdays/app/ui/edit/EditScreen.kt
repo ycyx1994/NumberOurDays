@@ -69,19 +69,12 @@ import com.numberourdays.app.domain.DateCalculator
 import com.numberourdays.app.notify.NotificationHelper
 import com.numberourdays.app.ui.components.NodTopBar
 import com.numberourdays.app.ui.components.rememberCurrentDate
-import com.numberourdays.app.ui.theme.Accent
-import com.numberourdays.app.ui.theme.ErrorRed
-import com.numberourdays.app.ui.theme.N0
-import com.numberourdays.app.ui.theme.N300
-import com.numberourdays.app.ui.theme.N50
-import com.numberourdays.app.ui.theme.N500
-import com.numberourdays.app.ui.theme.N700
-import com.numberourdays.app.ui.theme.N900
 import com.numberourdays.app.ui.theme.NodButtonShape
 import com.numberourdays.app.ui.theme.NodFieldShape
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
+import com.numberourdays.app.ui.theme.LocalNodBrand
 
 @Composable
 private fun ProvideChineseDateLocale(content: @Composable () -> Unit) {
@@ -167,43 +160,43 @@ fun EditScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            Text(stringResource(R.string.title_label), color = N500, fontSize = 12.sp)
+            Text(stringResource(R.string.title_label), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
             Spacer(Modifier.height(6.dp))
             OutlinedTextField(
                 value = title,
                 onValueChange = { if (it.length <= 30) title = it },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                placeholder = { Text(stringResource(R.string.title_hint), color = N300) },
+                placeholder = { Text(stringResource(R.string.title_hint), color = MaterialTheme.colorScheme.outline) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 shape = NodFieldShape,
                 colors = nodFieldColors(),
             )
 
             Spacer(Modifier.height(16.dp))
-            Text(stringResource(R.string.date_label), color = N500, fontSize = 12.sp)
+            Text(stringResource(R.string.date_label), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
             Spacer(Modifier.height(6.dp))
             // ISO date field with calendar affordance
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(NodFieldShape)
-                    .background(N50)
-                    .border(1.dp, N300, NodFieldShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .border(1.dp, MaterialTheme.colorScheme.outline, NodFieldShape)
                     .clickable { showDatePicker = true }
                     .padding(horizontal = 12.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = dateText,
-                    color = N900,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 15.sp,
                     modifier = Modifier.weight(1f),
                 )
                 Icon(
                     imageVector = Icons.Outlined.CalendarMonth,
                     contentDescription = stringResource(R.string.choose_date),
-                    tint = N500,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp),
                 )
             }
@@ -214,7 +207,7 @@ fun EditScreen(
                     text = if (preview.kind == EventKind.REPEAT) {
                         "距离「$title」${preview.label}"
                     } else preview.label,
-                    color = Accent,
+                    color = MaterialTheme.colorScheme.primary,
                     fontSize = 13.sp,
                 )
             }
@@ -223,7 +216,7 @@ fun EditScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.repeat_label),
-                    color = N900,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 15.sp,
                     modifier = Modifier.weight(1f),
                 )
@@ -231,10 +224,10 @@ fun EditScreen(
                     checked = repeatOn,
                     onCheckedChange = { repeatOn = it },
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = N0,
-                        checkedTrackColor = Accent,
-                        uncheckedThumbColor = N0,
-                        uncheckedTrackColor = N300,
+                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.outline,
                     ),
                 )
             }
@@ -248,11 +241,11 @@ fun EditScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    Text(stringResource(R.string.repeat_every), color = N700, fontSize = 13.sp)
+                    Text(stringResource(R.string.repeat_every), color = LocalNodBrand.current.n700, fontSize = 13.sp)
                     StepButton(label = "−", onClick = { repeatInterval = (repeatInterval - 1).coerceAtLeast(1) })
                     Text(
                         text = repeatInterval.toString(),
-                        color = N900,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp,
                         modifier = Modifier.widthIn(min = 22.dp),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -271,10 +264,10 @@ fun EditScreen(
                             label = { Text(label, fontSize = 12.sp) },
                             modifier = Modifier.height(32.dp),
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Accent,
-                                selectedLabelColor = N0,
-                                containerColor = N0,
-                                labelColor = N700,
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = MaterialTheme.colorScheme.background,
+                                labelColor = LocalNodBrand.current.n700,
                             ),
                         )
                     }
@@ -285,7 +278,7 @@ fun EditScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.remind_label),
-                    color = N900,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 15.sp,
                     modifier = Modifier.weight(1f),
                 )
@@ -293,17 +286,17 @@ fun EditScreen(
                     checked = remindOn,
                     onCheckedChange = { remindOn = it },
                     colors = SwitchDefaults.colors(
-                        checkedThumbColor = N0,
-                        checkedTrackColor = Accent,
-                        uncheckedThumbColor = N0,
-                        uncheckedTrackColor = N300,
+                        checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primary,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.outline,
                     ),
                 )
             }
-            Text(stringResource(R.string.remind_hint), color = N500, fontSize = 11.sp)
+            Text(stringResource(R.string.remind_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
             if (remindOn) {
                 Spacer(Modifier.height(8.dp))
-                Text(stringResource(R.string.remind_time_label), color = N500, fontSize = 12.sp)
+                Text(stringResource(R.string.remind_time_label), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                 Spacer(Modifier.height(6.dp))
                 val currentHour = remindHour.toIntOrNull()?.coerceIn(0, 23) ?: 8
                 val currentMinute = remindMinute.toIntOrNull()?.coerceIn(0, 59) ?: 0
@@ -323,10 +316,10 @@ fun EditScreen(
                             },
                             label = { Text(label, fontSize = 13.sp) },
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Accent,
-                                selectedLabelColor = N0,
-                                containerColor = N0,
-                                labelColor = N700,
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = MaterialTheme.colorScheme.background,
+                                labelColor = LocalNodBrand.current.n700,
                             ),
                         )
                     }
@@ -348,17 +341,17 @@ fun EditScreen(
                             )
                         },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Accent,
-                            selectedLabelColor = N0,
-                            containerColor = N0,
-                            labelColor = N700,
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                            containerColor = MaterialTheme.colorScheme.background,
+                            labelColor = LocalNodBrand.current.n700,
                         ),
                     )
                 }
             }
 
             Spacer(Modifier.height(16.dp))
-            Text(stringResource(R.string.note_label), color = N500, fontSize = 12.sp)
+            Text(stringResource(R.string.note_label), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
             Spacer(Modifier.height(6.dp))
             OutlinedTextField(
                 value = note,
@@ -366,14 +359,14 @@ fun EditScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),
-                placeholder = { Text(stringResource(R.string.note_hint), color = N300) },
+                placeholder = { Text(stringResource(R.string.note_hint), color = MaterialTheme.colorScheme.outline) },
                 shape = NodFieldShape,
                 colors = nodFieldColors(),
             )
 
             errorText?.let {
                 Spacer(Modifier.height(6.dp))
-                Text(it, color = ErrorRed, fontSize = 12.sp)
+                Text(it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
             }
 
             Spacer(Modifier.height(20.dp))
@@ -417,8 +410,8 @@ fun EditScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(44.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Accent, contentColor = N0),
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.background),
                 shape = NodButtonShape,
             ) {
                 Text(stringResource(R.string.save), fontSize = 14.sp)
@@ -430,9 +423,9 @@ fun EditScreen(
                     onClick = { showDelete = true },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(44.dp),
+                        .height(48.dp),
                     shape = NodButtonShape,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = ErrorRed),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
                 ) {
                     Text(stringResource(R.string.delete), fontSize = 14.sp)
                 }
@@ -451,7 +444,7 @@ fun EditScreen(
                     repo.remove(existing.id)
                     showDelete = false
                     onSaved()
-                }) { Text(stringResource(R.string.delete), color = ErrorRed) }
+                }) { Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
                 TextButton(onClick = { showDelete = false }) { Text("取消") }
@@ -518,7 +511,7 @@ fun EditScreen(
                     TextButton(onClick = {
                         dateText = selectedIso
                         showDatePicker = false
-                    }) { Text("确定", color = Accent) }
+                    }) { Text("确定", color = MaterialTheme.colorScheme.primary) }
                 },
                 dismissButton = {
                     TextButton(onClick = { showDatePicker = false }) { Text("取消") }
@@ -547,7 +540,7 @@ fun EditScreen(
                     remindHour = timeState.hour.toString()
                     remindMinute = timeState.minute.toString()
                     showTimePicker = false
-                }) { Text("确定", color = Accent) }
+                }) { Text("确定", color = MaterialTheme.colorScheme.primary) }
             },
             dismissButton = {
                 TextButton(onClick = { showTimePicker = false }) { Text("取消") }
@@ -560,13 +553,13 @@ fun EditScreen(
 private fun StepButton(label: String, onClick: () -> Unit) {
     Text(
         text = label,
-        color = N700,
+        color = LocalNodBrand.current.n700,
         fontSize = 16.sp,
         textAlign = TextAlign.Center,
         modifier = Modifier
             .size(28.dp)
             .clip(NodButtonShape)
-            .border(1.dp, N300, NodButtonShape)
+            .border(1.dp, MaterialTheme.colorScheme.outline, NodButtonShape)
             .clickable(onClick = onClick)
             .padding(top = 3.dp),
     )
@@ -574,12 +567,12 @@ private fun StepButton(label: String, onClick: () -> Unit) {
 
 @Composable
 private fun nodFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedContainerColor = N0,
-    unfocusedContainerColor = N0,
-    disabledContainerColor = N0,
-    focusedBorderColor = Accent,
-    unfocusedBorderColor = N300,
-    focusedTextColor = N900,
-    unfocusedTextColor = N900,
-    cursorColor = Accent,
+    focusedContainerColor = MaterialTheme.colorScheme.background,
+    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+    disabledContainerColor = MaterialTheme.colorScheme.background,
+    focusedBorderColor = MaterialTheme.colorScheme.primary,
+    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+    cursorColor = MaterialTheme.colorScheme.primary,
 )

@@ -50,15 +50,8 @@ import com.numberourdays.app.data.DayEvent
 import com.numberourdays.app.data.DayEventCodec
 import com.numberourdays.app.notify.NotificationHelper
 import com.numberourdays.app.ui.components.NodTopBar
-import com.numberourdays.app.ui.theme.Accent
-import com.numberourdays.app.ui.theme.ErrorRed
-import com.numberourdays.app.ui.theme.N0
-import com.numberourdays.app.ui.theme.N300
-import com.numberourdays.app.ui.theme.N50
-import com.numberourdays.app.ui.theme.N500
-import com.numberourdays.app.ui.theme.N700
-import com.numberourdays.app.ui.theme.N900
 import androidx.compose.ui.graphics.Color
+import com.numberourdays.app.ui.theme.LocalNodBrand
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
@@ -130,7 +123,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             SectionLabel(stringResource(R.string.data_section))
             Text(
                 stringResource(R.string.local_events_value, events.size),
-                color = N900,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
@@ -144,7 +137,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     },
             )
             SectionLabel(stringResource(R.string.backup_section))
-            Text(stringResource(R.string.backup_desc), color = N500, fontSize = 12.sp)
+            Text(stringResource(R.string.backup_desc), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
             ActionPair(
                 stringResource(R.string.export_file),
                 {
@@ -179,7 +172,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     importText, { importText = it },
                     Modifier.fillMaxWidth().height(100.dp),
                     placeholder = {
-                        Text(stringResource(R.string.paste_backup), color = N300, fontSize = 12.sp)
+                        Text(stringResource(R.string.paste_backup), color = MaterialTheme.colorScheme.outline, fontSize = 12.sp)
                     },
                     shape = RoundedCornerShape(12.dp),
                     colors = fieldColors(),
@@ -194,10 +187,10 @@ fun SettingsScreen(onBack: () -> Unit) {
                         repo.saveAll(DayEventCodec.merge(repo.loadEvents(), evts))
                         importText = ""
                         message = context.getString(R.string.import_file_merged, repo.loadEvents().size, note?.let { "，$it" } ?: "")
-                    }) { Text(stringResource(R.string.import_merge), color = Accent) }
+                    }) { Text(stringResource(R.string.import_merge), color = MaterialTheme.colorScheme.primary) }
                     Spacer(Modifier.weight(1f))
                     TextButton(onClick = { confirmReplace = true }) {
-                        Text(stringResource(R.string.import_replace), color = ErrorRed)
+                        Text(stringResource(R.string.import_replace), color = MaterialTheme.colorScheme.error)
                     }
                 }
             }
@@ -227,7 +220,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             }
             SectionLabel(stringResource(R.string.nav_anim))
-            Text(stringResource(R.string.nav_anim_hint), color = N500, fontSize = 12.sp)
+            Text(stringResource(R.string.nav_anim_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -242,11 +235,11 @@ fun SettingsScreen(onBack: () -> Unit) {
                     val selected = navAnimStyle == key
                     Text(
                         label,
-                        color = if (selected) N0 else N700,
+                        color = if (selected) MaterialTheme.colorScheme.onPrimary else LocalNodBrand.current.n700,
                         fontSize = 13.sp,
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
-                            .background(if (selected) Accent else N50)
+                            .background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                             .clickable {
                                 navAnimStyle = key
                                 NavAnimPrefs.setStyle(context, key)
@@ -260,12 +253,12 @@ fun SettingsScreen(onBack: () -> Unit) {
             FullButton(stringResource(R.string.clear_data), danger = true) { confirmClear = true }
             message?.let {
                 Spacer(Modifier.height(12.dp))
-                Text(it, color = N500, fontSize = 12.sp)
+                Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
             }
             Spacer(Modifier.height(36.dp))
             Text(
                 stringResource(R.string.footer),
-                color = N300,
+                color = MaterialTheme.colorScheme.outline,
                 fontSize = 11.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
@@ -289,14 +282,14 @@ fun SettingsScreen(onBack: () -> Unit) {
                         showFileImportConfirm = false
                         pendingFileImport = null
                         pendingFileImportNote = null
-                    }) { Text(stringResource(R.string.import_file_merge), color = Accent) }
+                    }) { Text(stringResource(R.string.import_file_merge), color = MaterialTheme.colorScheme.primary) }
                     TextButton(onClick = {
                         repo.saveAll(incoming)
                         message = context.getString(R.string.import_file_replaced, incoming.size, noteSuffix)
                         showFileImportConfirm = false
                         pendingFileImport = null
                         pendingFileImportNote = null
-                    }) { Text(stringResource(R.string.import_file_replace), color = ErrorRed) }
+                    }) { Text(stringResource(R.string.import_file_replace), color = MaterialTheme.colorScheme.error) }
                 }
             },
             dismissButton = {
@@ -325,7 +318,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     importText = ""
                     message = context.getString(R.string.import_file_replaced, evts.size, note?.let { "，$it" } ?: "")
                     confirmReplace = false
-                }) { Text("覆盖", color = ErrorRed) }
+                }) { Text("覆盖", color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = { TextButton(onClick = { confirmReplace = false }) { Text("取消") } },
         )
@@ -340,7 +333,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     repo.clearAll()
                     message = context.getString(R.string.cleared)
                     confirmClear = false
-                }) { Text("清空", color = ErrorRed) }
+                }) { Text("清空", color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = { TextButton(onClick = { confirmClear = false }) { Text("取消") } },
         )
@@ -349,7 +342,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
 @Composable
 private fun SectionLabel(text: String) {
-    Text(text, color = N500, fontSize = 12.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
+    Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, modifier = Modifier.padding(top = 12.dp, bottom = 6.dp))
 }
 
 private val ToneGreenBg = Color(0xFFE3ECE1)
@@ -371,18 +364,18 @@ private fun ActionButton(
         green -> ToneGreenBg
         danger -> ToneDangerBg
         primary -> ToneAccentBg
-        else -> N50
+        else -> MaterialTheme.colorScheme.surfaceVariant
     }
     val fg = when {
         green -> ToneGreenFg
-        danger -> ErrorRed
-        primary -> Accent
-        muted -> N500
-        else -> N700
+        danger -> MaterialTheme.colorScheme.error
+        primary -> MaterialTheme.colorScheme.primary
+        muted -> MaterialTheme.colorScheme.onSurfaceVariant
+        else -> LocalNodBrand.current.n700
     }
     Row(
         modifier
-            .height(44.dp)
+            .height(48.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(bg)
             .clickable(onClick = onClick),
@@ -422,14 +415,14 @@ private fun FullButton(label: String, danger: Boolean = false, muted: Boolean = 
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(if (danger) ToneDangerBg else N50)
+            .background(if (danger) ToneDangerBg else MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick),
         Arrangement.Center,
         Alignment.CenterVertically,
     ) {
         Text(
             label,
-            color = if (danger) ErrorRed else if (muted) N500 else Accent,
+            color = if (danger) MaterialTheme.colorScheme.error else if (muted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary,
             fontSize = 15.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(vertical = 14.dp),
@@ -439,13 +432,13 @@ private fun FullButton(label: String, danger: Boolean = false, muted: Boolean = 
 
 @Composable
 private fun fieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedContainerColor = N50,
-    unfocusedContainerColor = N50,
-    disabledContainerColor = N50,
-    focusedBorderColor = Accent,
-    unfocusedBorderColor = N300,
-    focusedTextColor = N900,
-    unfocusedTextColor = N900,
-    disabledTextColor = N700,
-    cursorColor = Accent,
+    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+    focusedBorderColor = MaterialTheme.colorScheme.primary,
+    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+    disabledTextColor = LocalNodBrand.current.n700,
+    cursorColor = MaterialTheme.colorScheme.primary,
 )

@@ -14,9 +14,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.numberourdays.app.ui.theme.Accent
-import com.numberourdays.app.ui.theme.N700
 import com.numberourdays.app.ui.theme.NodDisplayNumber
+import androidx.compose.material3.MaterialTheme
+import com.numberourdays.app.ui.theme.LocalNodBrand
 
 /**
  * Big day-count with optical centering of the digits: a transparent
@@ -49,7 +49,7 @@ fun DayCountHero(
         Text(
             text = value,
             style = numberStyle,
-            color = Accent,
+            color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
         )
         if (suffix.isNotEmpty()) {
@@ -57,7 +57,7 @@ fun DayCountHero(
             Text(
                 text = suffix,
                 style = suffixStyle,
-                color = N700,
+                color = LocalNodBrand.current.n700,
                 modifier = Modifier.padding(bottom = suffixBottomPadding.dp),
             )
         }
