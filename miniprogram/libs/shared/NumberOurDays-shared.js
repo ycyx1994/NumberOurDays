@@ -2,107 +2,109 @@
   'use strict';
   //region block: imports
   var imul = Math.imul;
-  var replace = kotlin_kotlin.$_$.tb;
-  var protoOf = kotlin_kotlin.$_$.fa;
-  var initMetadataForObject = kotlin_kotlin.$_$.l9;
-  var initMetadataForCompanion = kotlin_kotlin.$_$.h9;
+  var replace = kotlin_kotlin.$_$.ub;
+  var protoOf = kotlin_kotlin.$_$.ga;
+  var initMetadataForObject = kotlin_kotlin.$_$.m9;
+  var initMetadataForCompanion = kotlin_kotlin.$_$.i9;
   var PluginGeneratedSerialDescriptor = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.v1;
   var StringSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.o;
   var IntSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.m;
   var System_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.f;
-  var THROW_CCE = kotlin_kotlin.$_$.kd;
-  var Long = kotlin_kotlin.$_$.fd;
+  var THROW_CCE = kotlin_kotlin.$_$.ld;
+  var Long = kotlin_kotlin.$_$.gd;
   var UnknownFieldException_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.c;
   var get_nullable = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.r;
   var BooleanSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.l;
   var LongSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.n;
   var typeParametersSerializers = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.q1;
   var GeneratedSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.r1;
-  var VOID = kotlin_kotlin.$_$.e;
+  var VOID = kotlin_kotlin.$_$.f;
   var throwMissingFieldException = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.y1;
-  var objectCreate = kotlin_kotlin.$_$.ea;
-  var getStringHashCode = kotlin_kotlin.$_$.e9;
-  var getBooleanHashCode = kotlin_kotlin.$_$.c9;
-  var initMetadataForClass = kotlin_kotlin.$_$.g9;
-  var charSequenceLength = kotlin_kotlin.$_$.w8;
-  var coerceAtLeast = kotlin_kotlin.$_$.na;
-  var coerceIn = kotlin_kotlin.$_$.pa;
-  var isCharSequence = kotlin_kotlin.$_$.q9;
-  var trim = kotlin_kotlin.$_$.oc;
-  var toString = kotlin_kotlin.$_$.ja;
-  var listOf = kotlin_kotlin.$_$.v6;
-  var joinToString = kotlin_kotlin.$_$.o6;
-  var Unit_getInstance = kotlin_kotlin.$_$.u4;
+  var objectCreate = kotlin_kotlin.$_$.fa;
+  var getStringHashCode = kotlin_kotlin.$_$.f9;
+  var getBooleanHashCode = kotlin_kotlin.$_$.d9;
+  var initMetadataForClass = kotlin_kotlin.$_$.h9;
+  var charSequenceLength = kotlin_kotlin.$_$.x8;
+  var coerceAtLeast = kotlin_kotlin.$_$.oa;
+  var coerceIn = kotlin_kotlin.$_$.qa;
+  var isCharSequence = kotlin_kotlin.$_$.r9;
+  var trim = kotlin_kotlin.$_$.pc;
+  var toString = kotlin_kotlin.$_$.ka;
+  var listOf = kotlin_kotlin.$_$.w6;
+  var joinToString = kotlin_kotlin.$_$.p6;
+  var Unit_getInstance = kotlin_kotlin.$_$.v4;
   var Json = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.e;
-  var getKClass = kotlin_kotlin.$_$.d;
-  var arrayOf = kotlin_kotlin.$_$.yd;
-  var createKType = kotlin_kotlin.$_$.a;
+  var getKClass = kotlin_kotlin.$_$.e;
+  var arrayOf = kotlin_kotlin.$_$.zd;
+  var createKType = kotlin_kotlin.$_$.b;
   var serializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.m2;
   var KSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.e2;
-  var isInterface = kotlin_kotlin.$_$.u9;
-  var isBlank = kotlin_kotlin.$_$.ib;
-  var Companion_getInstance = kotlin_kotlin.$_$.p4;
-  var _Result___init__impl__xyqfz8 = kotlin_kotlin.$_$.m2;
-  var createFailure = kotlin_kotlin.$_$.ae;
-  var _Result___get_value__impl__bjfvqg = kotlin_kotlin.$_$.p2;
-  var _Result___get_isFailure__impl__jpiriv = kotlin_kotlin.$_$.o2;
+  var isInterface = kotlin_kotlin.$_$.v9;
+  var isBlank = kotlin_kotlin.$_$.jb;
+  var Companion_getInstance = kotlin_kotlin.$_$.q4;
+  var _Result___init__impl__xyqfz8 = kotlin_kotlin.$_$.n2;
+  var createFailure = kotlin_kotlin.$_$.be;
+  var _Result___get_value__impl__bjfvqg = kotlin_kotlin.$_$.q2;
+  var _Result___get_isFailure__impl__jpiriv = kotlin_kotlin.$_$.p2;
   var get_jsonArray = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.f;
-  var ArrayList_init_$Create$ = kotlin_kotlin.$_$.k;
+  var ArrayList_init_$Create$ = kotlin_kotlin.$_$.l;
   var JsonObject = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.d;
-  var Result__exceptionOrNull_impl_p6xea9 = kotlin_kotlin.$_$.n2;
-  var emptyList = kotlin_kotlin.$_$.e6;
+  var Result__exceptionOrNull_impl_p6xea9 = kotlin_kotlin.$_$.o2;
+  var emptyList = kotlin_kotlin.$_$.f6;
   var JsonObjectBuilder = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.c;
   var put = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.i;
   var put_0 = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.h;
   var JsonArrayBuilder = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.b;
   var Companion_getInstance_0 = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.a;
-  var to = kotlin_kotlin.$_$.me;
+  var to = kotlin_kotlin.$_$.ne;
   var get_jsonObject = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.g;
-  var Exception = kotlin_kotlin.$_$.cd;
-  var LinkedHashMap_init_$Create$ = kotlin_kotlin.$_$.t;
-  var HashMap_init_$Create$ = kotlin_kotlin.$_$.n;
-  var toList = kotlin_kotlin.$_$.n7;
-  var toString_0 = kotlin_kotlin.$_$.hc;
-  var Default_getInstance = kotlin_kotlin.$_$.j4;
+  var Exception = kotlin_kotlin.$_$.dd;
+  var LinkedHashMap_init_$Create$ = kotlin_kotlin.$_$.u;
+  var HashMap_init_$Create$ = kotlin_kotlin.$_$.o;
+  var toList = kotlin_kotlin.$_$.o7;
+  var toString_0 = kotlin_kotlin.$_$.ic;
+  var Default_getInstance = kotlin_kotlin.$_$.k4;
   var DayOfWeek_SATURDAY_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.a;
   var DatePeriod_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.b;
   var plus = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.j;
   var Companion_getInstance_1 = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.i;
   var todayIn = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.m;
   var LocalDate_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.c;
-  var initMetadataForInterface = kotlin_kotlin.$_$.j9;
-  var THROW_IAE = kotlin_kotlin.$_$.ld;
-  var enumEntries = kotlin_kotlin.$_$.o8;
-  var Enum = kotlin_kotlin.$_$.ad;
-  var noWhenBranchMatchedException = kotlin_kotlin.$_$.he;
-  var equals = kotlin_kotlin.$_$.a9;
-  var FunctionAdapter = kotlin_kotlin.$_$.p8;
-  var Comparator = kotlin_kotlin.$_$.xc;
-  var hashCode = kotlin_kotlin.$_$.f9;
-  var compareValues = kotlin_kotlin.$_$.v7;
-  var reversed = kotlin_kotlin.$_$.ub;
+  var initMetadataForInterface = kotlin_kotlin.$_$.k9;
+  var THROW_IAE = kotlin_kotlin.$_$.md;
+  var enumEntries = kotlin_kotlin.$_$.p8;
+  var Enum = kotlin_kotlin.$_$.bd;
+  var noWhenBranchMatchedException = kotlin_kotlin.$_$.ie;
+  var equals = kotlin_kotlin.$_$.b9;
+  var FunctionAdapter = kotlin_kotlin.$_$.q8;
+  var Comparator = kotlin_kotlin.$_$.yc;
+  var hashCode = kotlin_kotlin.$_$.g9;
+  var compareValues = kotlin_kotlin.$_$.w7;
+  var reversed = kotlin_kotlin.$_$.vb;
   var Companion_getInstance_2 = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.h;
-  var Regex_init_$Create$ = kotlin_kotlin.$_$.a1;
-  var toLong = kotlin_kotlin.$_$.ha;
-  var numberToLong = kotlin_kotlin.$_$.da;
-  var abs = kotlin_kotlin.$_$.ka;
-  var sortedWith = kotlin_kotlin.$_$.k7;
-  var compareTo = kotlin_kotlin.$_$.y8;
-  var first = kotlin_kotlin.$_$.i6;
-  var listOf_0 = kotlin_kotlin.$_$.u6;
-  var plus_0 = kotlin_kotlin.$_$.b7;
-  var abs_0 = kotlin_kotlin.$_$.la;
-  var collectionSizeOrDefault = kotlin_kotlin.$_$.p5;
-  var ArrayList_init_$Create$_0 = kotlin_kotlin.$_$.j;
+  var Regex_init_$Create$ = kotlin_kotlin.$_$.b1;
+  var toLong = kotlin_kotlin.$_$.ia;
+  var numberToLong = kotlin_kotlin.$_$.ea;
+  var abs = kotlin_kotlin.$_$.la;
+  var sortedWith = kotlin_kotlin.$_$.l7;
+  var compareTo = kotlin_kotlin.$_$.z8;
+  var first = kotlin_kotlin.$_$.j6;
+  var listOf_0 = kotlin_kotlin.$_$.v6;
+  var plus_0 = kotlin_kotlin.$_$.c7;
+  var abs_0 = kotlin_kotlin.$_$.ma;
+  var collectionSizeOrDefault = kotlin_kotlin.$_$.q5;
+  var ArrayList_init_$Create$_0 = kotlin_kotlin.$_$.k;
   var LocalTime_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.e;
   var LocalDateTime_init_$Create$ = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.d;
   var toInstant = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.k;
   var Companion_getInstance_3 = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.g;
   var toLocalDateTime = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.l;
-  var startsWith = kotlin_kotlin.$_$.wb;
-  var trimIndent = kotlin_kotlin.$_$.nc;
-  var PrimitiveClasses_getInstance = kotlin_kotlin.$_$.k4;
-  var defineProp = kotlin_kotlin.$_$.z8;
+  var startsWith = kotlin_kotlin.$_$.xb;
+  var KtList = kotlin_kotlin.$_$.f5;
+  var createInvariantKTypeProjection = kotlin_kotlin.$_$.a;
+  var firstOrNull = kotlin_kotlin.$_$.i6;
+  var PrimitiveClasses_getInstance = kotlin_kotlin.$_$.l4;
+  var defineProp = kotlin_kotlin.$_$.a9;
   //endregion
   //region block: pre-declaration
   initMetadataForObject(BackupNaming, 'BackupNaming');
@@ -130,6 +132,12 @@
   initMetadataForObject(HolidayCalculator, 'HolidayCalculator');
   initMetadataForClass(HolidayListRow, 'HolidayListRow');
   initMetadataForObject(ReminderTiming, 'ReminderTiming');
+  initMetadataForCompanion(Companion_1);
+  initMetadataForObject($serializer_0, '$serializer', VOID, VOID, [GeneratedSerializer]);
+  initMetadataForCompanion(Companion_2);
+  initMetadataForObject($serializer_1, '$serializer', VOID, VOID, [GeneratedSerializer]);
+  initMetadataForClass(DisplayDto, 'DisplayDto', VOID, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_0});
+  initMetadataForClass(DurationDto, 'DurationDto', VOID, VOID, VOID, VOID, VOID, {0: $serializer_getInstance_1});
   initMetadataForObject(WeappDomain, 'WeappDomain');
   //endregion
   function BackupNaming() {
@@ -2664,62 +2672,629 @@
       new ReminderTiming();
     return ReminderTiming_instance;
   }
+  function Companion_1() {
+    Companion_instance_1 = this;
+  }
+  protoOf(Companion_1).serializer_9w0wvi_k$ = function () {
+    return $serializer_getInstance_0();
+  };
+  var Companion_instance_1;
+  function Companion_getInstance_6() {
+    if (Companion_instance_1 == null)
+      new Companion_1();
+    return Companion_instance_1;
+  }
+  function $serializer_0() {
+    $serializer_instance_0 = this;
+    var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.numberourdays.app.weapp.WeappDomain.DisplayDto', this, 14);
+    tmp0_serialDesc.addElement_5pzumi_k$('id', false);
+    tmp0_serialDesc.addElement_5pzumi_k$('title', false);
+    tmp0_serialDesc.addElement_5pzumi_k$('date', false);
+    tmp0_serialDesc.addElement_5pzumi_k$('kind', false);
+    tmp0_serialDesc.addElement_5pzumi_k$('days', false);
+    tmp0_serialDesc.addElement_5pzumi_k$('elapsedDays', false);
+    tmp0_serialDesc.addElement_5pzumi_k$('label', false);
+    tmp0_serialDesc.addElement_5pzumi_k$('nextDate', true);
+    tmp0_serialDesc.addElement_5pzumi_k$('repeatLabel', true);
+    tmp0_serialDesc.addElement_5pzumi_k$('starred', true);
+    tmp0_serialDesc.addElement_5pzumi_k$('remindEnabled', true);
+    tmp0_serialDesc.addElement_5pzumi_k$('remindHour', true);
+    tmp0_serialDesc.addElement_5pzumi_k$('remindMinute', true);
+    tmp0_serialDesc.addElement_5pzumi_k$('note', true);
+    this.descriptor_1 = tmp0_serialDesc;
+  }
+  protoOf($serializer_0).serialize_w863vk_k$ = function (encoder, value) {
+    var tmp0_desc = this.descriptor_1;
+    var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
+    tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 0, value.id_1);
+    tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 1, value.title_1);
+    tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 2, value.date_1);
+    tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 3, value.kind_1);
+    tmp1_output.encodeIntElement_krhhce_k$(tmp0_desc, 4, value.days_1);
+    tmp1_output.encodeIntElement_krhhce_k$(tmp0_desc, 5, value.elapsedDays_1);
+    tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 6, value.label_1);
+    if (tmp1_output.shouldEncodeElementDefault_x8eyid_k$(tmp0_desc, 7) ? true : !(value.nextDate_1 == null)) {
+      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(tmp0_desc, 7, StringSerializer_getInstance(), value.nextDate_1);
+    }
+    if (tmp1_output.shouldEncodeElementDefault_x8eyid_k$(tmp0_desc, 8) ? true : !(value.repeatLabel_1 == null)) {
+      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(tmp0_desc, 8, StringSerializer_getInstance(), value.repeatLabel_1);
+    }
+    if (tmp1_output.shouldEncodeElementDefault_x8eyid_k$(tmp0_desc, 9) ? true : !(value.starred_1 === false)) {
+      tmp1_output.encodeBooleanElement_ydht7q_k$(tmp0_desc, 9, value.starred_1);
+    }
+    if (tmp1_output.shouldEncodeElementDefault_x8eyid_k$(tmp0_desc, 10) ? true : !(value.remindEnabled_1 === false)) {
+      tmp1_output.encodeBooleanElement_ydht7q_k$(tmp0_desc, 10, value.remindEnabled_1);
+    }
+    if (tmp1_output.shouldEncodeElementDefault_x8eyid_k$(tmp0_desc, 11) ? true : !(value.remindHour_1 === 8)) {
+      tmp1_output.encodeIntElement_krhhce_k$(tmp0_desc, 11, value.remindHour_1);
+    }
+    if (tmp1_output.shouldEncodeElementDefault_x8eyid_k$(tmp0_desc, 12) ? true : !(value.remindMinute_1 === 0)) {
+      tmp1_output.encodeIntElement_krhhce_k$(tmp0_desc, 12, value.remindMinute_1);
+    }
+    if (tmp1_output.shouldEncodeElementDefault_x8eyid_k$(tmp0_desc, 13) ? true : !(value.note_1 == null)) {
+      tmp1_output.encodeNullableSerializableElement_5lquiv_k$(tmp0_desc, 13, StringSerializer_getInstance(), value.note_1);
+    }
+    tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
+  };
+  protoOf($serializer_0).serialize_5ase3y_k$ = function (encoder, value) {
+    return this.serialize_w863vk_k$(encoder, value instanceof DisplayDto ? value : THROW_CCE());
+  };
+  protoOf($serializer_0).deserialize_sy6x50_k$ = function (decoder) {
+    var tmp0_desc = this.descriptor_1;
+    var tmp1_flag = true;
+    var tmp2_index = 0;
+    var tmp3_bitMask0 = 0;
+    var tmp4_local0 = null;
+    var tmp5_local1 = null;
+    var tmp6_local2 = null;
+    var tmp7_local3 = null;
+    var tmp8_local4 = 0;
+    var tmp9_local5 = 0;
+    var tmp10_local6 = null;
+    var tmp11_local7 = null;
+    var tmp12_local8 = null;
+    var tmp13_local9 = false;
+    var tmp14_local10 = false;
+    var tmp15_local11 = 0;
+    var tmp16_local12 = 0;
+    var tmp17_local13 = null;
+    var tmp18_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
+    if (tmp18_input.decodeSequentially_xlblqy_k$()) {
+      tmp4_local0 = tmp18_input.decodeStringElement_3oenpg_k$(tmp0_desc, 0);
+      tmp3_bitMask0 = tmp3_bitMask0 | 1;
+      tmp5_local1 = tmp18_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+      tmp3_bitMask0 = tmp3_bitMask0 | 2;
+      tmp6_local2 = tmp18_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
+      tmp3_bitMask0 = tmp3_bitMask0 | 4;
+      tmp7_local3 = tmp18_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
+      tmp3_bitMask0 = tmp3_bitMask0 | 8;
+      tmp8_local4 = tmp18_input.decodeIntElement_941u6a_k$(tmp0_desc, 4);
+      tmp3_bitMask0 = tmp3_bitMask0 | 16;
+      tmp9_local5 = tmp18_input.decodeIntElement_941u6a_k$(tmp0_desc, 5);
+      tmp3_bitMask0 = tmp3_bitMask0 | 32;
+      tmp10_local6 = tmp18_input.decodeStringElement_3oenpg_k$(tmp0_desc, 6);
+      tmp3_bitMask0 = tmp3_bitMask0 | 64;
+      tmp11_local7 = tmp18_input.decodeNullableSerializableElement_k2y6ab_k$(tmp0_desc, 7, StringSerializer_getInstance(), tmp11_local7);
+      tmp3_bitMask0 = tmp3_bitMask0 | 128;
+      tmp12_local8 = tmp18_input.decodeNullableSerializableElement_k2y6ab_k$(tmp0_desc, 8, StringSerializer_getInstance(), tmp12_local8);
+      tmp3_bitMask0 = tmp3_bitMask0 | 256;
+      tmp13_local9 = tmp18_input.decodeBooleanElement_vuyhtj_k$(tmp0_desc, 9);
+      tmp3_bitMask0 = tmp3_bitMask0 | 512;
+      tmp14_local10 = tmp18_input.decodeBooleanElement_vuyhtj_k$(tmp0_desc, 10);
+      tmp3_bitMask0 = tmp3_bitMask0 | 1024;
+      tmp15_local11 = tmp18_input.decodeIntElement_941u6a_k$(tmp0_desc, 11);
+      tmp3_bitMask0 = tmp3_bitMask0 | 2048;
+      tmp16_local12 = tmp18_input.decodeIntElement_941u6a_k$(tmp0_desc, 12);
+      tmp3_bitMask0 = tmp3_bitMask0 | 4096;
+      tmp17_local13 = tmp18_input.decodeNullableSerializableElement_k2y6ab_k$(tmp0_desc, 13, StringSerializer_getInstance(), tmp17_local13);
+      tmp3_bitMask0 = tmp3_bitMask0 | 8192;
+    } else
+      while (tmp1_flag) {
+        tmp2_index = tmp18_input.decodeElementIndex_bstkhp_k$(tmp0_desc);
+        switch (tmp2_index) {
+          case -1:
+            tmp1_flag = false;
+            break;
+          case 0:
+            tmp4_local0 = tmp18_input.decodeStringElement_3oenpg_k$(tmp0_desc, 0);
+            tmp3_bitMask0 = tmp3_bitMask0 | 1;
+            break;
+          case 1:
+            tmp5_local1 = tmp18_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+            tmp3_bitMask0 = tmp3_bitMask0 | 2;
+            break;
+          case 2:
+            tmp6_local2 = tmp18_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
+            tmp3_bitMask0 = tmp3_bitMask0 | 4;
+            break;
+          case 3:
+            tmp7_local3 = tmp18_input.decodeStringElement_3oenpg_k$(tmp0_desc, 3);
+            tmp3_bitMask0 = tmp3_bitMask0 | 8;
+            break;
+          case 4:
+            tmp8_local4 = tmp18_input.decodeIntElement_941u6a_k$(tmp0_desc, 4);
+            tmp3_bitMask0 = tmp3_bitMask0 | 16;
+            break;
+          case 5:
+            tmp9_local5 = tmp18_input.decodeIntElement_941u6a_k$(tmp0_desc, 5);
+            tmp3_bitMask0 = tmp3_bitMask0 | 32;
+            break;
+          case 6:
+            tmp10_local6 = tmp18_input.decodeStringElement_3oenpg_k$(tmp0_desc, 6);
+            tmp3_bitMask0 = tmp3_bitMask0 | 64;
+            break;
+          case 7:
+            tmp11_local7 = tmp18_input.decodeNullableSerializableElement_k2y6ab_k$(tmp0_desc, 7, StringSerializer_getInstance(), tmp11_local7);
+            tmp3_bitMask0 = tmp3_bitMask0 | 128;
+            break;
+          case 8:
+            tmp12_local8 = tmp18_input.decodeNullableSerializableElement_k2y6ab_k$(tmp0_desc, 8, StringSerializer_getInstance(), tmp12_local8);
+            tmp3_bitMask0 = tmp3_bitMask0 | 256;
+            break;
+          case 9:
+            tmp13_local9 = tmp18_input.decodeBooleanElement_vuyhtj_k$(tmp0_desc, 9);
+            tmp3_bitMask0 = tmp3_bitMask0 | 512;
+            break;
+          case 10:
+            tmp14_local10 = tmp18_input.decodeBooleanElement_vuyhtj_k$(tmp0_desc, 10);
+            tmp3_bitMask0 = tmp3_bitMask0 | 1024;
+            break;
+          case 11:
+            tmp15_local11 = tmp18_input.decodeIntElement_941u6a_k$(tmp0_desc, 11);
+            tmp3_bitMask0 = tmp3_bitMask0 | 2048;
+            break;
+          case 12:
+            tmp16_local12 = tmp18_input.decodeIntElement_941u6a_k$(tmp0_desc, 12);
+            tmp3_bitMask0 = tmp3_bitMask0 | 4096;
+            break;
+          case 13:
+            tmp17_local13 = tmp18_input.decodeNullableSerializableElement_k2y6ab_k$(tmp0_desc, 13, StringSerializer_getInstance(), tmp17_local13);
+            tmp3_bitMask0 = tmp3_bitMask0 | 8192;
+            break;
+          default:
+            throw UnknownFieldException_init_$Create$(tmp2_index);
+        }
+      }
+    tmp18_input.endStructure_1xqz0n_k$(tmp0_desc);
+    return DisplayDto_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, tmp7_local3, tmp8_local4, tmp9_local5, tmp10_local6, tmp11_local7, tmp12_local8, tmp13_local9, tmp14_local10, tmp15_local11, tmp16_local12, tmp17_local13, null);
+  };
+  protoOf($serializer_0).get_descriptor_wjt6a0_k$ = function () {
+    return this.descriptor_1;
+  };
+  protoOf($serializer_0).childSerializers_5ghqw5_k$ = function () {
+    // Inline function 'kotlin.arrayOf' call
+    // Inline function 'kotlin.js.unsafeCast' call
+    // Inline function 'kotlin.js.asDynamic' call
+    return [StringSerializer_getInstance(), StringSerializer_getInstance(), StringSerializer_getInstance(), StringSerializer_getInstance(), IntSerializer_getInstance(), IntSerializer_getInstance(), StringSerializer_getInstance(), get_nullable(StringSerializer_getInstance()), get_nullable(StringSerializer_getInstance()), BooleanSerializer_getInstance(), BooleanSerializer_getInstance(), IntSerializer_getInstance(), IntSerializer_getInstance(), get_nullable(StringSerializer_getInstance())];
+  };
+  var $serializer_instance_0;
+  function $serializer_getInstance_0() {
+    if ($serializer_instance_0 == null)
+      new $serializer_0();
+    return $serializer_instance_0;
+  }
+  function DisplayDto_init_$Init$(seen0, id, title, date, kind, days, elapsedDays, label, nextDate, repeatLabel, starred, remindEnabled, remindHour, remindMinute, note, serializationConstructorMarker, $this) {
+    if (!(127 === (127 & seen0))) {
+      throwMissingFieldException(seen0, 127, $serializer_getInstance_0().descriptor_1);
+    }
+    $this.id_1 = id;
+    $this.title_1 = title;
+    $this.date_1 = date;
+    $this.kind_1 = kind;
+    $this.days_1 = days;
+    $this.elapsedDays_1 = elapsedDays;
+    $this.label_1 = label;
+    if (0 === (seen0 & 128))
+      $this.nextDate_1 = null;
+    else
+      $this.nextDate_1 = nextDate;
+    if (0 === (seen0 & 256))
+      $this.repeatLabel_1 = null;
+    else
+      $this.repeatLabel_1 = repeatLabel;
+    if (0 === (seen0 & 512))
+      $this.starred_1 = false;
+    else
+      $this.starred_1 = starred;
+    if (0 === (seen0 & 1024))
+      $this.remindEnabled_1 = false;
+    else
+      $this.remindEnabled_1 = remindEnabled;
+    if (0 === (seen0 & 2048))
+      $this.remindHour_1 = 8;
+    else
+      $this.remindHour_1 = remindHour;
+    if (0 === (seen0 & 4096))
+      $this.remindMinute_1 = 0;
+    else
+      $this.remindMinute_1 = remindMinute;
+    if (0 === (seen0 & 8192))
+      $this.note_1 = null;
+    else
+      $this.note_1 = note;
+    return $this;
+  }
+  function DisplayDto_init_$Create$(seen0, id, title, date, kind, days, elapsedDays, label, nextDate, repeatLabel, starred, remindEnabled, remindHour, remindMinute, note, serializationConstructorMarker) {
+    return DisplayDto_init_$Init$(seen0, id, title, date, kind, days, elapsedDays, label, nextDate, repeatLabel, starred, remindEnabled, remindHour, remindMinute, note, serializationConstructorMarker, objectCreate(protoOf(DisplayDto)));
+  }
+  function Companion_2() {
+    Companion_instance_2 = this;
+  }
+  protoOf(Companion_2).serializer_9w0wvi_k$ = function () {
+    return $serializer_getInstance_1();
+  };
+  var Companion_instance_2;
+  function Companion_getInstance_7() {
+    if (Companion_instance_2 == null)
+      new Companion_2();
+    return Companion_instance_2;
+  }
+  function $serializer_1() {
+    $serializer_instance_1 = this;
+    var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.numberourdays.app.weapp.WeappDomain.DurationDto', this, 3);
+    tmp0_serialDesc.addElement_5pzumi_k$('value', false);
+    tmp0_serialDesc.addElement_5pzumi_k$('unitLabel', false);
+    tmp0_serialDesc.addElement_5pzumi_k$('rest', false);
+    this.descriptor_1 = tmp0_serialDesc;
+  }
+  protoOf($serializer_1).serialize_1x8naa_k$ = function (encoder, value) {
+    var tmp0_desc = this.descriptor_1;
+    var tmp1_output = encoder.beginStructure_yljocp_k$(tmp0_desc);
+    tmp1_output.encodeIntElement_krhhce_k$(tmp0_desc, 0, value.value_1);
+    tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 1, value.unitLabel_1);
+    tmp1_output.encodeStringElement_1n5wu2_k$(tmp0_desc, 2, value.rest_1);
+    tmp1_output.endStructure_1xqz0n_k$(tmp0_desc);
+  };
+  protoOf($serializer_1).serialize_5ase3y_k$ = function (encoder, value) {
+    return this.serialize_1x8naa_k$(encoder, value instanceof DurationDto ? value : THROW_CCE());
+  };
+  protoOf($serializer_1).deserialize_sy6x50_k$ = function (decoder) {
+    var tmp0_desc = this.descriptor_1;
+    var tmp1_flag = true;
+    var tmp2_index = 0;
+    var tmp3_bitMask0 = 0;
+    var tmp4_local0 = 0;
+    var tmp5_local1 = null;
+    var tmp6_local2 = null;
+    var tmp7_input = decoder.beginStructure_yljocp_k$(tmp0_desc);
+    if (tmp7_input.decodeSequentially_xlblqy_k$()) {
+      tmp4_local0 = tmp7_input.decodeIntElement_941u6a_k$(tmp0_desc, 0);
+      tmp3_bitMask0 = tmp3_bitMask0 | 1;
+      tmp5_local1 = tmp7_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+      tmp3_bitMask0 = tmp3_bitMask0 | 2;
+      tmp6_local2 = tmp7_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
+      tmp3_bitMask0 = tmp3_bitMask0 | 4;
+    } else
+      while (tmp1_flag) {
+        tmp2_index = tmp7_input.decodeElementIndex_bstkhp_k$(tmp0_desc);
+        switch (tmp2_index) {
+          case -1:
+            tmp1_flag = false;
+            break;
+          case 0:
+            tmp4_local0 = tmp7_input.decodeIntElement_941u6a_k$(tmp0_desc, 0);
+            tmp3_bitMask0 = tmp3_bitMask0 | 1;
+            break;
+          case 1:
+            tmp5_local1 = tmp7_input.decodeStringElement_3oenpg_k$(tmp0_desc, 1);
+            tmp3_bitMask0 = tmp3_bitMask0 | 2;
+            break;
+          case 2:
+            tmp6_local2 = tmp7_input.decodeStringElement_3oenpg_k$(tmp0_desc, 2);
+            tmp3_bitMask0 = tmp3_bitMask0 | 4;
+            break;
+          default:
+            throw UnknownFieldException_init_$Create$(tmp2_index);
+        }
+      }
+    tmp7_input.endStructure_1xqz0n_k$(tmp0_desc);
+    return DurationDto_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, null);
+  };
+  protoOf($serializer_1).get_descriptor_wjt6a0_k$ = function () {
+    return this.descriptor_1;
+  };
+  protoOf($serializer_1).childSerializers_5ghqw5_k$ = function () {
+    // Inline function 'kotlin.arrayOf' call
+    // Inline function 'kotlin.js.unsafeCast' call
+    // Inline function 'kotlin.js.asDynamic' call
+    return [IntSerializer_getInstance(), StringSerializer_getInstance(), StringSerializer_getInstance()];
+  };
+  var $serializer_instance_1;
+  function $serializer_getInstance_1() {
+    if ($serializer_instance_1 == null)
+      new $serializer_1();
+    return $serializer_instance_1;
+  }
+  function DurationDto_init_$Init$(seen0, value, unitLabel, rest, serializationConstructorMarker, $this) {
+    if (!(7 === (7 & seen0))) {
+      throwMissingFieldException(seen0, 7, $serializer_getInstance_1().descriptor_1);
+    }
+    $this.value_1 = value;
+    $this.unitLabel_1 = unitLabel;
+    $this.rest_1 = rest;
+    return $this;
+  }
+  function DurationDto_init_$Create$(seen0, value, unitLabel, rest, serializationConstructorMarker) {
+    return DurationDto_init_$Init$(seen0, value, unitLabel, rest, serializationConstructorMarker, objectCreate(protoOf(DurationDto)));
+  }
   function _get_json__d8whur_0($this) {
     return $this.json_1;
   }
-  function unwrap($this, raw) {
+  function DisplayDto(id, title, date, kind, days, elapsedDays, label, nextDate, repeatLabel, starred, remindEnabled, remindHour, remindMinute, note) {
+    Companion_getInstance_6();
+    nextDate = nextDate === VOID ? null : nextDate;
+    repeatLabel = repeatLabel === VOID ? null : repeatLabel;
+    starred = starred === VOID ? false : starred;
+    remindEnabled = remindEnabled === VOID ? false : remindEnabled;
+    remindHour = remindHour === VOID ? 8 : remindHour;
+    remindMinute = remindMinute === VOID ? 0 : remindMinute;
+    note = note === VOID ? null : note;
+    this.id_1 = id;
+    this.title_1 = title;
+    this.date_1 = date;
+    this.kind_1 = kind;
+    this.days_1 = days;
+    this.elapsedDays_1 = elapsedDays;
+    this.label_1 = label;
+    this.nextDate_1 = nextDate;
+    this.repeatLabel_1 = repeatLabel;
+    this.starred_1 = starred;
+    this.remindEnabled_1 = remindEnabled;
+    this.remindHour_1 = remindHour;
+    this.remindMinute_1 = remindMinute;
+    this.note_1 = note;
+  }
+  protoOf(DisplayDto).get_id_kntnx8_k$ = function () {
+    return this.id_1;
+  };
+  protoOf(DisplayDto).get_title_iz32un_k$ = function () {
+    return this.title_1;
+  };
+  protoOf(DisplayDto).get_date_wokkxj_k$ = function () {
+    return this.date_1;
+  };
+  protoOf(DisplayDto).get_kind_wop7ml_k$ = function () {
+    return this.kind_1;
+  };
+  protoOf(DisplayDto).get_days_wokl28_k$ = function () {
+    return this.days_1;
+  };
+  protoOf(DisplayDto).get_elapsedDays_5v4xai_k$ = function () {
+    return this.elapsedDays_1;
+  };
+  protoOf(DisplayDto).get_label_iuj8p7_k$ = function () {
+    return this.label_1;
+  };
+  protoOf(DisplayDto).get_nextDate_8969rq_k$ = function () {
+    return this.nextDate_1;
+  };
+  protoOf(DisplayDto).get_repeatLabel_v0kvo0_k$ = function () {
+    return this.repeatLabel_1;
+  };
+  protoOf(DisplayDto).get_starred_u3zcve_k$ = function () {
+    return this.starred_1;
+  };
+  protoOf(DisplayDto).get_remindEnabled_8nmteb_k$ = function () {
+    return this.remindEnabled_1;
+  };
+  protoOf(DisplayDto).get_remindHour_muku0e_k$ = function () {
+    return this.remindHour_1;
+  };
+  protoOf(DisplayDto).get_remindMinute_7gj5fi_k$ = function () {
+    return this.remindMinute_1;
+  };
+  protoOf(DisplayDto).get_note_wor96j_k$ = function () {
+    return this.note_1;
+  };
+  protoOf(DisplayDto).component1_7eebsc_k$ = function () {
+    return this.id_1;
+  };
+  protoOf(DisplayDto).component2_7eebsb_k$ = function () {
+    return this.title_1;
+  };
+  protoOf(DisplayDto).component3_7eebsa_k$ = function () {
+    return this.date_1;
+  };
+  protoOf(DisplayDto).component4_7eebs9_k$ = function () {
+    return this.kind_1;
+  };
+  protoOf(DisplayDto).component5_7eebs8_k$ = function () {
+    return this.days_1;
+  };
+  protoOf(DisplayDto).component6_7eebs7_k$ = function () {
+    return this.elapsedDays_1;
+  };
+  protoOf(DisplayDto).component7_7eebs6_k$ = function () {
+    return this.label_1;
+  };
+  protoOf(DisplayDto).component8_7eebs5_k$ = function () {
+    return this.nextDate_1;
+  };
+  protoOf(DisplayDto).component9_7eebs4_k$ = function () {
+    return this.repeatLabel_1;
+  };
+  protoOf(DisplayDto).component10_gazzfo_k$ = function () {
+    return this.starred_1;
+  };
+  protoOf(DisplayDto).component11_gazzfn_k$ = function () {
+    return this.remindEnabled_1;
+  };
+  protoOf(DisplayDto).component12_gazzfm_k$ = function () {
+    return this.remindHour_1;
+  };
+  protoOf(DisplayDto).component13_gazzfl_k$ = function () {
+    return this.remindMinute_1;
+  };
+  protoOf(DisplayDto).component14_gazzfk_k$ = function () {
+    return this.note_1;
+  };
+  protoOf(DisplayDto).copy_hnh5f4_k$ = function (id, title, date, kind, days, elapsedDays, label, nextDate, repeatLabel, starred, remindEnabled, remindHour, remindMinute, note) {
+    return new DisplayDto(id, title, date, kind, days, elapsedDays, label, nextDate, repeatLabel, starred, remindEnabled, remindHour, remindMinute, note);
+  };
+  protoOf(DisplayDto).copy = function (id, title, date, kind, days, elapsedDays, label, nextDate, repeatLabel, starred, remindEnabled, remindHour, remindMinute, note, $super) {
+    id = id === VOID ? this.id_1 : id;
+    title = title === VOID ? this.title_1 : title;
+    date = date === VOID ? this.date_1 : date;
+    kind = kind === VOID ? this.kind_1 : kind;
+    days = days === VOID ? this.days_1 : days;
+    elapsedDays = elapsedDays === VOID ? this.elapsedDays_1 : elapsedDays;
+    label = label === VOID ? this.label_1 : label;
+    nextDate = nextDate === VOID ? this.nextDate_1 : nextDate;
+    repeatLabel = repeatLabel === VOID ? this.repeatLabel_1 : repeatLabel;
+    starred = starred === VOID ? this.starred_1 : starred;
+    remindEnabled = remindEnabled === VOID ? this.remindEnabled_1 : remindEnabled;
+    remindHour = remindHour === VOID ? this.remindHour_1 : remindHour;
+    remindMinute = remindMinute === VOID ? this.remindMinute_1 : remindMinute;
+    note = note === VOID ? this.note_1 : note;
+    return this.copy_hnh5f4_k$(id, title, date, kind, days, elapsedDays, label, nextDate, repeatLabel, starred, remindEnabled, remindHour, remindMinute, note);
+  };
+  protoOf(DisplayDto).toString = function () {
+    return 'DisplayDto(id=' + this.id_1 + ', title=' + this.title_1 + ', date=' + this.date_1 + ', kind=' + this.kind_1 + ', days=' + this.days_1 + ', elapsedDays=' + this.elapsedDays_1 + ', label=' + this.label_1 + ', nextDate=' + this.nextDate_1 + ', repeatLabel=' + this.repeatLabel_1 + ', starred=' + this.starred_1 + ', remindEnabled=' + this.remindEnabled_1 + ', remindHour=' + this.remindHour_1 + ', remindMinute=' + this.remindMinute_1 + ', note=' + this.note_1 + ')';
+  };
+  protoOf(DisplayDto).hashCode = function () {
+    var result = getStringHashCode(this.id_1);
+    result = imul(result, 31) + getStringHashCode(this.title_1) | 0;
+    result = imul(result, 31) + getStringHashCode(this.date_1) | 0;
+    result = imul(result, 31) + getStringHashCode(this.kind_1) | 0;
+    result = imul(result, 31) + this.days_1 | 0;
+    result = imul(result, 31) + this.elapsedDays_1 | 0;
+    result = imul(result, 31) + getStringHashCode(this.label_1) | 0;
+    result = imul(result, 31) + (this.nextDate_1 == null ? 0 : getStringHashCode(this.nextDate_1)) | 0;
+    result = imul(result, 31) + (this.repeatLabel_1 == null ? 0 : getStringHashCode(this.repeatLabel_1)) | 0;
+    result = imul(result, 31) + getBooleanHashCode(this.starred_1) | 0;
+    result = imul(result, 31) + getBooleanHashCode(this.remindEnabled_1) | 0;
+    result = imul(result, 31) + this.remindHour_1 | 0;
+    result = imul(result, 31) + this.remindMinute_1 | 0;
+    result = imul(result, 31) + (this.note_1 == null ? 0 : getStringHashCode(this.note_1)) | 0;
+    return result;
+  };
+  protoOf(DisplayDto).equals = function (other) {
+    if (this === other)
+      return true;
+    if (!(other instanceof DisplayDto))
+      return false;
+    var tmp0_other_with_cast = other instanceof DisplayDto ? other : THROW_CCE();
+    if (!(this.id_1 === tmp0_other_with_cast.id_1))
+      return false;
+    if (!(this.title_1 === tmp0_other_with_cast.title_1))
+      return false;
+    if (!(this.date_1 === tmp0_other_with_cast.date_1))
+      return false;
+    if (!(this.kind_1 === tmp0_other_with_cast.kind_1))
+      return false;
+    if (!(this.days_1 === tmp0_other_with_cast.days_1))
+      return false;
+    if (!(this.elapsedDays_1 === tmp0_other_with_cast.elapsedDays_1))
+      return false;
+    if (!(this.label_1 === tmp0_other_with_cast.label_1))
+      return false;
+    if (!(this.nextDate_1 == tmp0_other_with_cast.nextDate_1))
+      return false;
+    if (!(this.repeatLabel_1 == tmp0_other_with_cast.repeatLabel_1))
+      return false;
+    if (!(this.starred_1 === tmp0_other_with_cast.starred_1))
+      return false;
+    if (!(this.remindEnabled_1 === tmp0_other_with_cast.remindEnabled_1))
+      return false;
+    if (!(this.remindHour_1 === tmp0_other_with_cast.remindHour_1))
+      return false;
+    if (!(this.remindMinute_1 === tmp0_other_with_cast.remindMinute_1))
+      return false;
+    if (!(this.note_1 == tmp0_other_with_cast.note_1))
+      return false;
+    return true;
+  };
+  function DurationDto(value, unitLabel, rest) {
+    Companion_getInstance_7();
+    this.value_1 = value;
+    this.unitLabel_1 = unitLabel;
+    this.rest_1 = rest;
+  }
+  protoOf(DurationDto).get_value_j01efc_k$ = function () {
+    return this.value_1;
+  };
+  protoOf(DurationDto).get_unitLabel_ejr53_k$ = function () {
+    return this.unitLabel_1;
+  };
+  protoOf(DurationDto).get_rest_wotlp9_k$ = function () {
+    return this.rest_1;
+  };
+  protoOf(DurationDto).component1_7eebsc_k$ = function () {
+    return this.value_1;
+  };
+  protoOf(DurationDto).component2_7eebsb_k$ = function () {
+    return this.unitLabel_1;
+  };
+  protoOf(DurationDto).component3_7eebsa_k$ = function () {
+    return this.rest_1;
+  };
+  protoOf(DurationDto).copy_hrd73x_k$ = function (value, unitLabel, rest) {
+    return new DurationDto(value, unitLabel, rest);
+  };
+  protoOf(DurationDto).copy = function (value, unitLabel, rest, $super) {
+    value = value === VOID ? this.value_1 : value;
+    unitLabel = unitLabel === VOID ? this.unitLabel_1 : unitLabel;
+    rest = rest === VOID ? this.rest_1 : rest;
+    return this.copy_hrd73x_k$(value, unitLabel, rest);
+  };
+  protoOf(DurationDto).toString = function () {
+    return 'DurationDto(value=' + this.value_1 + ', unitLabel=' + this.unitLabel_1 + ', rest=' + this.rest_1 + ')';
+  };
+  protoOf(DurationDto).hashCode = function () {
+    var result = this.value_1;
+    result = imul(result, 31) + getStringHashCode(this.unitLabel_1) | 0;
+    result = imul(result, 31) + getStringHashCode(this.rest_1) | 0;
+    return result;
+  };
+  protoOf(DurationDto).equals = function (other) {
+    if (this === other)
+      return true;
+    if (!(other instanceof DurationDto))
+      return false;
+    var tmp0_other_with_cast = other instanceof DurationDto ? other : THROW_CCE();
+    if (!(this.value_1 === tmp0_other_with_cast.value_1))
+      return false;
+    if (!(this.unitLabel_1 === tmp0_other_with_cast.unitLabel_1))
+      return false;
+    if (!(this.rest_1 === tmp0_other_with_cast.rest_1))
+      return false;
+    return true;
+  };
+  function parseEventList($this, raw) {
     // Inline function 'kotlin.text.trim' call
     var t = toString(trim(isCharSequence(raw) ? raw : THROW_CCE()));
-    return startsWith(t, '[') ? t : '[' + t + ']';
+    // Inline function 'kotlin.text.isEmpty' call
+    if (charSequenceLength(t) === 0)
+      return emptyList();
+    var array = startsWith(t, '[') ? t : '[' + t + ']';
+    return DayEventCodec_getInstance().parseEventsArray_lu4k7h_k$(array);
   }
-  function encodeDisplay($this, d) {
-    var tmp0_safe_receiver = d.get_nextDate_8969rq_k$();
-    var tmp;
-    if (tmp0_safe_receiver == null) {
-      tmp = null;
-    } else {
-      // Inline function 'kotlin.let' call
-      // Inline function 'kotlin.contracts.contract' call
-      // Inline function 'com.numberourdays.app.weapp.WeappDomain.encodeDisplay.<anonymous>' call
-      tmp = '"' + tmp0_safe_receiver + '"';
+  function toDto_0(_this__u8e3s4, $this) {
+    return new DisplayDto(_this__u8e3s4.get_id_kntnx8_k$(), _this__u8e3s4.get_title_iz32un_k$(), _this__u8e3s4.get_date_wokkxj_k$(), _this__u8e3s4.get_kind_wop7ml_k$().get_name_woqyms_k$(), _this__u8e3s4.get_days_wokl28_k$(), _this__u8e3s4.get_elapsedDays_5v4xai_k$(), _this__u8e3s4.get_label_iuj8p7_k$(), _this__u8e3s4.get_nextDate_8969rq_k$(), _this__u8e3s4.get_repeatLabel_v0kvo0_k$(), _this__u8e3s4.get_starred_u3zcve_k$(), _this__u8e3s4.get_remindEnabled_8nmteb_k$(), _this__u8e3s4.get_remindHour_muku0e_k$(), _this__u8e3s4.get_remindMinute_7gj5fi_k$(), _this__u8e3s4.get_note_wor96j_k$());
+  }
+  function toDto_1(_this__u8e3s4, $this, unit) {
+    // Inline function 'kotlin.text.uppercase' call
+    // Inline function 'kotlin.js.asDynamic' call
+    var u;
+    switch (unit.toUpperCase()) {
+      case 'MONTH':
+        u = DurationUnit_MONTH_getInstance();
+        break;
+      case 'YEAR':
+        u = DurationUnit_YEAR_getInstance();
+        break;
+      default:
+        u = DurationUnit_DAY_getInstance();
+        break;
     }
-    var tmp1_elvis_lhs = tmp;
-    var next = tmp1_elvis_lhs == null ? 'null' : tmp1_elvis_lhs;
-    var tmp2_safe_receiver = d.get_repeatLabel_v0kvo0_k$();
-    var tmp_0;
-    if (tmp2_safe_receiver == null) {
-      tmp_0 = null;
-    } else {
-      // Inline function 'kotlin.let' call
-      // Inline function 'kotlin.contracts.contract' call
-      // Inline function 'com.numberourdays.app.weapp.WeappDomain.encodeDisplay.<anonymous>' call
-      tmp_0 = '"' + replace(tmp2_safe_receiver, '"', '\\"') + '"';
-    }
-    var tmp3_elvis_lhs = tmp_0;
-    var repeat = tmp3_elvis_lhs == null ? 'null' : tmp3_elvis_lhs;
-    var tmp4_safe_receiver = d.get_note_wor96j_k$();
-    var tmp_1;
-    if (tmp4_safe_receiver == null) {
-      tmp_1 = null;
-    } else {
-      // Inline function 'kotlin.let' call
-      // Inline function 'kotlin.contracts.contract' call
-      // Inline function 'com.numberourdays.app.weapp.WeappDomain.encodeDisplay.<anonymous>' call
-      tmp_1 = '"' + replace(replace(tmp4_safe_receiver, '"', '\\"'), '\n', '\\n') + '"';
-    }
-    var tmp5_elvis_lhs = tmp_1;
-    var note = tmp5_elvis_lhs == null ? 'null' : tmp5_elvis_lhs;
-    var title = replace(d.get_title_iz32un_k$(), '"', '\\"');
-    return replace(trimIndent('\n            {"id":"' + d.get_id_kntnx8_k$() + '","title":"' + title + '","date":"' + d.get_date_wokkxj_k$() + '","kind":"' + d.get_kind_wop7ml_k$().get_name_woqyms_k$() + '",\n             "days":' + d.get_days_wokl28_k$() + ',"elapsedDays":' + d.get_elapsedDays_5v4xai_k$() + ',"label":"' + replace(d.get_label_iuj8p7_k$(), '"', '\\"') + '",\n             "nextDate":' + next + ',"repeatLabel":' + repeat + ',"starred":' + d.get_starred_u3zcve_k$() + ',\n             "remindEnabled":' + d.get_remindEnabled_8nmteb_k$() + ',"remindHour":' + d.get_remindHour_muku0e_k$() + ',"remindMinute":' + d.get_remindMinute_7gj5fi_k$() + ',\n             "note":' + note + '}\n        '), '\n', '');
+    var shown = DateCalculator_getInstance().formatDuration_2avqn4_k$(_this__u8e3s4, u);
+    return new DurationDto(shown.get_value_j01efc_k$(), shown.get_unitLabel_ejr53_k$(), shown.get_rest_wotlp9_k$());
   }
   function WeappDomain$json$lambda($this$Json) {
     $this$Json.set_ignoreUnknownKeys_pzvtne_k$(true);
     $this$Json.set_encodeDefaults_c5evsg_k$(true);
     $this$Json.set_explicitNulls_mtj2ai_k$(true);
     return Unit_getInstance();
-  }
-  function WeappDomain$sortDisplaysJson$lambda(it) {
-    return encodeDisplay(WeappDomain_getInstance(), it);
   }
   function WeappDomain$parseBackup$lambda(it) {
     return DayEventCodec_getInstance().toJson_1ebj9p_k$(it);
@@ -2742,6 +3317,9 @@
     var d = DateCalculator_getInstance().parse_6kqlp0_k$(text);
     return d == null ? '' : DateCalculator_getInstance().format_36xaz2_k$(d);
   };
+  protoOf(WeappDomain).formatDate = function (iso) {
+    return iso;
+  };
   protoOf(WeappDomain).createId = function () {
     return createEventId_0();
   };
@@ -2761,35 +3339,25 @@
     var e = tmp;
     var tmp1_elvis_lhs = DateCalculator_getInstance().parse_6kqlp0_k$(todayIso);
     var ref = tmp1_elvis_lhs == null ? DateCalculator_getInstance().today_1tt4xt_k$() : tmp1_elvis_lhs;
-    var d = DateCalculator_getInstance().computeDisplay_rjjayo_k$(e, ref);
-    return encodeDisplay(this, d);
+    // Inline function 'kotlinx.serialization.encodeToString' call
+    var this_0 = this.json_1;
+    var value = toDto_0(DateCalculator_getInstance().computeDisplay_rjjayo_k$(e, ref), this);
+    // Inline function 'kotlinx.serialization.serializer' call
+    var this_1 = this_0.get_serializersModule_piitvg_k$();
+    // Inline function 'kotlinx.serialization.internal.cast' call
+    var this_2 = serializer(this_1, createKType(getKClass(DisplayDto), arrayOf([]), false));
+    var tmp$ret$1 = isInterface(this_2, KSerializer) ? this_2 : THROW_CCE();
+    return this_0.encodeToString_k0apqx_k$(tmp$ret$1, value);
   };
   protoOf(WeappDomain).computeDisplayJson = function (eventJson, todayIso, $super) {
     todayIso = todayIso === VOID ? this.today() : todayIso;
     return this.computeDisplayJson_brlugd_k$(eventJson, todayIso);
   };
   protoOf(WeappDomain).sortDisplaysJson_vdir0p_k$ = function (eventsJson, todayIso) {
-    var tmp = DayEventCodec_getInstance();
-    var tmp_0;
-    // Inline function 'kotlin.text.trim' call
-    var tmp$ret$0 = toString(trim(isCharSequence(eventsJson) ? eventsJson : THROW_CCE()));
-    if (startsWith(tmp$ret$0, '[')) {
-      tmp_0 = eventsJson;
-    } else {
-      tmp_0 = '[' + eventsJson + ']';
-    }
-    var events = tmp.parseEventsArray_lu4k7h_k$(tmp_0);
-    var tmp_1;
-    if (events.isEmpty_y1axqb_k$()) {
-      var pair = DayEventCodec_getInstance().parseBackup_xtnnyd_k$(eventsJson);
-      tmp_1 = pair.get_first_irdx8n_k$();
-    } else {
-      tmp_1 = events;
-    }
-    var list = tmp_1;
+    var list = parseEventList(this, eventsJson);
     var tmp0_elvis_lhs = DateCalculator_getInstance().parse_6kqlp0_k$(todayIso);
     var ref = tmp0_elvis_lhs == null ? DateCalculator_getInstance().today_1tt4xt_k$() : tmp0_elvis_lhs;
-    var tmp_2 = DateCalculator_getInstance();
+    var tmp = DateCalculator_getInstance();
     // Inline function 'kotlin.collections.map' call
     // Inline function 'kotlin.collections.mapTo' call
     var destination = ArrayList_init_$Create$_0(collectionSizeOrDefault(list, 10));
@@ -2797,27 +3365,167 @@
     while (tmp0_iterator.hasNext_bitz1p_k$()) {
       var item = tmp0_iterator.next_20eer_k$();
       // Inline function 'com.numberourdays.app.weapp.WeappDomain.sortDisplaysJson.<anonymous>' call
-      var tmp$ret$1 = DateCalculator_getInstance().computeDisplay_rjjayo_k$(item, ref);
-      destination.add_utx5q5_k$(tmp$ret$1);
+      var tmp$ret$0 = DateCalculator_getInstance().computeDisplay_rjjayo_k$(item, ref);
+      destination.add_utx5q5_k$(tmp$ret$0);
     }
-    var displays = tmp_2.sortEvents_xxw6gz_k$(destination);
-    return '[' + joinToString(displays, ',', VOID, VOID, VOID, VOID, WeappDomain$sortDisplaysJson$lambda) + ']';
+    var displays = tmp.sortEvents_xxw6gz_k$(destination);
+    // Inline function 'kotlinx.serialization.encodeToString' call
+    var this_0 = this.json_1;
+    // Inline function 'kotlin.collections.map' call
+    // Inline function 'kotlin.collections.mapTo' call
+    var destination_0 = ArrayList_init_$Create$_0(collectionSizeOrDefault(displays, 10));
+    var tmp0_iterator_0 = displays.iterator_jk1svi_k$();
+    while (tmp0_iterator_0.hasNext_bitz1p_k$()) {
+      var item_0 = tmp0_iterator_0.next_20eer_k$();
+      // Inline function 'com.numberourdays.app.weapp.WeappDomain.sortDisplaysJson.<anonymous>' call
+      var tmp$ret$3 = toDto_0(item_0, WeappDomain_getInstance());
+      destination_0.add_utx5q5_k$(tmp$ret$3);
+    }
+    // Inline function 'kotlinx.serialization.serializer' call
+    var this_1 = this_0.get_serializersModule_piitvg_k$();
+    // Inline function 'kotlinx.serialization.internal.cast' call
+    var this_2 = serializer(this_1, createKType(getKClass(KtList), arrayOf([createInvariantKTypeProjection(createKType(getKClass(DisplayDto), arrayOf([]), false))]), false));
+    var tmp$ret$7 = isInterface(this_2, KSerializer) ? this_2 : THROW_CCE();
+    return this_0.encodeToString_k0apqx_k$(tmp$ret$7, destination_0);
   };
   protoOf(WeappDomain).sortDisplaysJson = function (eventsJson, todayIso, $super) {
     todayIso = todayIso === VOID ? this.today() : todayIso;
     return this.sortDisplaysJson_vdir0p_k$(eventsJson, todayIso);
   };
-  protoOf(WeappDomain).serialize = function (eventsJson) {
-    var tmp = DayEventCodec_getInstance();
-    var tmp_0;
-    // Inline function 'kotlin.text.trim' call
-    var tmp$ret$0 = toString(trim(isCharSequence(eventsJson) ? eventsJson : THROW_CCE()));
-    if (startsWith(tmp$ret$0, '[')) {
-      tmp_0 = eventsJson;
+  protoOf(WeappDomain).pickNearestJson = function (displaysJson) {
+    // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
+    var this_0 = this.json_1;
+    // Inline function 'kotlin.text.ifEmpty' call
+    // Inline function 'kotlin.contracts.contract' call
+    var tmp;
+    // Inline function 'kotlin.text.isEmpty' call
+    if (charSequenceLength(displaysJson) === 0) {
+      // Inline function 'com.numberourdays.app.weapp.WeappDomain.pickNearestJson.<anonymous>' call
+      tmp = '[]';
     } else {
-      tmp_0 = '[' + eventsJson + ']';
+      tmp = displaysJson;
     }
-    var events = tmp.parseEventsArray_lu4k7h_k$(tmp_0);
+    var string = tmp;
+    // Inline function 'kotlinx.serialization.serializer' call
+    var this_1 = this_0.get_serializersModule_piitvg_k$();
+    // Inline function 'kotlinx.serialization.internal.cast' call
+    var this_2 = serializer(this_1, createKType(getKClass(KtList), arrayOf([createInvariantKTypeProjection(createKType(getKClass(DisplayDto), arrayOf([]), false))]), false));
+    var tmp$ret$4 = isInterface(this_2, KSerializer) ? this_2 : THROW_CCE();
+    var list = this_0.decodeFromString_jwu9sq_k$(tmp$ret$4, string);
+    // Inline function 'kotlin.collections.filter' call
+    // Inline function 'kotlin.collections.filterTo' call
+    var destination = ArrayList_init_$Create$();
+    var tmp0_iterator = list.iterator_jk1svi_k$();
+    while (tmp0_iterator.hasNext_bitz1p_k$()) {
+      var element = tmp0_iterator.next_20eer_k$();
+      // Inline function 'com.numberourdays.app.weapp.WeappDomain.pickNearestJson.<anonymous>' call
+      if (element.days_1 > 0 && (element.kind_1 === 'REPEAT' || element.kind_1 === 'COUNTDOWN')) {
+        destination.add_utx5q5_k$(element);
+      }
+    }
+    var candidates = destination;
+    var tmp$ret$9;
+    $l$block_0: {
+      // Inline function 'kotlin.collections.minByOrNull' call
+      var iterator = candidates.iterator_jk1svi_k$();
+      if (!iterator.hasNext_bitz1p_k$()) {
+        tmp$ret$9 = null;
+        break $l$block_0;
+      }
+      var minElem = iterator.next_20eer_k$();
+      if (!iterator.hasNext_bitz1p_k$()) {
+        tmp$ret$9 = minElem;
+        break $l$block_0;
+      }
+      // Inline function 'com.numberourdays.app.weapp.WeappDomain.pickNearestJson.<anonymous>' call
+      var minValue = minElem.days_1;
+      do {
+        var e = iterator.next_20eer_k$();
+        // Inline function 'com.numberourdays.app.weapp.WeappDomain.pickNearestJson.<anonymous>' call
+        var v = e.days_1;
+        if (compareTo(minValue, v) > 0) {
+          minElem = e;
+          minValue = v;
+        }
+      }
+       while (iterator.hasNext_bitz1p_k$());
+      tmp$ret$9 = minElem;
+    }
+    var tmp0_elvis_lhs = tmp$ret$9;
+    var best = tmp0_elvis_lhs == null ? firstOrNull(list) : tmp0_elvis_lhs;
+    var tmp_0;
+    if (best == null) {
+      tmp_0 = '';
+    } else {
+      // Inline function 'kotlinx.serialization.encodeToString' call
+      var this_3 = this.json_1;
+      // Inline function 'kotlinx.serialization.serializer' call
+      var this_4 = this_3.get_serializersModule_piitvg_k$();
+      // Inline function 'kotlinx.serialization.internal.cast' call
+      var this_5 = serializer(this_4, createKType(getKClass(DisplayDto), arrayOf([]), false));
+      var tmp$ret$13 = isInterface(this_5, KSerializer) ? this_5 : THROW_CCE();
+      tmp_0 = this_3.encodeToString_k0apqx_k$(tmp$ret$13, best);
+    }
+    return tmp_0;
+  };
+  protoOf(WeappDomain).targetDurationJson_p1tdvx_k$ = function (eventJson, unit, todayIso) {
+    var tmp0_elvis_lhs = DayEventCodec_getInstance().migrate_w3le1o_k$(eventJson);
+    var tmp;
+    if (tmp0_elvis_lhs == null) {
+      return '';
+    } else {
+      tmp = tmp0_elvis_lhs;
+    }
+    var e = tmp;
+    var tmp1_elvis_lhs = DateCalculator_getInstance().parse_6kqlp0_k$(todayIso);
+    var ref = tmp1_elvis_lhs == null ? DateCalculator_getInstance().today_1tt4xt_k$() : tmp1_elvis_lhs;
+    var display = DateCalculator_getInstance().computeDisplay_rjjayo_k$(e, ref);
+    var target = DateCalculator_getInstance().detailTargetDate_43qj1g_k$(display);
+    var breakdown = DateCalculator_getInstance().convertDuration_rmswjd_k$(ref, target);
+    // Inline function 'kotlinx.serialization.encodeToString' call
+    var this_0 = this.json_1;
+    var value = toDto_1(breakdown, this, unit);
+    // Inline function 'kotlinx.serialization.serializer' call
+    var this_1 = this_0.get_serializersModule_piitvg_k$();
+    // Inline function 'kotlinx.serialization.internal.cast' call
+    var this_2 = serializer(this_1, createKType(getKClass(DurationDto), arrayOf([]), false));
+    var tmp$ret$1 = isInterface(this_2, KSerializer) ? this_2 : THROW_CCE();
+    return this_0.encodeToString_k0apqx_k$(tmp$ret$1, value);
+  };
+  protoOf(WeappDomain).targetDurationJson = function (eventJson, unit, todayIso, $super) {
+    todayIso = todayIso === VOID ? this.today() : todayIso;
+    return this.targetDurationJson_p1tdvx_k$(eventJson, unit, todayIso);
+  };
+  protoOf(WeappDomain).elapsedDurationJson_o0bzpe_k$ = function (eventJson, unit, todayIso) {
+    var tmp0_elvis_lhs = DayEventCodec_getInstance().migrate_w3le1o_k$(eventJson);
+    var tmp;
+    if (tmp0_elvis_lhs == null) {
+      return '';
+    } else {
+      tmp = tmp0_elvis_lhs;
+    }
+    var e = tmp;
+    var tmp1_elvis_lhs = DateCalculator_getInstance().parse_6kqlp0_k$(todayIso);
+    var ref = tmp1_elvis_lhs == null ? DateCalculator_getInstance().today_1tt4xt_k$() : tmp1_elvis_lhs;
+    var tmp2_elvis_lhs = DateCalculator_getInstance().parse_6kqlp0_k$(e.get_date_wokkxj_k$());
+    var anchor = tmp2_elvis_lhs == null ? ref : tmp2_elvis_lhs;
+    var breakdown = DateCalculator_getInstance().convertDuration_rmswjd_k$(anchor, ref);
+    // Inline function 'kotlinx.serialization.encodeToString' call
+    var this_0 = this.json_1;
+    var value = toDto_1(breakdown, this, unit);
+    // Inline function 'kotlinx.serialization.serializer' call
+    var this_1 = this_0.get_serializersModule_piitvg_k$();
+    // Inline function 'kotlinx.serialization.internal.cast' call
+    var this_2 = serializer(this_1, createKType(getKClass(DurationDto), arrayOf([]), false));
+    var tmp$ret$1 = isInterface(this_2, KSerializer) ? this_2 : THROW_CCE();
+    return this_0.encodeToString_k0apqx_k$(tmp$ret$1, value);
+  };
+  protoOf(WeappDomain).elapsedDurationJson = function (eventJson, unit, todayIso, $super) {
+    todayIso = todayIso === VOID ? this.today() : todayIso;
+    return this.elapsedDurationJson_o0bzpe_k$(eventJson, unit, todayIso);
+  };
+  protoOf(WeappDomain).serialize = function (eventsJson) {
+    var events = parseEventList(this, eventsJson);
     return DayEventCodec_getInstance().serialize_7sr98y_k$(events);
   };
   protoOf(WeappDomain).parseBackup = function (text) {
@@ -2842,9 +3550,7 @@
     return '{"events":' + arr + ',"note":' + noteJson + '}';
   };
   protoOf(WeappDomain).mergeJson = function (localJson, incomingJson) {
-    var local = DayEventCodec_getInstance().parseEventsArray_lu4k7h_k$(unwrap(this, localJson));
-    var incoming = DayEventCodec_getInstance().parseEventsArray_lu4k7h_k$(unwrap(this, incomingJson));
-    var merged = DayEventCodec_getInstance().merge_ri0zj8_k$(local, incoming);
+    var merged = DayEventCodec_getInstance().merge_ri0zj8_k$(parseEventList(this, localJson), parseEventList(this, incomingJson));
     return joinToString(merged, ',', '[', ']', VOID, VOID, WeappDomain$mergeJson$lambda);
   };
   var WeappDomain_instance;
@@ -2858,6 +3564,8 @@
   }
   //region block: post-declaration
   protoOf($serializer).typeParametersSerializers_fr94fx_k$ = typeParametersSerializers;
+  protoOf($serializer_0).typeParametersSerializers_fr94fx_k$ = typeParametersSerializers;
+  protoOf($serializer_1).typeParametersSerializers_fr94fx_k$ = typeParametersSerializers;
   //endregion
   //region block: exports
   function $jsExportAll$(_) {

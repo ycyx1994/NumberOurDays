@@ -2,7 +2,7 @@
   <view class="card hero">
     <view class="tag">目标</view>
     <view class="title">{{display.title}}</view>
-    <view class="days">{{display.days}}<text class="unit">天</text></view>
+    <view class="days">{{display.days}}<text class="unit">{{heroText}}</text></view>
     <view class="date">{{display.date}}</view>
   </view>
 

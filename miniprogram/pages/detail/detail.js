@@ -7,6 +7,7 @@ Page({
     event: null,
     display: null,
     unit: 'DAY',
+    heroText: '',
     elapsedText: '',
   },
   onLoad(query) {
@@ -22,32 +23,23 @@ Page({
       return
     }
     const display = domain.computeDisplay(event, domain.today())
-    this.setData({ event, display }, this.computeElapsed)
+    this.setData({ event, display }, this.computeUnits)
   },
-  computeElapsed() {
+  computeUnits() {
     const { event, unit } = this.data
     if (!event) return
-    // reuse serialize→display path for elapsed: we already have display.days for countdown
-    // For elapsed text, parse backup isn't needed — use label / elapsedDays from display for DAY
-    const display = this.data.display
-    if (!display) return
-    if (unit === 'DAY') {
-      this.setData({ elapsedText: `${display.elapsedDays} 天` })
-    } else if (unit === 'MONTH') {
-      // approximate from elapsedDays for MVP display string; full breakdown is in native apps
-      const months = Math.floor(display.elapsedDays / 30)
-      const days = display.elapsedDays % 30
-      this.setData({ elapsedText: `${months} 月 ${days} 天` })
-    } else {
-      const years = Math.floor(display.elapsedDays / 365)
-      const rest = display.elapsedDays % 365
-      const months = Math.floor(rest / 30)
-      const days = rest % 30
-      this.setData({ elapsedText: `${years} 年 ${months} 月 ${days} 天` })
-    }
+    const target = domain.targetDuration(event, unit)
+    const elapsed = domain.elapsedDuration(event, unit)
+    const heroText = target
+      ? [target.unitLabel, target.rest].filter(Boolean).join(' ')
+      : '天'
+    const elapsedText = elapsed
+      ? [`${elapsed.value} ${elapsed.unitLabel}`, elapsed.rest].filter(Boolean).join(' ')
+      : ''
+    this.setData({ heroText, elapsedText })
   },
   setUnit(e) {
-    this.setData({ unit: e.currentTarget.dataset.unit }, this.computeElapsed)
+    this.setData({ unit: e.currentTarget.dataset.unit }, this.computeUnits)
   },
   onEdit() {
     wx.navigateTo({ url: `/pages/edit/edit?id=${this.data.id}` })

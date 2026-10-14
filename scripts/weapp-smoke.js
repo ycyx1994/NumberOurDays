@@ -42,4 +42,16 @@ if (err !== '请填写标题') {
   console.error('FAIL validateForm', err)
   process.exit(1)
 }
-console.log('smoke ok', displays[0].label)
+const bad = { ...ev, id: 'bad', title: 'ok\ttab', date: '2026-10-21' }
+const mixed = adapter.sortDisplays([ev, bad], '2026-10-14')
+if (!Array.isArray(mixed) || mixed.length !== 2) {
+  console.error('FAIL escape title', mixed)
+  process.exit(1)
+}
+const dur = adapter.targetDuration(ev, 'MONTH', '2026-10-14')
+if (!dur || typeof dur.value !== 'number' || !dur.unitLabel) {
+  console.error('FAIL duration', dur)
+  process.exit(1)
+}
+console.log('smoke ok', displays[0].label, 'dur', dur)
+

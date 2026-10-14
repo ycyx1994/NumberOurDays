@@ -83,8 +83,8 @@ Page({
       repeatUnit: (repeatOn ? unit : 'NONE').toLowerCase(),
       repeatInterval: interval,
       remindEnabled: (existing && existing.remindEnabled) || false,
-      remindHour: (existing && existing.remindHour) || 8,
-      remindMinute: (existing && existing.remindMinute) || 0,
+      remindHour: existing && existing.remindHour != null ? existing.remindHour : 8,
+      remindMinute: existing && existing.remindMinute != null ? existing.remindMinute : 0,
       createdAt: (existing && existing.createdAt) || now,
       updatedAt: now,
     }

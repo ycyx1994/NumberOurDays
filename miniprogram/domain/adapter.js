@@ -20,26 +20,40 @@ module.exports = {
   isValidDate(text) {
     return WeappDomain.isValidDate(text)
   },
+  parseDate(text) {
+    return WeappDomain.parseDate(text || '')
+  },
+  formatDate(iso) {
+    return WeappDomain.formatDate(iso || '')
+  },
   createId() {
     return WeappDomain.createId()
   },
   validateForm(title, date, unit, interval) {
-    return WeappDomain.validateForm(title || '', date || '', unit || 'none', interval || 1)
+    return WeappDomain.validateForm(title || '', date || '', unit || 'none', interval == null ? 1 : interval)
   },
   sortDisplays(events, today) {
     const json = WeappDomain.sortDisplaysJson(JSON.stringify(events || []), today || WeappDomain.today())
     return parseJson(json, [])
   },
+  pickNearest(displays) {
+    return parseJson(WeappDomain.pickNearestJson(JSON.stringify(displays || [])), null)
+  },
   computeDisplay(event, today) {
     const json = WeappDomain.computeDisplayJson(JSON.stringify(event), today || WeappDomain.today())
     return parseJson(json, null)
+  },
+  targetDuration(event, unit, today) {
+    return parseJson(WeappDomain.targetDurationJson(JSON.stringify(event), unit || 'DAY', today || WeappDomain.today()), null)
+  },
+  elapsedDuration(event, unit, today) {
+    return parseJson(WeappDomain.elapsedDurationJson(JSON.stringify(event), unit || 'DAY', today || WeappDomain.today()), null)
   },
   serialize(events) {
     return WeappDomain.serialize(JSON.stringify(events || []))
   },
   parseBackup(text) {
-    const obj = parseJson(WeappDomain.parseBackup(text || ''), { events: [], note: null })
-    return obj
+    return parseJson(WeappDomain.parseBackup(text || ''), { events: [], note: null })
   },
   merge(local, incoming) {
     const json = WeappDomain.mergeJson(JSON.stringify(local || []), JSON.stringify(incoming || []))

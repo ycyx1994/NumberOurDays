@@ -1,16 +1,20 @@
 const store = require('../../storage/events')
+const domain = require('../../domain/adapter')
 
 Page({
   data: {
     displays: [],
+    hero: null,
     today: '',
   },
   onShow() {
     this.refresh()
   },
   refresh() {
-    const today = require('../../domain/adapter').today()
-    this.setData({ today, displays: store.listDisplays() })
+    const today = domain.today()
+    const displays = store.listDisplays()
+    const hero = domain.pickNearest(displays) || displays[0] || null
+    this.setData({ today, displays, hero })
   },
   onAdd() {
     wx.navigateTo({ url: '/pages/edit/edit' })

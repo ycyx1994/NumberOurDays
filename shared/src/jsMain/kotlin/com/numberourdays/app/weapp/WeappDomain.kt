@@ -2,21 +2,53 @@ package com.numberourdays.app.weapp
 
 import com.numberourdays.app.data.DayEvent
 import com.numberourdays.app.data.DayEventCodec
+import com.numberourdays.app.data.DayEventDisplay
+import com.numberourdays.app.data.DurationUnit
 import com.numberourdays.app.data.RepeatUnit
 import com.numberourdays.app.domain.DateCalculator
 import kotlin.js.ExperimentalJsExport
 import kotlin.js.JsExport
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 /**
  * Stable JS surface for the WeChat mini program host.
- * All payloads are JSON strings so the host does not depend on Kotlin class shapes.
+ * All payloads are JSON strings; encoding uses kotlinx.serialization (not string templates).
  */
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 object WeappDomain {
-    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true; explicitNulls = true }
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+        explicitNulls = true
+    }
+
+    @Serializable
+    internal data class DisplayDto(
+        val id: String,
+        val title: String,
+        val date: String,
+        val kind: String,
+        val days: Int,
+        val elapsedDays: Int,
+        val label: String,
+        val nextDate: String? = null,
+        val repeatLabel: String? = null,
+        val starred: Boolean = false,
+        val remindEnabled: Boolean = false,
+        val remindHour: Int = 8,
+        val remindMinute: Int = 0,
+        val note: String? = null,
+    )
+
+    @Serializable
+    internal data class DurationDto(
+        val value: Int,
+        val unitLabel: String,
+        val rest: String,
+    )
 
     fun today(): String = DateCalculator.format(DateCalculator.today())
 
@@ -27,6 +59,8 @@ object WeappDomain {
         return if (d == null) "" else DateCalculator.format(d)
     }
 
+    fun formatDate(iso: String): String = iso
+
     fun createId(): String = createEventId()
 
     fun validateForm(title: String, date: String, unit: String, interval: Int): String {
@@ -34,35 +68,52 @@ object WeappDomain {
         return DateCalculator.validateForm(title, date, u, interval) ?: ""
     }
 
-    /** DayEvent JSON object → DayEventDisplay JSON object. */
     fun computeDisplayJson(eventJson: String, todayIso: String = today()): String {
         val e = DayEventCodec.migrate(eventJson) ?: return ""
         val ref = DateCalculator.parse(todayIso) ?: DateCalculator.today()
-        val d = DateCalculator.computeDisplay(e, ref)
-        return encodeDisplay(d)
+        return json.encodeToString(DateCalculator.computeDisplay(e, ref).toDto())
     }
 
-    /** JSON array of DayEvent → sorted JSON array of DayEventDisplay. */
     fun sortDisplaysJson(eventsJson: String, todayIso: String = today()): String {
-        val events = DayEventCodec.parseEventsArray(if (eventsJson.trim().startsWith("[")) eventsJson else "[$eventsJson]")
-        // also accept backup wrapper
-        val list = if (events.isEmpty()) {
-            val pair = DayEventCodec.parseBackup(eventsJson)
-            pair.first
-        } else {
-            events
-        }
+        val list = parseEventList(eventsJson)
         val ref = DateCalculator.parse(todayIso) ?: DateCalculator.today()
         val displays = DateCalculator.sortEvents(list.map { DateCalculator.computeDisplay(it, ref) })
-        return "[" + displays.joinToString(",") { encodeDisplay(it) } + "]"
+        return json.encodeToString(displays.map { it.toDto() })
+    }
+
+    /** Pick nearest countdown/repeat for the home hero (matches Android pickNearest). */
+    fun pickNearestJson(displaysJson: String): String {
+        val list = json.decodeFromString<List<DisplayDto>>(displaysJson.ifEmpty { "[]" })
+        // Rebuild minimal display-like ranking using days + kind string
+        val candidates = list.filter { it.days > 0 && (it.kind == "REPEAT" || it.kind == "COUNTDOWN") }
+        val best = candidates.minByOrNull { it.days } ?: list.firstOrNull()
+        return if (best == null) "" else json.encodeToString(best)
+    }
+
+    /** Remaining duration toward the detail target for the given unit (DAY/MONTH/YEAR). */
+    fun targetDurationJson(eventJson: String, unit: String, todayIso: String = today()): String {
+        val e = DayEventCodec.migrate(eventJson) ?: return ""
+        val ref = DateCalculator.parse(todayIso) ?: DateCalculator.today()
+        val display = DateCalculator.computeDisplay(e, ref)
+        val target = DateCalculator.detailTargetDate(display)
+        val breakdown = DateCalculator.convertDuration(ref, target)
+        return json.encodeToString(breakdown.toDto(unit))
+    }
+
+    /** Absolute elapsed duration from anchor date to today. */
+    fun elapsedDurationJson(eventJson: String, unit: String, todayIso: String = today()): String {
+        val e = DayEventCodec.migrate(eventJson) ?: return ""
+        val ref = DateCalculator.parse(todayIso) ?: DateCalculator.today()
+        val anchor = DateCalculator.parse(e.date) ?: ref
+        val breakdown = DateCalculator.convertDuration(anchor, ref)
+        return json.encodeToString(breakdown.toDto(unit))
     }
 
     fun serialize(eventsJson: String): String {
-        val events = DayEventCodec.parseEventsArray(if (eventsJson.trim().startsWith("[")) eventsJson else "[$eventsJson]")
+        val events = parseEventList(eventsJson)
         return DayEventCodec.serialize(events)
     }
 
-    /** Returns { "events": DayEventJson[], "note": string|null } */
     fun parseBackup(text: String): String {
         val (events, note) = DayEventCodec.parseBackup(text)
         val arr = events.joinToString(",", prefix = "[", postfix = "]") { DayEventCodec.toJson(it) }
@@ -71,32 +122,43 @@ object WeappDomain {
     }
 
     fun mergeJson(localJson: String, incomingJson: String): String {
-        val local = DayEventCodec.parseEventsArray(unwrap(localJson))
-        val incoming = DayEventCodec.parseEventsArray(unwrap(incomingJson))
-        val merged = DayEventCodec.merge(local, incoming)
+        val merged = DayEventCodec.merge(parseEventList(localJson), parseEventList(incomingJson))
         return merged.joinToString(",", prefix = "[", postfix = "]") { DayEventCodec.toJson(it) }
     }
 
-    private fun unwrap(raw: String): String {
+    private fun parseEventList(raw: String): List<DayEvent> {
         val t = raw.trim()
-        return if (t.startsWith("[")) t else "[$t]"
+        if (t.isEmpty()) return emptyList()
+        val array = if (t.startsWith("[")) t else "[$t]"
+        return DayEventCodec.parseEventsArray(array)
     }
 
-    private fun encodeDisplay(d: com.numberourdays.app.data.DayEventDisplay): String {
-        // Keep a small explicit object so WeChat JS stays stable.
-        val next = d.nextDate?.let { "\"${it}\"" } ?: "null"
-        val repeat = d.repeatLabel?.let { "\"${it.replace("\"", "\\\"")}\"" } ?: "null"
-        val note = d.note?.let { "\"${it.replace("\"", "\\\"").replace("\n", "\\n")}\"" } ?: "null"
-        val title = d.title.replace("\"", "\\\"")
-        return """
-            {"id":"${d.id}","title":"$title","date":"${d.date}","kind":"${d.kind.name}",
-             "days":${d.days},"elapsedDays":${d.elapsedDays},"label":"${d.label.replace("\"", "\\\"")}",
-             "nextDate":$next,"repeatLabel":$repeat,"starred":${d.starred},
-             "remindEnabled":${d.remindEnabled},"remindHour":${d.remindHour},"remindMinute":${d.remindMinute},
-             "note":$note}
-        """.trimIndent().replace("\n", "")
+    private fun DayEventDisplay.toDto() = DisplayDto(
+        id = id,
+        title = title,
+        date = date,
+        kind = kind.name,
+        days = days,
+        elapsedDays = elapsedDays,
+        label = label,
+        nextDate = nextDate,
+        repeatLabel = repeatLabel,
+        starred = starred,
+        remindEnabled = remindEnabled,
+        remindHour = remindHour,
+        remindMinute = remindMinute,
+        note = note,
+    )
+
+    private fun com.numberourdays.app.data.DurationBreakdown.toDto(unit: String): DurationDto {
+        val u = when (unit.uppercase()) {
+            "MONTH" -> DurationUnit.MONTH
+            "YEAR" -> DurationUnit.YEAR
+            else -> DurationUnit.DAY
+        }
+        val shown = DateCalculator.formatDuration(this, u)
+        return DurationDto(shown.value, shown.unitLabel, shown.rest)
     }
 }
 
-// createEventId is top-level in DayEventCodec.kt package data
 private fun createEventId(): String = com.numberourdays.app.data.createEventId()
