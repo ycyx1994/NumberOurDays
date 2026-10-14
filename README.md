@@ -1,15 +1,26 @@
-# NumberOurDays · Android（原生 Kotlin）
+# NumberOurDays（数日子）
 
-参考 `/Users/mac/Documents/code/NumberOurDays` 的设计与产品逻辑，使用 **Jetpack Compose + Material 3（Kotlin）** 实现的到数日 App。
+跨端倒数日 / 纪念日 App：**Android（Compose）+ iOS（SwiftUI）**，业务逻辑共享在 Kotlin Multiplatform `:shared`。
+
+参考 `/Users/mac/Documents/code/NumberOurDays` 的设计与产品逻辑。
 
 ## 功能
 
-- 首页：主数字轮播卡 + 纪念日列表（星标置顶、拖拽排序）
-- 详情：天 / 月 / 年切换、已经过时长循环、星标、编辑
-- 编辑：标题、日期、重复（天/周/月/年）、提醒开关、备注、删除
-- 设置：本地条数、剪贴板导出/导入 JSON、合并/覆盖、清空
-- 本地持久化：`SharedPreferences` JSON（`nod:events:v1`）
-- 首次空库播种 demo（周末 / 新年）
+- 首页：主数字轮播卡 + 纪念日列表（星标置顶，组内按倒数日期）
+- 详情：天 / 月 / 年切换（含「X 月 X 天」）、已过时长联动、编辑、删除
+- 编辑：标题、日期选择器、重复（天/周/月/年）、提醒、备注
+- 设置：本地条数、JSON 文件 / 剪贴板备份（合并 / 覆盖）、清空
+- 法定假日倒数与列表（无假期时置灰入口）
+- 本地提醒：Android 精确闹钟；iOS 本地通知
+- 桌面小组件（Android）
+
+## 工程结构
+
+| 目录 | 说明 |
+|---|---|
+| `shared/` | KMP 共享领域：日期计算、节假日、备份 JSON、提醒时机 |
+| `app/` | Android UI（Compose + Material 3） |
+| `iosApp/` | iOS UI（SwiftUI），见 `iosApp/README.md` |
 
 ## 设计 Token
 
@@ -22,30 +33,28 @@
 
 ## 构建
 
-需要本机 JDK 17 + Android SDK（已装 platform 35）。
+### Android
+
+需要本机 JDK 17 + Android SDK（platform 35）。
 
 ```bash
-cd NumberOurDays-Android
-# 若本机 ~/.gradle/gradle.properties 配置了不可用的 SOCKS，可用独立 GRADLE_USER_HOME：
+# 若 ~/.gradle 配置了不可用 SOCKS，可用独立 GRADLE_USER_HOME：
 export GRADLE_USER_HOME=/tmp/gradle-home-nod
 export ANDROID_HOME=$HOME/Library/Android/sdk
-$HOME/.gradle/wrapper/dists/gradle-8.11.1-all/*/gradle-8.11.1/bin/gradle assembleDebug
+./gradlew :app:assembleDebug
+# 产物：app/build/outputs/apk/debug/app-debug.apk
 ```
 
-产物：
+### iOS
 
-`app/build/outputs/apk/debug/app-debug.apk`
+需要 Xcode + xcodegen。详见 [iosApp/README.md](iosApp/README.md)。
 
-根目录亦有拷贝：`NumberOurDays-debug.apk`
+```bash
+./iosApp/scripts/build-shared.sh Debug
+cd iosApp && xcodegen generate
+open NumberOurDays.xcodeproj
+```
 
-## 包名
+## 共享逻辑
 
-`com.numberourdays.app`
-
-## 页面（Compose + Navigation）
-
-- `MainActivity` — `NavHost` 宿主
-- `HomeScreen` — 首页（轮播 + 列表 + FAB）
-- `DetailScreen` — 详情
-- `EditScreen` — 添加/编辑
-- `SettingsScreen` — 备份设置
+倒数 / 重复展开、法定假期、备份 schema（`schemaVersion = 1`）、下次提醒时刻等均在 `:shared`，Android 与 iOS 不得各自重写日期算法。
