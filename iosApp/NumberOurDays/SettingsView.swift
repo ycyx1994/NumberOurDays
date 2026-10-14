@@ -31,6 +31,15 @@ struct SettingsView: View {
                         }
                     }
                 }
+                Section("调试") {
+                    Button("一分钟后提醒（本地通知）") {
+                        Task {
+                            await ReminderScheduler.shared.requestAuthorization()
+                            ReminderScheduler.shared.scheduleDebugReminder(after: 60)
+                            message = "已排定，约 60 秒后通知"
+                        }
+                    }
+                }
                 Section("危险操作") {
                     Button("清空全部", role: .destructive) {
                         store.clearAll()

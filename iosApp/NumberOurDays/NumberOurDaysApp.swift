@@ -10,6 +10,10 @@ struct NumberOurDaysApp: App {
             HomeView(store: store)
                 .tint(NodTheme.accent)
                 .preferredColorScheme(.light)
+                .task {
+                    await ReminderScheduler.shared.requestAuthorization()
+                    ReminderScheduler.shared.rescheduleAll(events: store.events)
+                }
         }
     }
 }

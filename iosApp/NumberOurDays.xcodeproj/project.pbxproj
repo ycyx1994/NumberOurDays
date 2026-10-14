@@ -16,6 +16,7 @@
 		73A6D51929484F49957402EC /* HolidayViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA73A5324451DAFBF511CBFB /* HolidayViews.swift */; };
 		7F3701BA9BA6CCA6BCBBCA6A /* NumberOurDaysApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD0C88892119D4304E81C05D /* NumberOurDaysApp.swift */; };
 		A12F4E929E2ED40A1712DC45 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7D0C2CA21D7A2D2C6F83BDB /* SettingsView.swift */; };
+		AB472D95B6BEED7A2C8D8DCF /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9190FEFC0DC7F58B39031B2 /* ReminderScheduler.swift */; };
 		E1B939660DFD6C2FFD068121 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE42A66C08C9B0FED3EAC97 /* Shared.framework */; };
 		FC0959408C54700024DE0628 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104AD0CB9D5DFA1B4F0B15DC /* HomeView.swift */; };
 /* End PBXBuildFile section */
@@ -43,6 +44,7 @@
 		76A8A5F9D637EB61BF45C21C /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		A767E278549D7A56529AF79D /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		BD0C88892119D4304E81C05D /* NumberOurDaysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberOurDaysApp.swift; sourceTree = "<group>"; };
+		C9190FEFC0DC7F58B39031B2 /* ReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderScheduler.swift; sourceTree = "<group>"; };
 		CF0019E941D823C59415EA85 /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
 		DA73A5324451DAFBF511CBFB /* HolidayViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HolidayViews.swift; sourceTree = "<group>"; };
 		F7D0C2CA21D7A2D2C6F83BDB /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -89,6 +91,7 @@
 				104AD0CB9D5DFA1B4F0B15DC /* HomeView.swift */,
 				0BF918FC6CE6987E0C93CDCB /* Info.plist */,
 				BD0C88892119D4304E81C05D /* NumberOurDaysApp.swift */,
+				C9190FEFC0DC7F58B39031B2 /* ReminderScheduler.swift */,
 				F7D0C2CA21D7A2D2C6F83BDB /* SettingsView.swift */,
 				4E49B8C4898F6EACFAE64641 /* Theme.swift */,
 			);
@@ -182,6 +185,7 @@
 				73A6D51929484F49957402EC /* HolidayViews.swift in Sources */,
 				FC0959408C54700024DE0628 /* HomeView.swift in Sources */,
 				7F3701BA9BA6CCA6BCBBCA6A /* NumberOurDaysApp.swift in Sources */,
+				AB472D95B6BEED7A2C8D8DCF /* ReminderScheduler.swift in Sources */,
 				A12F4E929E2ED40A1712DC45 /* SettingsView.swift in Sources */,
 				4F4B28B983CF133740820A53 /* Theme.swift in Sources */,
 			);

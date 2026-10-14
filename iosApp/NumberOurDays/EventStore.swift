@@ -36,17 +36,21 @@ final class EventStore: ObservableObject {
             events.append(event)
         }
         save()
+        Task { ReminderScheduler.shared.schedule(event: event) }
     }
 
     func remove(id: String) {
         events.removeAll { $0.id == id }
         save()
+        Task { ReminderScheduler.shared.cancel(id: id) }
     }
 
     func clearAll() {
+        let ids = events.map { $0.id }
         events = []
         UserDefaults.standard.set(true, forKey: seededKey)
         save()
+        Task { ReminderScheduler.shared.cancelAll(ids: ids) }
     }
 
     func toggleStar(id: String) {
