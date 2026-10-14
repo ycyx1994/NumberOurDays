@@ -26,8 +26,11 @@ object NotificationHelper {
         val channel = NotificationChannel(
             CHANNEL_ID,
             context.getString(R.string.notif_channel_name),
-            NotificationManager.IMPORTANCE_DEFAULT,
-        )
+            NotificationManager.IMPORTANCE_HIGH,
+        ).apply {
+            description = context.getString(R.string.notif_channel_name)
+            enableVibration(true)
+        }
         manager.createNotificationChannel(channel)
     }
 
@@ -56,9 +59,12 @@ object NotificationHelper {
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(title)
             .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setContentIntent(pending)
             .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .build()
         try {
             NotificationManagerCompat.from(context)

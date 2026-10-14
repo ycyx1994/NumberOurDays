@@ -133,6 +133,7 @@ fun EditScreen(
     var remindOn by rememberSaveable { mutableStateOf(existing?.remindEnabled ?: false) }
     var remindHour by rememberSaveable { mutableStateOf((existing?.remindHour ?: 8).toString()) }
     var remindMinute by rememberSaveable { mutableStateOf((existing?.remindMinute ?: 0).toString()) }
+    var showExactAlarmDialog by rememberSaveable { mutableStateOf(false) }
     var errorText by rememberSaveable { mutableStateOf<String?>(null) }
     var showDelete by rememberSaveable { mutableStateOf(false) }
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
@@ -408,7 +409,11 @@ fun EditScreen(
                             Toast.LENGTH_LONG,
                         ).show()
                     }
-                    onSaved()
+                    if (remindOn && !com.numberourdays.app.notify.ReminderScheduler.canScheduleExact(context)) {
+                        showExactAlarmDialog = true
+                    } else {
+                        onSaved()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -450,6 +455,40 @@ fun EditScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showDelete = false }) { Text("取消") }
+            },
+        )
+    }
+
+    if (showExactAlarmDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showExactAlarmDialog = false
+                onSaved()
+            },
+            title = { Text(stringResource(R.string.exact_alarm_title)) },
+            text = { Text(stringResource(R.string.exact_alarm_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showExactAlarmDialog = false
+                        val intent = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                            android.content.Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                        } else {
+                            android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                .setData(android.net.Uri.fromParts("package", context.packageName, null))
+                        }
+                        runCatching { context.startActivity(intent) }
+                        onSaved()
+                    },
+                ) { Text(stringResource(R.string.exact_alarm_go)) }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showExactAlarmDialog = false
+                        onSaved()
+                    },
+                ) { Text(stringResource(R.string.exact_alarm_skip)) }
             },
         )
     }

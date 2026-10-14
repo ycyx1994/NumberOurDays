@@ -97,6 +97,10 @@
     <string name="remind_off">未开启</string>
     <string name="remind_on">已开启 · %1$02d:%2$02d</string>
     <string name="notif_channel_name">纪念日提醒</string>
+    <string name="exact_alarm_title">需要精确闹钟权限</string>
+    <string name="exact_alarm_message">澎湃 OS / Android 12+ 需允许「精确闹钟」，提醒才能准点弹出。是否去设置？</string>
+    <string name="exact_alarm_go">去设置</string>
+    <string name="exact_alarm_skip">稍后</string>
     <string name="notif_body">今天 · %1$s</string>
     <string name="notif_permission_needed">请允许通知，才能在目标日提醒你</string>
     <string name="event_missing">事件不存在</string>
