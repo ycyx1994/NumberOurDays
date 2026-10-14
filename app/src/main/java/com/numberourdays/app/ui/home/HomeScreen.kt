@@ -362,8 +362,8 @@ private fun HolidayEmptyCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(NodCardShape)
-            .background(HolidayTint)
-            .border(1.dp, HolidayEdge, NodCardShape)
+            .background(N50)
+            .border(1.dp, N100, NodCardShape)
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -371,14 +371,14 @@ private fun HolidayEmptyCard(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(R.string.holiday_legal),
-                color = Accent,
+                color = N300,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 text = stringResource(R.string.holiday_none_left),
-                color = N900,
+                color = N500,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -387,7 +387,7 @@ private fun HolidayEmptyCard(
         }
         Text(
             text = stringResource(R.string.holiday_none_hint),
-            color = Accent,
+            color = N300,
             fontSize = 12.sp,
         )
     }
