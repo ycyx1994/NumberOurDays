@@ -214,6 +214,16 @@ fun SettingsScreen(onBack: () -> Unit) {
                     )
                     message = context.getString(R.string.test_notification)
                 }
+                FullButton(stringResource(R.string.test_alarm_one_min), muted = true) {
+                    com.numberourdays.app.notify.ReminderScheduler.scheduleDebugReminder(context)
+                    val exact = com.numberourdays.app.notify.ReminderScheduler.canScheduleExact(context)
+                    message = if (exact) {
+                        context.getString(R.string.test_alarm_one_min_done)
+                    } else {
+                        context.getString(R.string.test_alarm_one_min_need_exact)
+                    }
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
             }
             SectionLabel(stringResource(R.string.danger_section))
             FullButton(stringResource(R.string.clear_data), danger = true) { confirmClear = true }

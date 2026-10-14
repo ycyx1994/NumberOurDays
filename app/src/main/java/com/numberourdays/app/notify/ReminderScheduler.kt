@@ -58,6 +58,34 @@ object ReminderScheduler {
         return am.canScheduleExactAlarms()
     }
 
+    /** Debug helper: fire a standalone reminder after [delayMillis] (default 60s). */
+    fun scheduleDebugReminder(context: Context, delayMillis: Long = 60_000L) {
+        val at = System.currentTimeMillis() + delayMillis
+        val intent = Intent(context, ReminderReceiver::class.java).apply {
+            action = ACTION
+            putExtra(ReminderReceiver.EXTRA_EVENT_ID, "debug_reminder")
+            putExtra(ReminderReceiver.EXTRA_DEBUG, true)
+            putExtra(ReminderReceiver.EXTRA_TITLE, "一分钟提醒")
+            putExtra(ReminderReceiver.EXTRA_TEXT, "AlarmManager 精确闹钟链路正常")
+        }
+        val pending = PendingIntent.getBroadcast(
+            context,
+            DEBUG_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pending)
+            } else {
+                am.setExact(AlarmManager.RTC_WAKEUP, at, pending)
+            }
+        } catch (_: SecurityException) {
+            am.set(AlarmManager.RTC_WAKEUP, at, pending)
+        }
+    }
+
     private fun pendingIntent(context: Context, eventId: String): PendingIntent {
         val intent = Intent(context, ReminderReceiver::class.java).apply {
             action = ACTION
@@ -70,4 +98,6 @@ object ReminderScheduler {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
+
+    private const val DEBUG_REQUEST_CODE = 0x0D0B
 }

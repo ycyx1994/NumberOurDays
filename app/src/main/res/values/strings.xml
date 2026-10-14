@@ -32,6 +32,9 @@
     <string name="test_notification">发送测试通知</string>
     <string name="test_notification_body">测试通知 · 点击打开事件详情</string>
     <string name="test_notification_empty">先添加一条纪念日再测试</string>
+    <string name="test_alarm_one_min">一分钟后提醒（精确闹钟）</string>
+    <string name="test_alarm_one_min_done">已排定，约 60 秒后通知</string>
+    <string name="test_alarm_one_min_need_exact">无精确闹钟权限，通知可能延迟</string>
     <string name="backup_section">备份</string>
     <string name="import_section">导入</string>
     <string name="danger_section">危险操作</string>

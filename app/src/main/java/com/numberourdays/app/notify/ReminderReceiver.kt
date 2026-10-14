@@ -15,6 +15,19 @@ import kotlinx.coroutines.launch
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val eventId = intent.getStringExtra(EXTRA_EVENT_ID) ?: return
+
+        if (intent.getBooleanExtra(EXTRA_DEBUG, false)) {
+            val title = intent.getStringExtra(EXTRA_TITLE) ?: "一分钟提醒"
+            val text = intent.getStringExtra(EXTRA_TEXT) ?: "AlarmManager 精确闹钟链路正常"
+            NotificationHelper.showReminder(
+                context = context,
+                eventId = eventId,
+                title = title,
+                text = text,
+            )
+            return
+        }
+
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -42,5 +55,8 @@ class ReminderReceiver : BroadcastReceiver() {
 
     companion object {
         const val EXTRA_EVENT_ID = "com.numberourdays.app.extra.EVENT_ID"
+        const val EXTRA_DEBUG = "com.numberourdays.app.extra.DEBUG"
+        const val EXTRA_TITLE = "com.numberourdays.app.extra.TITLE"
+        const val EXTRA_TEXT = "com.numberourdays.app.extra.TEXT"
     }
 }
