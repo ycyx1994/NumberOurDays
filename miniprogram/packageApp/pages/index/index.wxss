@@ -1,17 +1,20 @@
 .page { padding: 8rpx 24rpx 180rpx; }
 .hero-wrap { margin: 0 0 8rpx; }
-.hero-swiper { height: 320rpx; border-radius: 24rpx; overflow: hidden; }
+.hero-swiper { height: 260rpx; border-radius: 24rpx; overflow: hidden; }
 .hero {
   height: 100%;
   margin: 0;
+  padding: 16rpx 24rpx;
+  box-sizing: border-box;
   text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 .hero-tag { color: #8a8175; font-size: 22rpx; }
-.hero-title { font-size: 32rpx; font-weight: 600; margin-top: 6rpx; }
-.hero-days { font-size: 80rpx; font-weight: 700; color: #d4553a; line-height: 1.1; }
+.hero-title { font-size: 30rpx; font-weight: 600; margin-top: 2rpx; }
+.hero-days { font-size: 72rpx; font-weight: 700; color: #d4553a; line-height: 1.05; margin: 4rpx 0; }
 .hero-unit { font-size: 26rpx; color: #4a453e; margin-left: 10rpx; font-weight: 600; }
 .hero-date { color: #8a8175; font-size: 24rpx; margin-top: 2rpx; }
 .dots {
