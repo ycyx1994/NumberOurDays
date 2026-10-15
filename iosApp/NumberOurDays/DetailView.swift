@@ -30,7 +30,9 @@ struct DetailView: View {
                         if let next = d.nextDate {
                             metaRow("下一次", next)
                         }
-                        metaRow("已过", elapsedText(d))
+                        if let elapsed = elapsedParts(d), elapsed.value != 0 || !elapsed.rest.isEmpty {
+                            metaRow("已过", "\(elapsed.value) \(elapsed.unitLabel)\(elapsed.rest.isEmpty ? "" : " \(elapsed.rest)")")
+                        }
                         metaRow("状态", d.label)
                         metaRow(
                             "提醒",
@@ -124,14 +126,12 @@ struct DetailView: View {
         return (Int(shown.value), parts.joined(separator: " "))
     }
 
-    private func elapsedText(_ d: DayEventDisplay) -> String {
+    private func elapsedParts(_ d: DayEventDisplay) -> (value: Int32, unitLabel: String, rest: String)? {
         let anchor = DateCalculator.shared.parse(text: d.date) ?? DateCalculator.shared.today()
         let today = DateCalculator.shared.today()
-        // Future anchors are countdown — not elapsed yet.
         let bd = DateCalculator.shared.elapsedSince(anchor: anchor, today: today)
         let shown = DateCalculator.shared.formatDuration(b: bd, unit: unit)
-        let rest = shown.rest.isEmpty ? "" : " \(shown.rest)"
-        return "\(shown.value) \(shown.unitLabel)\(rest)"
+        return (shown.value, shown.unitLabel, shown.rest)
     }
 
     private func unitChip(_ title: String, _ value: DurationUnit) -> some View {

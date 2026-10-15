@@ -10,6 +10,7 @@ Page({
     heroValue: 0,
     heroSuffix: '天',
     elapsedText: '',
+    showElapsed: false,
   },
   onLoad(query) {
     this.setData({ id: query.id })
@@ -36,10 +37,11 @@ Page({
     const heroSuffix = target
       ? [target.unitLabel, target.rest].filter(Boolean).join(' ')
       : '天'
+    const showElapsed = !!(elapsed && (elapsed.value !== 0 || elapsed.rest))
     const elapsedText = elapsed
       ? [`${elapsed.value} ${elapsed.unitLabel}`, elapsed.rest].filter(Boolean).join(' ')
       : ''
-    this.setData({ heroValue, heroSuffix, elapsedText })
+    this.setData({ heroValue, heroSuffix, elapsedText, showElapsed })
   },
   setUnit(e) {
     this.setData({ unit: e.currentTarget.dataset.unit }, this.computeUnits)

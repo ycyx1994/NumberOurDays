@@ -222,10 +222,12 @@ fun DetailScreen(
                     val elapsedText = listOf("${elapsedShown.value} ${elapsedShown.unitLabel}", elapsedShown.rest)
                         .filter { it.isNotBlank() }
                         .joinToString(" ")
-                    MetaRow(
-                        label = stringResource(R.string.label_elapsed),
-                        value = elapsedText,
-                    )
+                    if (elapsedShown.value != 0 || elapsedShown.rest.isNotBlank()) {
+                        MetaRow(
+                            label = stringResource(R.string.label_elapsed),
+                            value = elapsedText,
+                        )
+                    }
                     MetaRow(stringResource(R.string.label_status), d.label)
                     MetaRow(
                         stringResource(R.string.label_remind),

@@ -15,7 +15,7 @@
   <view class="card meta">
     <view class="row"><text>重复</text><text class="v">{{display.repeatLabel || '不重复'}}</text></view>
     <view class="row" wx:if="{{display.nextDate}}"><text>下一次</text><text class="v">{{display.nextDate}}</text></view>
-    <view class="row"><text>已过</text><text class="v">{{elapsedText}}</text></view>
+    <view class="row" wx:if="{{showElapsed}}"><text>已过</text><text class="v">{{elapsedText}}</text></view>
     <view class="row"><text>状态</text><text class="v">{{display.label}}</text></view>
     <view class="row"><text>备注</text><text class="v">{{display.note || '—'}}</text></view>
   </view>
