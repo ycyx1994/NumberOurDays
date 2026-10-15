@@ -5,9 +5,7 @@
       circular="{{slides.length > 1}}"
       current="{{current}}"
       bindchange="onSwiperChange"
-      indicator-dots="{{slides.length > 1}}"
-      indicator-active-color="#D4553A"
-      indicator-color="#C9C0B2"
+      indicator-dots="{{false}}"
     >
       <swiper-item wx:for="{{slides}}" wx:key="id" data-id="{{item.id}}" bindtap="onOpen">
         <view class="hero card">
@@ -18,6 +16,13 @@
         </view>
       </swiper-item>
     </swiper>
+    <view class="dots" wx:if="{{slides.length > 1}}">
+      <view
+        wx:for="{{slides}}"
+        wx:key="id"
+        class="dot {{current === index ? 'on' : ''}}"
+      ></view>
+    </view>
   </view>
 
   <view class="holiday-card" bindtap="onHolidays">

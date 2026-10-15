@@ -14,6 +14,23 @@
 .hero-days { font-size: 80rpx; font-weight: 700; color: #d4553a; line-height: 1.1; }
 .hero-unit { font-size: 26rpx; color: #4a453e; margin-left: 10rpx; font-weight: 600; }
 .hero-date { color: #8a8175; font-size: 24rpx; margin-top: 2rpx; }
+.dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10rpx;
+  margin-top: 14rpx;
+}
+.dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 5rpx;
+  background: #c9c0b2;
+}
+.dot.on {
+  width: 28rpx;
+  background: #d4553a;
+}
 
 .holiday-card {
   margin: 20rpx 0 8rpx;
