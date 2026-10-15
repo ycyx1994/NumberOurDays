@@ -9,7 +9,8 @@
         "pages/index/index",
         "pages/detail/detail",
         "pages/edit/edit",
-        "pages/settings/settings"
+        "pages/settings/settings",
+        "pages/holiday/holiday"
       ]
     }
   ],

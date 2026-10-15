@@ -1,0 +1,14 @@
+.page { padding: 24rpx 32rpx 48rpx; }
+.row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+  background: #f3eee6;
+  border-radius: 20rpx;
+  padding: 24rpx;
+}
+.left { flex: 1; min-width: 0; }
+.name { font-size: 28rpx; font-weight: 600; color: #1c1916; }
+.range { margin-top: 8rpx; font-size: 22rpx; color: #8a8175; }
+.status { color: #d4553a; font-size: 24rpx; margin-left: 16rpx; flex-shrink: 0; }
+.status.muted { color: #b5a99a; }

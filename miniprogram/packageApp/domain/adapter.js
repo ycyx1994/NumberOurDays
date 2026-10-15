@@ -55,6 +55,12 @@ module.exports = {
   parseBackup(text) {
     return parseJson(WeappDomain.parseBackup(text || ''), { events: [], note: null })
   },
+  holidayCountdown(today) {
+    return parseJson(WeappDomain.holidayCountdownJson(today || WeappDomain.today()), null)
+  },
+  holidayList(today) {
+    return parseJson(WeappDomain.holidayListJson(today || WeappDomain.today()), [])
+  },
   merge(local, incoming) {
     const json = WeappDomain.mergeJson(JSON.stringify(local || []), JSON.stringify(incoming || []))
     return parseJson(json, [])

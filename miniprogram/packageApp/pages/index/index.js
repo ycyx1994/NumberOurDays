@@ -9,6 +9,7 @@ Page({
     heroValue: 0,
     heroSuffix: '天',
     today: '',
+    holiday: null,
   },
   onShow() {
     this.refresh()
@@ -21,7 +22,8 @@ Page({
     const slides = nearest
       ? [nearest].concat(displays.filter((d) => d.id !== nearest.id))
       : displays
-    this.setData({ today, displays, slides, current: 0 }, () => this.applyUnit())
+    const holiday = domain.holidayCountdown(today)
+    this.setData({ today, displays, slides, holiday, current: 0 }, () => this.applyUnit())
   },
   applyUnit() {
     const { slides, current } = this.data
@@ -56,5 +58,8 @@ Page({
   },
   onSettings() {
     wx.navigateTo({ url: '/packageApp/pages/settings/settings' })
+  },
+  onHolidays() {
+    wx.navigateTo({ url: '/packageApp/pages/holiday/holiday' })
   },
 })

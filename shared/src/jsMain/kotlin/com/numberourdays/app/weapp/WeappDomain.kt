@@ -90,6 +90,38 @@ object WeappDomain {
         return if (best == null) "" else json.encodeToString(best)
     }
 
+    /**
+     * Next/ongoing legal holiday, or {} when none remain.
+     * Shape: { name, start, end, status, daysUntilStart, label }
+     */
+    fun holidayCountdownJson(todayIso: String = today()): String {
+        val ref = DateCalculator.parse(todayIso) ?: DateCalculator.today()
+        val c = com.numberourdays.app.domain.HolidayCalculator.nextOrOngoing(
+            com.numberourdays.app.data.LegalHolidays.periods(),
+            ref,
+        ) ?: return "{}"
+        val name = c.period.name.replace("\"", "\\\"")
+        val label = c.label.replace("\"", "\\\"")
+        val start = DateCalculator.format(c.period.start)
+        val end = DateCalculator.format(c.period.end)
+        return """{"name":"$name","start":"$start","end":"$end","status":"${c.status.name}","daysUntilStart":${c.daysUntilStart},"label":"$label"}"""
+    }
+
+    /** Full legal-holiday rows for the list page. */
+    fun holidayListJson(todayIso: String = today()): String {
+        val ref = DateCalculator.parse(todayIso) ?: DateCalculator.today()
+        val rows = com.numberourdays.app.domain.HolidayCalculator.listRows(
+            com.numberourdays.app.data.LegalHolidays.periods(),
+            ref,
+        )
+        return rows.joinToString(",", prefix = "[", postfix = "]") { row ->
+            val name = row.period.name.replace("\"", "\\\"")
+            val start = DateCalculator.format(row.period.start)
+            val end = DateCalculator.format(row.period.end)
+            """{"name":"$name","start":"$start","end":"$end","ongoing":${row.ongoing},"past":${row.past},"daysUntilStart":${row.daysUntilStart},"daysPastEnd":${row.daysPastEnd},"vacationDays":${row.vacationDays}}"""
+        }
+    }
+
     /** Remaining duration toward the detail target for the given unit (DAY/MONTH/YEAR). */
     fun targetDurationJson(eventJson: String, unit: String, todayIso: String = today()): String {
         val e = DayEventCodec.migrate(eventJson) ?: return ""

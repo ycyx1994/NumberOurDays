@@ -20,11 +20,22 @@
     </swiper>
   </view>
 
+  <view class="holiday-card" bindtap="onHolidays">
+    <view class="holiday-left">
+      <view class="holiday-kicker">法定假日</view>
+      <view class="holiday-title">{{holiday.name || '今年没有节假日咯😭'}}</view>
+    </view>
+    <view class="holiday-right {{holiday.name ? '' : 'muted'}}">
+      {{holiday.name ? holiday.label : '点我查看放假安排'}}
+    </view>
+  </view>
+
   <view class="section-title">全部纪念日</view>
   <view class="list">
     <view class="row" wx:for="{{displays}}" wx:key="id" data-id="{{item.id}}" bindtap="onOpen">
+      <view class="star {{item.starred ? 'on' : ''}}">{{item.starred ? '★' : '☆'}}</view>
       <view class="row-main">
-        <view class="row-title">{{item.starred ? '★ ' : ''}}{{item.title}}</view>
+        <view class="row-title">{{item.title}}</view>
         <view class="row-sub">{{item.date}} · {{item.kind === 'ELAPSED' ? '已过' : (item.kind === 'TODAY' ? '今天' : (item.repeatLabel || '倒数'))}}</view>
       </view>
       <view class="row-label">{{item.label}}</view>
