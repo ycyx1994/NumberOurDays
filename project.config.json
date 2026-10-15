@@ -4,19 +4,12 @@
   "description": "数日子",
   "appid": "wxea507de2dccbf14a",
   "setting": {
-    "urlCheck": true,
+    "urlCheck": false,
     "es6": false,
-    "enhance": false,
-    "postcss": false,
     "minified": false,
     "minifyWXSS": true,
-    "minifyWXML": true,
-    "uploadWithSourceMap": true
+    "minifyWXML": true
   },
   "compileType": "miniprogram",
-  "packOptions": {
-    "ignore": [],
-    "include": []
-  },
-  "editorSetting": {}
+  "packOptions": { "ignore": [], "include": [] }
 }
