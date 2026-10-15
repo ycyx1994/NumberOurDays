@@ -127,8 +127,8 @@ struct DetailView: View {
     private func elapsedText(_ d: DayEventDisplay) -> String {
         let anchor = DateCalculator.shared.parse(text: d.date) ?? DateCalculator.shared.today()
         let today = DateCalculator.shared.today()
-        let bd = DateCalculator.shared.convertDuration(from: anchor, to: today)
-        // Follow the same unit as the hero chips (no separate elapsed switch).
+        // Future anchors are countdown — not elapsed yet.
+        let bd = DateCalculator.shared.elapsedSince(anchor: anchor, today: today)
         let shown = DateCalculator.shared.formatDuration(b: bd, unit: unit)
         let rest = shown.rest.isEmpty ? "" : " \(shown.rest)"
         return "\(shown.value) \(shown.unitLabel)\(rest)"

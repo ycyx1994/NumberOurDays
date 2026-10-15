@@ -213,7 +213,7 @@ fun DetailScreen(
                     d.nextDate?.let { MetaRow(stringResource(R.string.label_next), it) }
 
                     val elapsedShown = remember(d, today, unitEnum) {
-                        val elapsedBd = DateCalculator.convertDuration(
+                        val elapsedBd = DateCalculator.elapsedSince(
                             DateCalculator.parse(d.date) ?: today,
                             today,
                         )

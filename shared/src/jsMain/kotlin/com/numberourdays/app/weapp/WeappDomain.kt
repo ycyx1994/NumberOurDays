@@ -100,12 +100,12 @@ object WeappDomain {
         return json.encodeToString(breakdown.toDto(unit))
     }
 
-    /** Absolute elapsed duration from anchor date to today. */
+    /** Elapsed since anchor; zeros for future (countdown) dates. */
     fun elapsedDurationJson(eventJson: String, unit: String, todayIso: String = today()): String {
         val e = DayEventCodec.migrate(eventJson) ?: return ""
         val ref = DateCalculator.parse(todayIso) ?: DateCalculator.today()
         val anchor = DateCalculator.parse(e.date) ?: ref
-        val breakdown = DateCalculator.convertDuration(anchor, ref)
+        val breakdown = DateCalculator.elapsedSince(anchor, ref)
         return json.encodeToString(breakdown.toDto(unit))
     }
 
