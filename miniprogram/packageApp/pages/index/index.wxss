@@ -1,3 +1,13 @@
+.nav-bar {
+  padding: 24rpx 24rpx 8rpx;
+  padding-top: calc(24rpx + env(safe-area-inset-top));
+}
+.nav-title {
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1c1916;
+}
 .page { padding: 8rpx 24rpx 180rpx; }
 .hero-wrap { margin: 0 0 8rpx; }
 .hero-swiper { height: 260rpx; border-radius: 24rpx; overflow: hidden; }

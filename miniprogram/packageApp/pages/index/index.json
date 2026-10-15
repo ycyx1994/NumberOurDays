@@ -1,4 +1,4 @@
 {
-  "navigationBarTitleText": "数日子",
+  "navigationStyle": "custom",
   "enablePullDownRefresh": false
 }
