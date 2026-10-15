@@ -25,3 +25,25 @@ DIR="$(dirname "$SRC")"
 find "$DIR" -maxdepth 1 -type f -name '*.js' -exec cp -f {} "$OUT/" \;
 echo "Staged into $OUT:"
 ls "$OUT"
+
+# WeChat resolves require('@js-joda/core') as libs/shared/@js-joda/core.js
+mkdir -p "$OUT/@js-joda"
+if [ -f "$OUT/node_modules/@js-joda/core/dist/js-joda.js" ]; then
+  cp -f "$OUT/node_modules/@js-joda/core/dist/js-joda.js" "$OUT/@js-joda/core.js"
+fi
+if [ ! -f "$OUT/format-util.js" ]; then
+  cat > "$OUT/format-util.js" <<'EOS'
+function format(fmt) {
+  var args = Array.prototype.slice.call(arguments, 1)
+  var i = 0
+  return String(fmt).replace(/%s|%d|%j/g, function (m) {
+    var v = args[i++]
+    if (m === '%j') { try { return JSON.stringify(v) } catch (e) { return String(v) } }
+    return String(v)
+  })
+}
+module.exports = format
+module.exports.format = format
+EOS
+fi
+echo "WeChat shims ready in $OUT/@js-joda and format-util.js"

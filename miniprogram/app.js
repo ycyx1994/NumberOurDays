@@ -1,9 +1,13 @@
 App({
   onLaunch() {
-    // storage seeded lazily by pages via store
+    try {
+      const adapter = require('./domain/adapter')
+      console.log('[NOD] domain ok', adapter.today())
+    } catch (e) {
+      console.error('[NOD] domain load failed', e)
+    }
   },
   globalData: {
-    // paper tokens
     n0: '#FAF7F2',
     n50: '#F3EEE6',
     n300: '#C9C0B2',
