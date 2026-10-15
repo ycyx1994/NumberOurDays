@@ -1,9 +1,28 @@
 <view class="page">
-  <view class="hero card" wx:if="{{hero}}">
-    <view class="hero-tag">下一个 · {{hero.label}}</view>
-    <view class="hero-title">{{hero.title}}</view>
-    <view class="hero-days">{{hero.days}}<text class="hero-unit">天</text></view>
-    <view class="hero-date">{{hero.date}}</view>
+  <view class="hero-wrap" wx:if="{{slides.length}}">
+    <swiper
+      class="hero-swiper"
+      circular="{{slides.length > 1}}"
+      current="{{current}}"
+      bindchange="onSwiperChange"
+      indicator-dots="{{slides.length > 1}}"
+      indicator-active-color="#D4553A"
+      indicator-color="#C9C0B2"
+    >
+      <swiper-item wx:for="{{slides}}" wx:key="id" data-id="{{item.id}}" bindtap="onOpen">
+        <view class="hero card">
+          <view class="hero-tag">下一个 · {{item.label}}</view>
+          <view class="hero-title">{{item.title}}</view>
+          <view class="hero-days">{{heroValue}}<text class="hero-unit">{{heroSuffix}}</text></view>
+          <view class="hero-date">{{item.date}}</view>
+        </view>
+      </swiper-item>
+    </swiper>
+    <view class="units">
+      <view class="chip {{unit === 'DAY' ? 'on' : ''}}" data-unit="DAY" bindtap="setUnit">天</view>
+      <view class="chip {{unit === 'MONTH' ? 'on' : ''}}" data-unit="MONTH" bindtap="setUnit">月</view>
+      <view class="chip {{unit === 'YEAR' ? 'on' : ''}}" data-unit="YEAR" bindtap="setUnit">年</view>
+    </view>
   </view>
 
   <view class="section-title">全部纪念日</view>
@@ -15,9 +34,17 @@
       </view>
       <view class="row-label">{{item.label}}</view>
     </view>
-    <view wx:if="{{!displays.length}}" class="empty">还没有纪念日，点右下角添加</view>
+    <view wx:if="{{!displays.length}}" class="empty">还没有纪念日，点下方按钮添加</view>
   </view>
 
-  <view class="fab" bindtap="onAdd">＋</view>
-  <view class="settings-btn" bindtap="onSettings">⚙</view>
+  <view class="footer-actions">
+    <view class="foot-btn" bindtap="onSettings">
+      <view class="foot-icon">⚙</view>
+      <view class="foot-text">设置</view>
+    </view>
+    <view class="foot-btn foot-btn-accent" bindtap="onAdd">
+      <view class="foot-icon">＋</view>
+      <view class="foot-text">添加</view>
+    </view>
+  </view>
 </view>

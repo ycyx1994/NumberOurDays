@@ -8,7 +8,7 @@ Page({
     display: null,
     unit: 'DAY',
     heroValue: 0,
-    heroText: '',
+    heroSuffix: '天',
     elapsedText: '',
   },
   onLoad(query) {
@@ -27,18 +27,19 @@ Page({
     this.setData({ event, display }, this.computeUnits)
   },
   computeUnits() {
-    const { event, unit } = this.data
+    const { event, unit, display } = this.data
     if (!event) return
     const target = domain.targetDuration(event, unit)
     const elapsed = domain.elapsedDuration(event, unit)
-    const heroValue = target && target.value != null ? target.value : (this.data.display ? this.data.display.days : 0)
-    const heroText = target
+    const heroValue = target && target.value != null ? target.value : (display ? display.days : 0)
+    // Android DayCountHero: value + "unitLabel rest" e.g. 1 月 2 天
+    const heroSuffix = target
       ? [target.unitLabel, target.rest].filter(Boolean).join(' ')
       : '天'
     const elapsedText = elapsed
       ? [`${elapsed.value} ${elapsed.unitLabel}`, elapsed.rest].filter(Boolean).join(' ')
       : ''
-    this.setData({ heroValue, heroText, elapsedText })
+    this.setData({ heroValue, heroSuffix, elapsedText })
   },
   setUnit(e) {
     this.setData({ unit: e.currentTarget.dataset.unit }, this.computeUnits)
