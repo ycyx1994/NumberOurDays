@@ -2,7 +2,7 @@
  * Node smoke: adapter + WeappDomain via miniprogram libs (no wx.*).
  */
 const path = require('path')
-const adapter = require('../miniprogram/packageApp/domain/adapter')
+const adapter = require('../miniprogram/domain/adapter')
 
 const today = adapter.today()
 console.log('today', today)

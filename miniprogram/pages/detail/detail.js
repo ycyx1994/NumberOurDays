@@ -47,7 +47,7 @@ Page({
     this.setData({ unit: e.currentTarget.dataset.unit }, this.computeUnits)
   },
   onEdit() {
-    wx.navigateTo({ url: `/packageApp/pages/edit/edit?id=${this.data.id}` })
+    wx.navigateTo({ url: `/pages/edit/edit?id=${this.data.id}` })
   },
   onDelete() {
     wx.showModal({

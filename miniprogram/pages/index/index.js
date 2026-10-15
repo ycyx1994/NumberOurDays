@@ -50,16 +50,16 @@ Page({
     this.setData({ current: e.detail.current }, this.applyUnit)
   },
   onAdd() {
-    wx.navigateTo({ url: '/packageApp/pages/edit/edit' })
+    wx.navigateTo({ url: '/pages/edit/edit' })
   },
   onOpen(e) {
     const { id } = e.currentTarget.dataset
-    wx.navigateTo({ url: `/packageApp/pages/detail/detail?id=${id}` })
+    wx.navigateTo({ url: `/pages/detail/detail?id=${id}` })
   },
   onSettings() {
-    wx.navigateTo({ url: '/packageApp/pages/settings/settings' })
+    wx.navigateTo({ url: '/pages/settings/settings' })
   },
   onHolidays() {
-    wx.navigateTo({ url: '/packageApp/pages/holiday/holiday' })
+    wx.navigateTo({ url: '/pages/holiday/holiday' })
   },
 })
