@@ -1,10 +1,18 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/detail/detail",
-    "pages/edit/edit",
-    "pages/settings/settings",
-    "pages/holiday/holiday"
+    "pages/entry/entry"
+  ],
+  "subPackages": [
+    {
+      "root": "packageApp",
+      "pages": [
+        "pages/index/index",
+        "pages/detail/detail",
+        "pages/edit/edit",
+        "pages/settings/settings",
+        "pages/holiday/holiday"
+      ]
+    }
   ],
   "window": {
     "backgroundTextStyle": "light",
