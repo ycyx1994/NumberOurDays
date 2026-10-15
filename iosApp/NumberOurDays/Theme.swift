@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 enum NodTheme {
     static let n0 = Color(hex: 0xFAF7F2)
@@ -18,5 +19,27 @@ extension Color {
             green: Double((hex >> 8) & 0xFF) / 255.0,
             blue: Double(hex & 0xFF) / 255.0
         )
+    }
+}
+
+enum HomeUnitPrefs {
+    private static let key = "home_unit"
+
+    static var unit: DurationUnit {
+        get {
+            guard let raw = UserDefaults.standard.string(forKey: key) else { return .day }
+            switch raw {
+            case "MONTH": return .month
+            case "YEAR": return .year
+            default: return .day
+            }
+        }
+        set {
+            switch newValue {
+            case .month: UserDefaults.standard.set("MONTH", forKey: key)
+            case .year: UserDefaults.standard.set("YEAR", forKey: key)
+            default: UserDefaults.standard.set("DAY", forKey: key)
+            }
+        }
     }
 }

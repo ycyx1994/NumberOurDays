@@ -1,0 +1,1 @@
+.loading{min-height:100vh;display:flex;align-items:center;justify-content:center;color:#8a8175;background:#faf7f2;}

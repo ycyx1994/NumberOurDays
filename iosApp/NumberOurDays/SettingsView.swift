@@ -19,6 +19,20 @@ struct SettingsView: View {
                 Section("本地数据") {
                     LabeledContent("纪念日条数", value: "\(store.events.count)")
                 }
+                Section("首页大卡单位") {
+                    Picker("单位", selection: Binding(
+                        get: { HomeUnitPrefs.unit },
+                        set: { HomeUnitPrefs.unit = $0 }
+                    )) {
+                        Text("天").tag(DurationUnit.day)
+                        Text("月").tag(DurationUnit.month)
+                        Text("年").tag(DurationUnit.year)
+                    }
+                    .pickerStyle(.segmented)
+                    Text("首页轮播数字按此单位显示")
+                        .font(.footnote)
+                        .foregroundStyle(NodTheme.n500)
+                }
                 Section("备份 · 文件") {
                     Button("导出到文件…") {
                         exportJSON = store.exportJSON()

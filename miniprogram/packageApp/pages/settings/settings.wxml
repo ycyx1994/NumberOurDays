@@ -1,0 +1,32 @@
+<view class="page">
+  <view class="card">
+    <view class="label">本地数据</view>
+    <view class="count">纪念日条数：{{count}}</view>
+
+    <view class="label">首页大卡单位</view>
+    <picker range="{{unitLabels}}" value="{{unitIndex}}" bindchange="onHomeUnit">
+      <view class="count">{{unitLabels[unitIndex]}}</view>
+    </picker>
+
+    <view class="label">备份 · 剪贴板</view>
+    <view class="btn-primary" bindtap="onExport">导出 JSON 到剪贴板</view>
+
+    <view class="label">备份 · 粘贴导入</view>
+    <textarea
+      class="paste-box"
+      placeholder="长按粘贴备份 JSON"
+      value="{{pasteText}}"
+      bindinput="onPasteInput"
+      maxlength="-1"
+      auto-height="{{false}}"
+    ></textarea>
+    <view class="btn-primary" bindtap="onImportMerge">粘贴导入（合并）</view>
+    <view class="btn-danger" bindtap="onImportReplace">粘贴导入（覆盖）</view>
+
+    <view class="label">危险操作</view>
+    <view class="btn-danger" bindtap="onClear">清空全部</view>
+
+    <view wx:if="{{message}}" class="msg">{{message}}</view>
+    <view class="foot">数日子小程序 · 本地数据，请先导出再清缓存</view>
+  </view>
+</view>

@@ -1,0 +1,11 @@
+<view class="page">
+  <view class="card row" wx:for="{{rows}}" wx:key="name">
+    <view class="left">
+      <view class="name">{{item.name}}</view>
+      <view class="range">{{item.start}} ~ {{item.end}} · 放假 {{item.vacationDays}} 天</view>
+    </view>
+    <view class="status {{item.past ? 'muted' : ''}}">
+      {{item.ongoing ? '假期中' : (item.past ? '已过 ' + item.daysPastEnd + ' 天' : '还有 ' + item.daysUntilStart + ' 天')}}
+    </view>
+  </view>
+</view>

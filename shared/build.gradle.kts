@@ -17,6 +17,10 @@ kotlin {
     }
     // Kotlin/JS for WeChat mini program (and any JS host). Same commonMain source.
     js {
+        compilerOptions {
+            // WeChat mini program host is CommonJS-style require/module.exports
+            moduleKind.set(org.jetbrains.kotlin.gradle.dsl.JsModuleKind.MODULE_COMMONJS)
+        }
         nodejs {
             testTask {
                 useMocha { timeout = "10s" }

@@ -120,4 +120,6 @@
     <string name="cleared">已清空本地数据</string>
   <string name="cancel">取消</string>
   <string name="delete_confirm_message">删除后无法恢复，确定删除这条纪念日吗？</string>
+  <string name="home_unit_title">首页大卡单位</string>
+  <string name="home_unit_hint">首页轮播数字按天 / 月 / 年显示</string>
 </resources>

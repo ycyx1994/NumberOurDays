@@ -444,9 +444,21 @@ private fun EventSlide(item: DayEventDisplay, onClick: (String) -> Unit) {
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.fillMaxWidth(),
         )
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val heroUnit = remember { com.numberourdays.app.ui.settings.HomeUnitPrefs.unit(context) }
+        val hero = remember(item, heroUnit) {
+            val today = DateCalculator.today()
+            val target = DateCalculator.detailTargetDate(item)
+            val breakdown = DateCalculator.convertDuration(today, target)
+            DateCalculator.formatDuration(breakdown, heroUnit)
+        }
+        val heroSuffix = listOf(hero.unitLabel, hero.rest)
+            .filter { it.isNotBlank() }
+            .joinToString(" ")
+            .ifEmpty { "天" }
         DayCountHero(
-            value = item.days.toString(),
-            suffix = stringResource(R.string.unit_day),
+            value = hero.value.toString(),
+            suffix = heroSuffix,
             suffixBottomPadding = 6,
             suffixStyle = HeroSuffixStyle,
         )

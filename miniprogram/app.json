@@ -1,0 +1,26 @@
+{
+  "pages": [
+    "pages/entry/entry"
+  ],
+  "subPackages": [
+    {
+      "root": "packageApp",
+      "pages": [
+        "pages/index/index",
+        "pages/detail/detail",
+        "pages/edit/edit",
+        "pages/settings/settings",
+        "pages/holiday/holiday"
+      ]
+    }
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FAF7F2",
+    "navigationBarTitleText": "数日子",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FAF7F2"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

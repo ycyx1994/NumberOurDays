@@ -1,0 +1,15 @@
+{
+  "miniprogramRoot": "miniprogram/",
+  "projectname": "NumberOurDays",
+  "description": "数日子",
+  "appid": "wxea507de2dccbf14a",
+  "setting": {
+    "urlCheck": false,
+    "es6": false,
+    "minified": false,
+    "minifyWXSS": true,
+    "minifyWXML": true
+  },
+  "compileType": "miniprogram",
+  "packOptions": { "ignore": [], "include": [] }
+}

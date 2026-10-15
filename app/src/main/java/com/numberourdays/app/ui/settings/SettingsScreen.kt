@@ -218,6 +218,36 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                 }
             }
+            SectionLabel(stringResource(R.string.home_unit_title))
+            Text(stringResource(R.string.home_unit_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                val unit = HomeUnitPrefs.unit(context)
+                listOf(
+                    com.numberourdays.app.data.DurationUnit.DAY to stringResource(R.string.unit_day),
+                    com.numberourdays.app.data.DurationUnit.MONTH to stringResource(R.string.unit_month),
+                    com.numberourdays.app.data.DurationUnit.YEAR to stringResource(R.string.unit_year),
+                ).forEach { (u, label) ->
+                    val selected = unit == u
+                    Text(
+                        label,
+                        color = if (selected) MaterialTheme.colorScheme.onPrimary else LocalNodBrand.current.n700,
+                        fontSize = 13.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                            .clickable {
+                                HomeUnitPrefs.setUnit(context, u)
+                                message = label
+                            }
+                            .padding(horizontal = 14.dp, vertical = 8.dp),
+                    )
+                }
+            }
             SectionLabel(stringResource(R.string.danger_section))
             FullButton(stringResource(R.string.clear_data), danger = true) { confirmClear = true }
             message?.let {

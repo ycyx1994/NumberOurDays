@@ -207,6 +207,17 @@ object DateCalculator {
         )
     }
 
+    /**
+     * Time already elapsed since [anchor] as of [today].
+     * Future anchors (countdown) are not "elapsed" — returns all zeros.
+     */
+    fun elapsedSince(anchor: LocalDate, today: LocalDate): DurationBreakdown {
+        if (anchor > today) {
+            return DurationBreakdown(0, 0, 0, 0, 0, 0)
+        }
+        return convertDuration(anchor, today)
+    }
+
     private fun joinNonZero(parts: List<Pair<Int, String>>): String =
         parts.filter { it.first > 0 }.joinToString(" ") { "${it.first} ${it.second}" }
 

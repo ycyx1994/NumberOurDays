@@ -1,0 +1,18 @@
+.page { padding: 24rpx 32rpx 48rpx; }
+.label { color: #8a8175; font-size: 24rpx; margin: 28rpx 0 12rpx; }
+.count { font-size: 32rpx; font-weight: 600; }
+.msg { margin-top: 24rpx; color: #8a8175; font-size: 24rpx; }
+.foot { margin-top: 64rpx; color: #c9c0b2; font-size: 22rpx; text-align: center; }
+.btn-primary, .btn-danger { margin-top: 16rpx; }
+
+.paste-box {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 180rpx;
+  background: #faf7f2;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  font-size: 22rpx;
+  color: #4a453e;
+  margin: 12rpx 0 20rpx;
+}

@@ -21,3 +21,5 @@ node_modules/
 keystore.properties
 *.keystore
 *.jks
+miniprogram/node_modules/
+miniprogram/libs/shared/node_modules/
