@@ -18,11 +18,6 @@
         </view>
       </swiper-item>
     </swiper>
-    <view class="units">
-      <view class="chip {{unit === 'DAY' ? 'on' : ''}}" data-unit="DAY" bindtap="setUnit">天</view>
-      <view class="chip {{unit === 'MONTH' ? 'on' : ''}}" data-unit="MONTH" bindtap="setUnit">月</view>
-      <view class="chip {{unit === 'YEAR' ? 'on' : ''}}" data-unit="YEAR" bindtap="setUnit">年</view>
-    </view>
   </view>
 
   <view class="section-title">全部纪念日</view>

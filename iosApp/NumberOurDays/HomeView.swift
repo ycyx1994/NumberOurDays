@@ -197,6 +197,20 @@ struct GlassAddButton: View {
 private struct EventHeroCard: View {
     let display: DayEventDisplay
 
+    private var heroNumber: String {
+        let target = DateCalculator.shared.detailTargetDate(event: display)
+        let bd = DateCalculator.shared.convertDuration(from: DateCalculator.shared.today(), to: target)
+        let shown = DateCalculator.shared.formatDuration(b: bd, unit: HomeUnitPrefs.unit)
+        return String(shown.value)
+    }
+
+    private var heroSuffix: String {
+        let target = DateCalculator.shared.detailTargetDate(event: display)
+        let bd = DateCalculator.shared.convertDuration(from: DateCalculator.shared.today(), to: target)
+        let shown = DateCalculator.shared.formatDuration(b: bd, unit: HomeUnitPrefs.unit)
+        return [shown.unitLabel, shown.rest].filter { !$0.isEmpty }.joined(separator: " ")
+    }
+
     var body: some View {
         VStack(spacing: 8) {
             Text(headline)
@@ -206,10 +220,10 @@ private struct EventHeroCard: View {
                 .font(.system(size: 17, weight: .bold))
                 .foregroundStyle(NodTheme.n900)
                 .lineLimit(1)
-            Text("\(display.days)")
+            Text(heroNumber)
                 .font(.system(size: 56, weight: .bold, design: .rounded))
                 .foregroundStyle(NodTheme.accent)
-            Text("天 · \(display.date)")
+            Text("\(heroSuffix) · \(display.date)")
                 .font(.system(size: 12))
                 .foregroundStyle(NodTheme.n500)
         }

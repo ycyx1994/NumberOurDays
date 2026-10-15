@@ -4,9 +4,20 @@ Page({
   data: {
     count: 0,
     message: '',
+    unitIndex: 0,
+    unitLabels: ['天', '月', '年'],
+    unitValues: ['DAY', 'MONTH', 'YEAR'],
   },
   onShow() {
-    this.setData({ count: store.load().length })
+    const u = wx.getStorageSync('nod:home_unit') || 'DAY'
+    const idx = Math.max(0, this.data.unitValues.indexOf(u))
+    this.setData({ count: store.load().length, unitIndex: idx })
+  },
+  onHomeUnit(e) {
+    const idx = Number(e.detail.value)
+    const v = this.data.unitValues[idx]
+    wx.setStorageSync('nod:home_unit', v)
+    this.setData({ unitIndex: idx, message: '首页大卡单位：' + this.data.unitLabels[idx] })
   },
   onExport() {
     const text = store.exportJson()

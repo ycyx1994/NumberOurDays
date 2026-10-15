@@ -6,7 +6,6 @@ Page({
     displays: [],
     slides: [],
     current: 0,
-    unit: 'DAY',
     heroValue: 0,
     heroSuffix: '天',
     today: '',
@@ -25,7 +24,8 @@ Page({
     this.setData({ today, displays, slides, current: 0 }, () => this.applyUnit())
   },
   applyUnit() {
-    const { slides, current, unit } = this.data
+    const { slides, current } = this.data
+    const unit = wx.getStorageSync('nod:home_unit') || 'DAY'
     const slide = slides[current]
     if (!slide) {
       this.setData({ heroValue: 0, heroSuffix: '天' })
@@ -46,9 +46,6 @@ Page({
   },
   onSwiperChange(e) {
     this.setData({ current: e.detail.current }, this.applyUnit)
-  },
-  setUnit(e) {
-    this.setData({ unit: e.currentTarget.dataset.unit }, this.applyUnit)
   },
   onAdd() {
     wx.navigateTo({ url: '/pages/edit/edit' })

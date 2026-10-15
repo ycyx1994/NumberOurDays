@@ -3,6 +3,11 @@
     <view class="label">本地数据</view>
     <view class="count">纪念日条数：{{count}}</view>
 
+    <view class="label">首页大卡单位</view>
+    <picker range="{{unitLabels}}" value="{{unitIndex}}" bindchange="onHomeUnit">
+      <view class="count">{{unitLabels[unitIndex]}}</view>
+    </picker>
+
     <view class="label">备份 · 剪贴板</view>
     <view class="btn-primary" bindtap="onExport">导出 JSON 到剪贴板</view>
     <view class="btn-primary" bindtap="onImportMerge">从剪贴板导入（合并）</view>
