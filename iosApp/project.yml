@@ -8,7 +8,7 @@ settings:
   base:
     SWIFT_VERSION: "5.9"
     TARGETED_DEVICE_FAMILY: "1,2"
-    CURRENT_PROJECT_VERSION: "3"
+    CURRENT_PROJECT_VERSION: "4"
     MARKETING_VERSION: "1.1.0"
 targets:
   NumberOurDays:
@@ -16,12 +16,14 @@ targets:
     platform: iOS
     sources:
       - path: NumberOurDays
+      - path: SharedSupport
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.numberourdays.app
         PRODUCT_NAME: NumberOurDays
         INFOPLIST_FILE: NumberOurDays/Info.plist
         GENERATE_INFOPLIST_FILE: false
+        CODE_SIGN_ENTITLEMENTS: NumberOurDays/NumberOurDays.entitlements
         LD_RUNPATH_SEARCH_PATHS:
           - "$(inherited)"
           - "@executable_path/Frameworks"
@@ -37,3 +39,36 @@ targets:
     dependencies:
       - framework: ../shared/build/xcode-frameworks/Shared.framework
         embed: true
+      - target: NumberOurDaysWidget
+        embed: true
+
+  NumberOurDaysWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: NumberOurDaysWidget
+      - path: SharedSupport
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.numberourdays.app.widget
+        PRODUCT_NAME: NumberOurDaysWidget
+        INFOPLIST_FILE: NumberOurDaysWidget/Info.plist
+        GENERATE_INFOPLIST_FILE: false
+        CODE_SIGN_ENTITLEMENTS: NumberOurDaysWidget/NumberOurDaysWidget.entitlements
+        SKIP_INSTALL: true
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/Frameworks"
+          - "@executable_path/../../Frameworks"
+        FRAMEWORK_SEARCH_PATHS:
+          - "$(inherited)"
+          - "$(PROJECT_DIR)/../shared/build/xcode-frameworks"
+        ENABLE_BITCODE: false
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "Apple Development"
+        DEVELOPMENT_TEAM: "XH8FSCQ9WR"
+        CURRENT_PROJECT_VERSION: "4"
+        MARKETING_VERSION: "1.1.0"
+    dependencies:
+      - framework: ../shared/build/xcode-frameworks/Shared.framework
+        embed: false

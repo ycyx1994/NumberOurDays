@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0CAE3A2D457A7BFD3FDED1D2 /* Shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FAE42A66C08C9B0FED3EAC97 /* Shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		17AF59C0F1E9A271E778E6D0 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A767E278549D7A56529AF79D /* EditView.swift */; };
+		388D9B900F6003FD8D93067F /* NumberOurDaysWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 175A15E75C8DE864F63AD4CC /* NumberOurDaysWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4CE28A16EABB9203EC4735EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1111CCD32DC1FC8AB6468985 /* Assets.xcassets */; };
 		4F4B28B983CF133740820A53 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E49B8C4898F6EACFAE64641 /* Theme.swift */; };
 		5493C4CC8FDB1E69B44B6327 /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0019E941D823C59415EA85 /* EventStore.swift */; };
@@ -17,9 +18,24 @@
 		7F3701BA9BA6CCA6BCBBCA6A /* NumberOurDaysApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD0C88892119D4304E81C05D /* NumberOurDaysApp.swift */; };
 		A12F4E929E2ED40A1712DC45 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7D0C2CA21D7A2D2C6F83BDB /* SettingsView.swift */; };
 		AB472D95B6BEED7A2C8D8DCF /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9190FEFC0DC7F58B39031B2 /* ReminderScheduler.swift */; };
+		CC5B9BEA479976F076B887DF /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE2B2D9C6E67D6122D8FF23 /* AppGroup.swift */; };
+		D9FFE824A00698391200256D /* WidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D7D593AD0302F49CA79331 /* WidgetData.swift */; };
+		E060C08395C2E3B37CA6DA97 /* AppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE2B2D9C6E67D6122D8FF23 /* AppGroup.swift */; };
 		E1B939660DFD6C2FFD068121 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE42A66C08C9B0FED3EAC97 /* Shared.framework */; };
+		EB0D698E20DA97051C5CD4F5 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAE42A66C08C9B0FED3EAC97 /* Shared.framework */; };
+		F6D4E8D98FBD25947AE14A95 /* NumberOurDaysWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AAB82C7BF286017C37B8A1 /* NumberOurDaysWidget.swift */; };
 		FC0959408C54700024DE0628 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104AD0CB9D5DFA1B4F0B15DC /* HomeView.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		07329DB734FC194F0628869D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4ABFDD7C89CE963E7D69AD8D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F53E9467DC4C97C25687EDBC;
+			remoteInfo = NumberOurDaysWidget;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		C33FD2C46D2F059264F7D07E /* Embed Frameworks */ = {
@@ -33,6 +49,17 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FD78462A4AACB842FC05A76D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				388D9B900F6003FD8D93067F /* NumberOurDaysWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -40,15 +67,22 @@
 		0BF918FC6CE6987E0C93CDCB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		104AD0CB9D5DFA1B4F0B15DC /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		1111CCD32DC1FC8AB6468985 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		175A15E75C8DE864F63AD4CC /* NumberOurDaysWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = NumberOurDaysWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E49B8C4898F6EACFAE64641 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		68AAB82C7BF286017C37B8A1 /* NumberOurDaysWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberOurDaysWidget.swift; sourceTree = "<group>"; };
 		76A8A5F9D637EB61BF45C21C /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
+		84C053C8F322002F96692C8A /* NumberOurDays.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NumberOurDays.entitlements; sourceTree = "<group>"; };
+		970EADA3981521B19EDD795E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A767E278549D7A56529AF79D /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
+		B0D7D593AD0302F49CA79331 /* WidgetData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetData.swift; sourceTree = "<group>"; };
 		BD0C88892119D4304E81C05D /* NumberOurDaysApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberOurDaysApp.swift; sourceTree = "<group>"; };
 		C9190FEFC0DC7F58B39031B2 /* ReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderScheduler.swift; sourceTree = "<group>"; };
+		CE1A40FA92458C177EBD8056 /* NumberOurDaysWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NumberOurDaysWidget.entitlements; sourceTree = "<group>"; };
 		CF0019E941D823C59415EA85 /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
 		DA73A5324451DAFBF511CBFB /* HolidayViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HolidayViews.swift; sourceTree = "<group>"; };
 		F7D0C2CA21D7A2D2C6F83BDB /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		FAE42A66C08C9B0FED3EAC97 /* Shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Shared.framework; path = "../shared/build/xcode-frameworks/Shared.framework"; sourceTree = "<group>"; };
+		FBE2B2D9C6E67D6122D8FF23 /* AppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppGroup.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,9 +94,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E5D8BFB34E3183E15B74F1E7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB0D698E20DA97051C5CD4F5 /* Shared.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C376469EBD9A396F99AB3D8 /* SharedSupport */ = {
+			isa = PBXGroup;
+			children = (
+				FBE2B2D9C6E67D6122D8FF23 /* AppGroup.swift */,
+			);
+			path = SharedSupport;
+			sourceTree = "<group>";
+		};
 		0C406D82EC139360B69F1EF2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -75,9 +125,22 @@
 			isa = PBXGroup;
 			children = (
 				BFD753A3A3F30CFB1D5FE451 /* NumberOurDays */,
+				453024434DC174A86CA07BC2 /* NumberOurDaysWidget */,
+				0C376469EBD9A396F99AB3D8 /* SharedSupport */,
 				0C406D82EC139360B69F1EF2 /* Frameworks */,
 				FF5DBF624C261140A0A71880 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		453024434DC174A86CA07BC2 /* NumberOurDaysWidget */ = {
+			isa = PBXGroup;
+			children = (
+				970EADA3981521B19EDD795E /* Info.plist */,
+				CE1A40FA92458C177EBD8056 /* NumberOurDaysWidget.entitlements */,
+				68AAB82C7BF286017C37B8A1 /* NumberOurDaysWidget.swift */,
+				B0D7D593AD0302F49CA79331 /* WidgetData.swift */,
+			);
+			path = NumberOurDaysWidget;
 			sourceTree = "<group>";
 		};
 		BFD753A3A3F30CFB1D5FE451 /* NumberOurDays */ = {
@@ -90,6 +153,7 @@
 				DA73A5324451DAFBF511CBFB /* HolidayViews.swift */,
 				104AD0CB9D5DFA1B4F0B15DC /* HomeView.swift */,
 				0BF918FC6CE6987E0C93CDCB /* Info.plist */,
+				84C053C8F322002F96692C8A /* NumberOurDays.entitlements */,
 				BD0C88892119D4304E81C05D /* NumberOurDaysApp.swift */,
 				C9190FEFC0DC7F58B39031B2 /* ReminderScheduler.swift */,
 				F7D0C2CA21D7A2D2C6F83BDB /* SettingsView.swift */,
@@ -102,6 +166,7 @@
 			isa = PBXGroup;
 			children = (
 				00873D9D2DA2EE0F3E85B761 /* NumberOurDays.app */,
+				175A15E75C8DE864F63AD4CC /* NumberOurDaysWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -116,11 +181,13 @@
 				EA8399B7D1C6BBAB1F279F01 /* Sources */,
 				FD59C01C85FB695994CC692B /* Resources */,
 				D58A51DEB0DE9A79CB01BDA4 /* Frameworks */,
+				FD78462A4AACB842FC05A76D /* Embed Foundation Extensions */,
 				C33FD2C46D2F059264F7D07E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				CC37A65FB75FF77810CB2DC2 /* PBXTargetDependency */,
 			);
 			name = NumberOurDays;
 			packageProductDependencies = (
@@ -128,6 +195,24 @@
 			productName = NumberOurDays;
 			productReference = 00873D9D2DA2EE0F3E85B761 /* NumberOurDays.app */;
 			productType = "com.apple.product-type.application";
+		};
+		F53E9467DC4C97C25687EDBC /* NumberOurDaysWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 48845CBBC952AA799A4E0B9A /* Build configuration list for PBXNativeTarget "NumberOurDaysWidget" */;
+			buildPhases = (
+				C14AC93539D9898B14937DAE /* Sources */,
+				E5D8BFB34E3183E15B74F1E7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NumberOurDaysWidget;
+			packageProductDependencies = (
+			);
+			productName = NumberOurDaysWidget;
+			productReference = 175A15E75C8DE864F63AD4CC /* NumberOurDaysWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -139,6 +224,10 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					57DD000CD1CB2DD54FE425C5 = {
+						DevelopmentTeam = XH8FSCQ9WR;
+						ProvisioningStyle = Automatic;
+					};
+					F53E9467DC4C97C25687EDBC = {
 						DevelopmentTeam = XH8FSCQ9WR;
 						ProvisioningStyle = Automatic;
 					};
@@ -159,6 +248,7 @@
 			projectRoot = "";
 			targets = (
 				57DD000CD1CB2DD54FE425C5 /* NumberOurDays */,
+				F53E9467DC4C97C25687EDBC /* NumberOurDaysWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -175,10 +265,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C14AC93539D9898B14937DAE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E060C08395C2E3B37CA6DA97 /* AppGroup.swift in Sources */,
+				F6D4E8D98FBD25947AE14A95 /* NumberOurDaysWidget.swift in Sources */,
+				D9FFE824A00698391200256D /* WidgetData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EA8399B7D1C6BBAB1F279F01 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC5B9BEA479976F076B887DF /* AppGroup.swift in Sources */,
 				65DB0896CD296DCB4E0CEFB5 /* DetailView.swift in Sources */,
 				17AF59C0F1E9A271E778E6D0 /* EditView.swift in Sources */,
 				5493C4CC8FDB1E69B44B6327 /* EventStore.swift in Sources */,
@@ -193,11 +294,20 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		CC37A65FB75FF77810CB2DC2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F53E9467DC4C97C25687EDBC /* NumberOurDaysWidget */;
+			targetProxy = 07329DB734FC194F0628869D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		0BA914B2D5054037F7906AEC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = NumberOurDays/NumberOurDays.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = XH8FSCQ9WR;
@@ -225,6 +335,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = NumberOurDays/NumberOurDays.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = XH8FSCQ9WR;
@@ -282,7 +393,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -313,6 +424,66 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		33D28F649CF7C11AFF19605B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NumberOurDaysWidget/NumberOurDaysWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = XH8FSCQ9WR;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/../shared/build/xcode-frameworks",
+					"\"../shared/build/xcode-frameworks\"",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = NumberOurDaysWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.numberourdays.app.widget;
+				PRODUCT_NAME = NumberOurDaysWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E102E31B26C065284C6ED4E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NumberOurDaysWidget/NumberOurDaysWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = XH8FSCQ9WR;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/../shared/build/xcode-frameworks",
+					"\"../shared/build/xcode-frameworks\"",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = NumberOurDaysWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.numberourdays.app.widget;
+				PRODUCT_NAME = NumberOurDaysWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
 		};
 		E22E34EFFAA27A9C607CD652 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -348,7 +519,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -376,6 +547,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		48845CBBC952AA799A4E0B9A /* Build configuration list for PBXNativeTarget "NumberOurDaysWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33D28F649CF7C11AFF19605B /* Debug */,
+				E102E31B26C065284C6ED4E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		535ADCE6D2605F43DB6C732E /* Build configuration list for PBXProject "NumberOurDays" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
