@@ -1,20 +1,20 @@
 import Foundation
 import Shared
 
-/// Local JSON store. Domain math stays in the KMP `Shared` module.
+/// Local store backed by App Group so WidgetKit can read the same events.
+/// Domain math stays in the KMP `Shared` module.
 @MainActor
 final class EventStore: ObservableObject {
     @Published private(set) var events: [DayEvent] = []
     @Published var message: String?
 
-    private let fileURL: URL
     private let seededKey = "nod.demo_seeded.v2"
 
     init() {
-        let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        fileURL = dir.appendingPathComponent("nod-events.json")
         load()
         seedIfNeeded()
+        // Ensure widget can always see current data (covers first install / migration).
+        persist(force: true)
     }
 
     func display(for event: DayEvent) -> DayEventDisplay {
@@ -35,13 +35,13 @@ final class EventStore: ObservableObject {
         } else {
             events.append(event)
         }
-        save()
+        persist()
         Task { ReminderScheduler.shared.schedule(event: event) }
     }
 
     func remove(id: String) {
         events.removeAll { $0.id == id }
-        save()
+        persist()
         Task { ReminderScheduler.shared.cancel(id: id) }
     }
 
@@ -49,7 +49,7 @@ final class EventStore: ObservableObject {
         let ids = events.map { $0.id }
         events = []
         UserDefaults.standard.set(true, forKey: seededKey)
-        save()
+        persist()
         Task { ReminderScheduler.shared.cancelAll(ids: ids) }
     }
 
@@ -80,7 +80,7 @@ final class EventStore: ObservableObject {
         } else {
             events = Array(DayEventCodec.shared.merge(local: events, incoming: incoming))
         }
-        save()
+        persist()
         if let note, !note.isEmpty { message = note }
     }
 
@@ -126,25 +126,46 @@ final class EventStore: ObservableObject {
     }
 
     private func load() {
-        guard let data = try? Data(contentsOf: fileURL), !data.isEmpty else { return }
-        let text = String(decoding: data, as: UTF8.self)
-        let pair = DayEventCodec.shared.parseBackup(text: text)
-        if let list = pair.first as? [DayEvent], !list.isEmpty {
-            events = list
+        // Prefer App Group storage for widget visibility.
+        if let text = AppGroup.loadEventsJSON(), !text.isEmpty {
+            let pair = DayEventCodec.shared.parseBackup(text: text)
+            if let list = pair.first as? [DayEvent], !list.isEmpty {
+                events = list
+                return
+            }
+        }
+        // Legacy documents migration
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("nod-events.json")
+        if let data = try? Data(contentsOf: docs), !data.isEmpty {
+            let text = String(decoding: data, as: UTF8.self)
+            let pair = DayEventCodec.shared.parseBackup(text: text)
+            if let list = pair.first as? [DayEvent], !list.isEmpty {
+                events = list
+                AppGroup.saveEventsJSON(text)
+            }
         }
     }
 
-    private func save() {
+    private func persist(force: Bool = false) {
         let text = DayEventCodec.shared.serialize(events: events)
-        try? text.data(using: .utf8)?.write(to: fileURL, options: .atomic)
+        AppGroup.saveEventsJSON(text)
+        if force || !events.isEmpty {
+            AppGroup.reloadWidgets()
+        }
     }
 
     private func seedIfNeeded() {
+        // Re-seed if shared storage is empty (e.g. reinstall / App Group not ready yet).
+        if events.isEmpty, !AppGroup.hasEventsJSON() {
+            events = DemoEvents.shared.create(now: Int64(Date().timeIntervalSince1970 * 1000))
+            UserDefaults.standard.set(true, forKey: seededKey)
+            return
+        }
         guard !UserDefaults.standard.bool(forKey: seededKey) else { return }
         if events.isEmpty {
             events = DemoEvents.shared.create(now: Int64(Date().timeIntervalSince1970 * 1000))
         }
         UserDefaults.standard.set(true, forKey: seededKey)
-        save()
     }
 }

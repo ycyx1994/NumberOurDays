@@ -3,6 +3,8 @@ import Shared
 
 struct HomeView: View {
     @ObservedObject var store: EventStore
+    @Binding var deepLinkEventId: String?
+    @Binding var deepLinkHolidays: Bool
     @State private var path = NavigationPath()
     @State private var showSettings = false
     @State private var showAdd = false
@@ -101,6 +103,20 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showHolidays) {
                 HolidayListView()
+            }
+            .onChange(of: deepLinkEventId) { newValue in
+                guard let id = newValue, store.event(id: id) != nil else { return }
+                path = NavigationPath()
+                path.append(id)
+                deepLinkEventId = nil
+            }
+            .onChange(of: deepLinkHolidays) { open in
+                guard open else { return }
+                showHolidays = true
+                deepLinkHolidays = false
+            }
+            .onChange(of: showHolidays) { open in
+                if open { deepLinkHolidays = false }
             }
             .overlay(alignment: .bottomTrailing) {
                 GlassAddButton {
