@@ -4,6 +4,10 @@ import Shared
 struct DetailView: View {
     @ObservedObject var store: EventStore
     let eventId: String
+    /// 提供后在详情栏工具栏挂 + 号（内屏右缘竖栏 / 推入态顶部栏）。
+    var onAdd: (() -> Void)? = nil
+    /// 删除后由宿主清掉双栏选中态（NavigationSplitView detail 列没有可 pop 的栈）。
+    var onDeleted: (() -> Void)? = nil
     @State private var unit: DurationUnit = .day
     @State private var showEdit = false
     @State private var showDeleteConfirm = false
@@ -60,7 +64,11 @@ struct DetailView: View {
                     .confirmationDialog("删除后无法恢复，确定删除吗？", isPresented: $showDeleteConfirm, titleVisibility: .visible) {
                         Button("删除", role: .destructive) {
                             store.remove(id: eventId)
-                            dismiss()
+                            if let onDeleted {
+                                onDeleted()
+                            } else {
+                                dismiss()
+                            }
                         }
                         Button("取消", role: .cancel) {}
                     }
@@ -76,8 +84,15 @@ struct DetailView: View {
         .navigationTitle(event?.title ?? "详情")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            if let onAdd {
+                AddEventToolbarItem(action: onAdd)
+            }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("编辑") { showEdit = true }
+                Button {
+                    showEdit = true
+                } label: {
+                    Label("编辑", systemImage: "pencil")
+                }
             }
         }
         .sheet(isPresented: $showEdit) {

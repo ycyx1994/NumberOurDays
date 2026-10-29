@@ -84,10 +84,28 @@ struct EditView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("取消") { dismiss() }
+                    Button {
+                        dismiss()
+                    } label: {
+                        Label("取消", systemImage: "xmark")
+                    }
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") { save() }
+                if #available(iOS 27.0, *) {
+                    ToolbarItem(placement: .topBarPinnedTrailing) {
+                        Button {
+                            save()
+                        } label: {
+                            Label("保存", systemImage: "checkmark")
+                        }
+                    }
+                } else {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button {
+                            save()
+                        } label: {
+                            Label("保存", systemImage: "checkmark")
+                        }
+                    }
                 }
             }
             .onAppear(perform: loadExisting)

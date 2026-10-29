@@ -80,8 +80,22 @@ struct HolidayListView: View {
             .navigationTitle("法定假日")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("完成") { dismiss() }
+                if #available(iOS 27.0, *) {
+                    ToolbarItem(placement: .topBarPinnedTrailing) {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Label("完成", systemImage: "checkmark")
+                        }
+                    }
+                } else {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Label("完成", systemImage: "checkmark")
+                        }
+                    }
                 }
             }
         }

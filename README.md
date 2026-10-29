@@ -13,6 +13,7 @@
 - 法定假日倒数与列表（无假期时置灰入口）
 - 本地提醒：Android 精确闹钟；iOS 本地通知
 - 桌面小组件（Android）
+- iOS 适配折叠屏 iPhone Duo（内屏双栏、侧边垂直工具栏），见 `iosApp/README.md`
 
 ## 工程结构
 

@@ -5,10 +5,12 @@ struct HomeView: View {
     @ObservedObject var store: EventStore
     @Binding var deepLinkEventId: String?
     @Binding var deepLinkHolidays: Bool
-    @State private var path = NavigationPath()
+    @State private var selectedId: String?
     @State private var showSettings = false
     @State private var showAdd = false
     @State private var showHolidays = false
+    /// iPhone Duo 外屏为紧凑宽度，内屏为常规宽度；主卡高度据此调整。
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     private var displays: [DayEventDisplay] { store.sortedDisplays() }
 
@@ -19,6 +21,133 @@ struct HomeView: View {
         )
     }
 
+    var body: some View {
+        NavigationSplitView {
+            sidebar
+        } detail: {
+            detail
+        }
+        .tint(NodTheme.accent)
+        .sheet(isPresented: $showSettings) {
+            SettingsView(store: store)
+        }
+        .sheet(isPresented: $showAdd) {
+            EditView(store: store, eventId: nil)
+        }
+        .sheet(isPresented: $showHolidays) {
+            HolidayListView()
+        }
+        .onChange(of: deepLinkEventId) { newValue in
+            guard let id = newValue, store.event(id: id) != nil else { return }
+            selectedId = id
+            deepLinkEventId = nil
+        }
+        .onChange(of: deepLinkHolidays) { open in
+            guard open else { return }
+            showHolidays = true
+            deepLinkHolidays = false
+        }
+        .onChange(of: showHolidays) { open in
+            if open { deepLinkHolidays = false }
+        }
+        .onChange(of: store.events.count) { _ in
+            if let id = selectedId, store.event(id: id) == nil {
+                selectedId = nil
+            }
+        }
+    }
+
+    // MARK: - Sidebar (list column; the only column on compact width)
+
+    private var sidebar: some View {
+        List(selection: $selectedId) {
+            if !displays.isEmpty {
+                Section {
+                    heroCarousel
+                        .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 0, trailing: 16))
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                }
+            }
+
+            Section {
+                holidayEntry
+                    .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 4, trailing: 16))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+            }
+
+            Section {
+                ForEach(displays, id: \.id) { item in
+                    EventRow(display: item) {
+                        store.toggleStar(id: item.id)
+                    }
+                    .tag(item.id)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparatorTint(NodTheme.n100)
+                }
+            } header: {
+                Text("全部纪念日")
+                    .font(.system(size: 13))
+                    .foregroundStyle(NodTheme.n500)
+                    .textCase(nil)
+                    .padding(.top, 8)
+            }
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(NodTheme.n0)
+        .navigationTitle("数日子")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showSettings = true
+                } label: {
+                    Label("设置", systemImage: "gearshape")
+                }
+            }
+            // 紧凑宽度（直板机 / Duo 外屏）：+ 挂侧栏工具栏——直板机进顶部导航栏，
+            // Duo 外屏由系统排入右缘竖栏。常规宽度（Duo 内屏）双栏同屏，+ 由详情栏
+            // 承接（见 detail），此处不渲染以免重复。
+            if sizeClass != .regular {
+                AddEventToolbarItem {
+                    showAdd = true
+                }
+            }
+        }
+    }
+
+    private var heroCarousel: some View {
+        VStack(spacing: 12) {
+            TabView {
+                ForEach(displays, id: \.id) { item in
+                    EventHeroCard(display: item)
+                        .onTapGesture {
+                            selectedId = item.id
+                        }
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height: heroHeight)
+            .background(NodTheme.n50)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+
+            HStack(spacing: 6) {
+                ForEach(Array(displays.indices.prefix(6)), id: \.self) { i in
+                    Capsule()
+                        .fill(i == 0 ? NodTheme.n700 : NodTheme.n300)
+                        .frame(width: i == 0 ? 18 : 6, height: 6)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    /// iPhone Duo 外屏为紧凑宽度（220），内屏为常规宽度，加高主卡让大屏不空旷。
+    private var heroHeight: CGFloat { sizeClass == .regular ? 280 : 220 }
+
     private var holidayEntry: some View {
         Button {
             showHolidays = true
@@ -28,185 +157,62 @@ struct HomeView: View {
         .buttonStyle(.plain)
     }
 
-    var body: some View {
-        NavigationStack(path: $path) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    if !displays.isEmpty {
-                        TabView {
-                            ForEach(displays, id: \.id) { item in
-                                EventHeroCard(display: item)
-                                    .onTapGesture {
-                                        path.append(item.id)
-                                    }
-                            }
-                        }
-                        .tabViewStyle(.page(indexDisplayMode: .never))
-                        .frame(height: 220)
-                        .background(NodTheme.n50)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+    // MARK: - Detail column (regular width: side-by-side; compact width: pushed)
 
-                        HStack(spacing: 6) {
-                            ForEach(Array(displays.indices.prefix(6)), id: \.self) { i in
-                                Capsule()
-                                    .fill(i == 0 ? NodTheme.n700 : NodTheme.n300)
-                                    .frame(width: i == 0 ? 18 : 6, height: 6)
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
+    @ViewBuilder
+    private var detail: some View {
+        if let id = selectedId, store.event(id: id) != nil {
+            DetailView(store: store, eventId: id, onAdd: { showAdd = true }) {
+                selectedId = nil
+            }
+            .id(id)
+        } else {
+            placeholder
+        }
+    }
 
-                    holidayEntry
-                        .padding(.top, 8)
-
-                    Text("全部纪念日")
-                        .font(.system(size: 13))
-                        .foregroundStyle(NodTheme.n500)
-                        .padding(.top, 8)
-
-                    VStack(spacing: 0) {
-                        ForEach(displays, id: \.id) { item in
-                            EventRow(display: item) {
-                                path.append(item.id)
-                            } onToggle: {
-                                store.toggleStar(id: item.id)
-                            }
-                            if item.id != displays.last?.id {
-                                Divider().background(NodTheme.n100)
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 96)
-            }
-            .background(NodTheme.n0)
-            .navigationDestination(for: String.self) { id in
-                DetailView(store: store, eventId: id)
-            }
-            .navigationTitle("数日子")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showSettings = true
-                    } label: {
-                        Image(systemName: "gearshape")
-                    }
-                }
-            }
-            .sheet(isPresented: $showSettings) {
-                SettingsView(store: store)
-            }
-            .sheet(isPresented: $showAdd) {
-                EditView(store: store, eventId: nil)
-            }
-            .sheet(isPresented: $showHolidays) {
-                HolidayListView()
-            }
-            .onChange(of: deepLinkEventId) { newValue in
-                guard let id = newValue, store.event(id: id) != nil else { return }
-                path = NavigationPath()
-                path.append(id)
-                deepLinkEventId = nil
-            }
-            .onChange(of: deepLinkHolidays) { open in
-                guard open else { return }
-                showHolidays = true
-                deepLinkHolidays = false
-            }
-            .onChange(of: showHolidays) { open in
-                if open { deepLinkHolidays = false }
-            }
-            .overlay(alignment: .bottomTrailing) {
-                GlassAddButton {
-                    showAdd = true
-                }
-                .padding(24)
+    private var placeholder: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "calendar")
+                .font(.system(size: 34, weight: .light))
+                .foregroundStyle(NodTheme.n300)
+            Text("选择一个纪念日")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(NodTheme.n700)
+            Text("在左侧列表里点一条查看详情")
+                .font(.system(size: 12))
+                .foregroundStyle(NodTheme.n500)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(NodTheme.n0)
+        .toolbar {
+            AddEventToolbarItem {
+                showAdd = true
             }
         }
     }
 }
 
-/// iOS add FAB: official Liquid Glass on iOS 26+, material fallback below.
-struct GlassAddButton: View {
-    var action: () -> Void
-    @State private var pressed = false
+/// + 号工具栏项：统一控件。系统按屏幕形态呈现——直板机进顶部导航栏，
+/// Duo 外屏/内屏进右缘竖栏（标准工具栏项会被系统自动排到侧边）。
+struct AddEventToolbarItem: ToolbarContent {
+    let action: () -> Void
 
-    var body: some View {
-        Button {
-            action()
-        } label: {
-            content
-                .scaleEffect(pressed ? 0.94 : 1)
-                .animation(.spring(response: 0.28, dampingFraction: 0.72), value: pressed)
-        }
-        .buttonStyle(.plain)
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in pressed = true }
-                .onEnded { _ in pressed = false }
-        )
-        .accessibilityLabel("添加纪念日")
-    }
-
-    @ViewBuilder
-    private var content: some View {
-        if #available(iOS 26.0, *) {
-            Label("添加纪念日", systemImage: "plus")
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(.white)
-                .labelStyle(.iconOnly)
-                .frame(width: 60, height: 60)
-                .glassEffect(.regular.tint(NodTheme.accent), in: .circle)
+    var body: some ToolbarContent {
+        if #available(iOS 27.0, *) {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: action) {
+                    Label("添加纪念日", systemImage: "plus")
+                }
+            }
+            .visibilityPriority(.high)
         } else {
-            legacyGlass
-        }
-    }
-
-    private var legacyGlass: some View {
-        ZStack {
-            Circle()
-                .fill(.ultraThinMaterial)
-                .overlay {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    NodTheme.accent.opacity(0.92),
-                                    NodTheme.accent.opacity(0.72),
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .blendMode(.plusLighter)
-                        .opacity(0.85)
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: action) {
+                    Label("添加纪念日", systemImage: "plus")
                 }
-                .overlay {
-                    Circle()
-                        .stroke(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.55),
-                                    Color.white.opacity(0.08),
-                                    Color.white.opacity(0.28),
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            lineWidth: 1
-                        )
-                }
-                .shadow(color: NodTheme.accent.opacity(0.35), radius: pressed ? 4 : 14, y: pressed ? 2 : 8)
-                .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
-
-            Image(systemName: "plus")
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(.white)
-                .shadow(color: .black.opacity(0.15), radius: 1, y: 0.5)
+            }
         }
-        .frame(width: 60, height: 60)
     }
 }
 
@@ -263,7 +269,6 @@ private struct EventHeroCard: View {
 
 private struct EventRow: View {
     let display: DayEventDisplay
-    let onOpen: () -> Void
     let onToggle: () -> Void
 
     var body: some View {
@@ -272,6 +277,7 @@ private struct EventRow: View {
                 Image(systemName: display.starred ? "star.fill" : "star")
                     .foregroundStyle(display.starred ? NodTheme.accent : NodTheme.n300)
             }
+            .buttonStyle(.plain)
             .frame(width: 40, height: 40)
 
             VStack(alignment: .leading, spacing: 4) {
@@ -291,7 +297,6 @@ private struct EventRow: View {
         }
         .padding(.vertical, 12)
         .contentShape(Rectangle())
-        .onTapGesture(perform: onOpen)
     }
 
     private var subtitle: String {
