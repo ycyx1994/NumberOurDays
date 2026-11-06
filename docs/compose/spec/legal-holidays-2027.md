@@ -3,20 +3,25 @@ feature: legal-holidays-2027
 status: delivered
 updated: 2026-11-06
 branch: feature/legal-holidays-2027
-commits: 63a64f5..7ba7bc1
+commits: 63a64f5..c491659
 ---
 
 # 法定假日模块支持 2027 年
 
 ## Report
 
-**What was built** — `LegalHolidays` 增补 2027 年国务院七段放假区间（国办发明电〔2026〕10号），`periods()` 改为 `Y2026 + Y2027` 共 14 段；Android 首页/假日列表/桌面 widget、iOS 首页/假日页/WidgetKit、微信小程序全部经由 `periods()` 取数，自动获得 2027 倒数目标，表尾（2027-10-07）之后仍返回 null 隐藏入口。测试适配 14 段并新增跨年倒数、春节 9 天、端午/中秋单日、2027 覆盖四组断言；同名假日（春节/端午/中秋）的 `first {}` 断言加年份过滤，避免绑定到错误年份。weapp bundle 重建同步同一张表，构建脚本在 minify 后把裸 `require('@js-joda/core')` 改写为 `require('./@js-joda/core.js')`（此前 Node smoke 直接 `MODULE_NOT_FOUND`），并跳过已压缩的 `@js-joda/*`；smoke 增补两条 2027 断言。
+**What was built** — `LegalHolidays` 增补 2027 年国务院七段放假区间（国办发明电〔2026〕10号），`periods()` 改为 `Y2026 + Y2027` 共 14 段；Android 首页/假日列表/桌面 widget、iOS 首页/假日页/WidgetKit、微信小程序全部经由 `periods()` 取数，自动获得 2027 倒数目标，表尾（2027-10-07）之后仍返回 null 隐藏入口。
+
+数据跨年后假日名不再唯一，假期列表改为**按年分组 + 可折叠**（见 S2.5）：`HolidayCalculator.yearGroups()` 产出 `HolidayYearGroup`，已过完的年份默认收起；三端列表的行 key 一律带放假首日，修掉了 iOS `ForEach` 因重名撞 identity 导致中段漏画、下段重复的缺陷（小程序 `wx:key="name"` 同款问题一并修）。Android 箭头改用 Material 图标（文本字符 `▾` 太小），iOS 年份改 `Text(verbatim:)` 避免 `2,027` 千分位。
+
+测试适配 14 段并新增跨年倒数、春节 9 天、端午/中秋单日、2027 覆盖、以及 4 组 `yearGroups` 断言；同名假日的 `first {}` 断言加年份过滤。weapp bundle 重建同步同一张表，构建脚本在 minify 后把裸 `require('@js-joda/core')` 改写为 `require('./@js-joda/core.js')`（此前 Node smoke 直接 `MODULE_NOT_FOUND`），并跳过已压缩的 `@js-joda/*`。
 
 **Verification** —
-- `:shared:jvmTest` — PASS — 49 tests, 0 failures（HolidayCalculatorTest 15 例）
-- `:shared:compileDebugKotlinAndroid` — PASS
-- `:app:testDebugUnitTest` — PASS
-- `node scripts/weapp-smoke.js` — PASS — 含新增两条假日断言
+- `:shared:jvmTest` — PASS — 53 tests, 0 failures（HolidayCalculatorTest 19 例）
+- `:app:testDebugUnitTest` / `:app:assembleDebug` — PASS
+- `node scripts/weapp-smoke.js` — PASS — 含 2027 倒数 / 14 行 / 分组顺序三条断言
+- iOS `xcodebuild` 真机构建 — PASS，已装机验证
+- Android 真机 `adb install` — Success
 - Independent review (general-1) — PASS — 0 critical，2 non-critical
 
 ## [S1] Problem
@@ -75,18 +80,31 @@ commits: 63a64f5..7ba7bc1
 | vendored shim | `@js-joda/*` 为已压缩的第三方产物，跳过 terser，避免二次压缩破坏 |
 | smoke | `scripts/weapp-smoke.js` 增加两条断言：`holidayCountdown('2026-10-08')` 命中 2027 元旦（start `2027-01-01`）；`holidayList('2026-10-08')` 返回 14 行 |
 
+### S2.5 年份分组列表（三端）
+
+数据表跨年后假日名不再唯一（2026/2027 各有一套元旦…国庆），列表按年分组并解决 identity。
+
+| 契约 | 行为 |
+|---|---|
+| 分组 | `HolidayCalculator.yearGroups()`：按放假首日所在年分组，一年一组 → `HolidayYearGroup(year, rows, allPast)` |
+| 组内顺序 | 保持 `listRows` 顺序（进行中 → 未到 → 已过） |
+| 组间顺序 | 仍有未结束段的年份在上（最近放假首日优先）；全部已过的年份沉底（最近的年份在前） |
+| 默认折叠 | `allPast` 的年份默认收起，点年份标题切换展开/收起 |
+| 行 identity | key 必须带放假首日：iOS `name@start`、Android `name + start`、小程序 `wx:key="start"`。只用 name 会撞 identity——iOS 的 `LazyVStack` 会漏画中段、下段重复 |
+| 箭头 | 展开/收起指示：Android 用 Material `KeyboardArrowDown` / `KeyboardArrowRight`（20.dp）；iOS 用 SF Symbol `chevron.down` / `chevron.right` |
+| 整数渲染 | 年份等整数进 `Text` 须用 `Text(verbatim:)`：SwiftUI 字符串字面量插值走 `LocalizedStringKey`，会给 2027 加千分位显示成 2,027 |
+
 ## [S3] Out of Scope
 
-- **按年分组 API（`yearGroups` / `HolidayYearGroup`）**：上一轮遗留的半截改动已按要求整体撤掉，本次不引入任何新 API。
 - iOS `project.yml` scheme / `xcshareddata` xcscheme 配置：与假日无关，不动。
-- Android / iOS / 小程序 UI 与 widget 布局：消费方读 `periods()` 即自动生效，无需改。
-- 2028 年数据、调休上班日建模、按年折叠列表 UI。
+- 2028 年数据、调休上班日建模。
 
 ## Tasks
 
 - [x] T1: `LegalHolidays` 新增 `Y2027` 七段并接入 `periods()` — acceptance: `periods()` 返回 14 段，2027 各段起止日期与 S2.1 表逐格一致，2026 数据零改动 (covers: S2.1, S2.2)
 - [x] T2: `HolidayCalculatorTest` 适配 14 段并补 2027 专项断言 — acceptance: `:shared:jvmTest` 全绿，含跨年倒数、春节 9 天、端午/中秋单日 (covers: S2.3)
 - [x] T3: 重建 weapp bundle 并补 smoke 断言 — acceptance: `node scripts/weapp-smoke.js` 通过，两条假日断言命中 2027；bundle 内可见 2027 区间 (covers: S2.4)
+- [x] T4: 三端年份分组列表 + 可折叠 — acceptance: `yearGroups` 排序/`allPast` 有单测；iOS/Android/小程序均可展开收起且已过年份默认收起；行 key 带放假首日 (covers: S2.5)
 
 ## Journey log
 
