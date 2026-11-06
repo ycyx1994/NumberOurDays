@@ -1,13 +1,23 @@
 ---
 feature: legal-holidays-2027
-status: in-progress
+status: delivered
 updated: 2026-11-06
 branch: feature/legal-holidays-2027
+commits: 63a64f5..7ba7bc1
 ---
 
 # 法定假日模块支持 2027 年
 
 ## Report
+
+**What was built** — `LegalHolidays` 增补 2027 年国务院七段放假区间（国办发明电〔2026〕10号），`periods()` 改为 `Y2026 + Y2027` 共 14 段；Android 首页/假日列表/桌面 widget、iOS 首页/假日页/WidgetKit、微信小程序全部经由 `periods()` 取数，自动获得 2027 倒数目标，表尾（2027-10-07）之后仍返回 null 隐藏入口。测试适配 14 段并新增跨年倒数、春节 9 天、端午/中秋单日、2027 覆盖四组断言；同名假日（春节/端午/中秋）的 `first {}` 断言加年份过滤，避免绑定到错误年份。weapp bundle 重建同步同一张表，构建脚本在 minify 后把裸 `require('@js-joda/core')` 改写为 `require('./@js-joda/core.js')`（此前 Node smoke 直接 `MODULE_NOT_FOUND`），并跳过已压缩的 `@js-joda/*`；smoke 增补两条 2027 断言。
+
+**Verification** —
+- `:shared:jvmTest` — PASS — 49 tests, 0 failures（HolidayCalculatorTest 15 例）
+- `:shared:compileDebugKotlinAndroid` — PASS
+- `:app:testDebugUnitTest` — PASS
+- `node scripts/weapp-smoke.js` — PASS — 含新增两条假日断言
+- Independent review (general-1) — PASS — 0 critical，2 non-critical
 
 ## [S1] Problem
 
@@ -74,10 +84,12 @@ branch: feature/legal-holidays-2027
 
 ## Tasks
 
-- [ ] T1: `LegalHolidays` 新增 `Y2027` 七段并接入 `periods()` — acceptance: `periods()` 返回 14 段，2027 各段起止日期与 S2.1 表逐格一致，2026 数据零改动 (covers: S2.1, S2.2)
-- [ ] T2: `HolidayCalculatorTest` 适配 14 段并补 2027 专项断言 — acceptance: `:shared:jvmTest` 全绿，含跨年倒数、春节 9 天、端午/中秋单日 (covers: S2.3)
-- [ ] T3: 重建 weapp bundle 并补 smoke 断言 — acceptance: `node scripts/weapp-smoke.js` 通过，两条假日断言命中 2027；bundle 内可见 2027 区间 (covers: S2.4)
+- [x] T1: `LegalHolidays` 新增 `Y2027` 七段并接入 `periods()` — acceptance: `periods()` 返回 14 段，2027 各段起止日期与 S2.1 表逐格一致，2026 数据零改动 (covers: S2.1, S2.2)
+- [x] T2: `HolidayCalculatorTest` 适配 14 段并补 2027 专项断言 — acceptance: `:shared:jvmTest` 全绿，含跨年倒数、春节 9 天、端午/中秋单日 (covers: S2.3)
+- [x] T3: 重建 weapp bundle 并补 smoke 断言 — acceptance: `node scripts/weapp-smoke.js` 通过，两条假日断言命中 2027；bundle 内可见 2027 区间 (covers: S2.4)
 
 ## Journey log
 
 - 上一轮把 `yearGroups` 插进 `HolidayCalculator.kt` 时吃掉了 `listRows` 的 `sortedWith(...)` 收尾和 `HolidayListRow` 的类声明，文件直接编译不过。教训：往 `object` 内插入新 fun 时要整块检查花括号配平；半截 API 与其带崩整个文件，不如整段撤掉重来。
+- 假日表跨年后 `first { it.name == "春节" }` 这类断言会静默绑到错误年份（`listRows_past_showsDaysPastEnd` 尤其危险：`first` 会命中 2027 端午而非已过的 2026 端午，断言直接红）。带年份的假日断言一律加 `start.year` 过滤。
+- Kotlin/JS 新产出会带裸 `require('@js-joda/core')`，Node 与微信都解析不到（实测 `MODULE_NOT_FOUND`）；必须在 terser 之后改写为 `require('./@js-joda/core.js')`——放在 minify 之前会被 terser 重新引号化而失配。另：`listRows` 的 past 段按 `start` 倒序而非 `end` 倒序，注释写的是「最近结束的在最前」；因放假区间互不重叠，两序恒等，行为无差，但注释措辞与比较器不一致，将来若引入重叠区间需回头改。
