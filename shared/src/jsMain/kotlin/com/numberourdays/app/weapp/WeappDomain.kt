@@ -107,6 +107,13 @@ object WeappDomain {
         return """{"name":"$name","start":"$start","end":"$end","status":"${c.status.name}","daysUntilStart":${c.daysUntilStart},"label":"$label"}"""
     }
 
+    private fun rowJson(row: com.numberourdays.app.domain.HolidayListRow): String {
+        val name = row.period.name.replace("\"", "\\\"")
+        val start = DateCalculator.format(row.period.start)
+        val end = DateCalculator.format(row.period.end)
+        return """{"name":"$name","start":"$start","end":"$end","ongoing":${row.ongoing},"past":${row.past},"daysUntilStart":${row.daysUntilStart},"daysPastEnd":${row.daysPastEnd},"vacationDays":${row.vacationDays}}"""
+    }
+
     /** Full legal-holiday rows for the list page. */
     fun holidayListJson(todayIso: String = today()): String {
         val ref = DateCalculator.parse(todayIso) ?: DateCalculator.today()
@@ -114,11 +121,22 @@ object WeappDomain {
             com.numberourdays.app.data.LegalHolidays.periods(),
             ref,
         )
-        return rows.joinToString(",", prefix = "[", postfix = "]") { row ->
-            val name = row.period.name.replace("\"", "\\\"")
-            val start = DateCalculator.format(row.period.start)
-            val end = DateCalculator.format(row.period.end)
-            """{"name":"$name","start":"$start","end":"$end","ongoing":${row.ongoing},"past":${row.past},"daysUntilStart":${row.daysUntilStart},"daysPastEnd":${row.daysPastEnd},"vacationDays":${row.vacationDays}}"""
+        return rows.joinToString(",", prefix = "[", postfix = "]") { rowJson(it) }
+    }
+
+    /**
+     * Legal-holiday rows grouped per calendar year for the list page.
+     * Shape: [{ year, allPast, rows: [<row>] }]
+     */
+    fun holidayGroupsJson(todayIso: String = today()): String {
+        val ref = DateCalculator.parse(todayIso) ?: DateCalculator.today()
+        val groups = com.numberourdays.app.domain.HolidayCalculator.yearGroups(
+            com.numberourdays.app.data.LegalHolidays.periods(),
+            ref,
+        )
+        return groups.joinToString(",", prefix = "[", postfix = "]") { g ->
+            val rows = g.rows.joinToString(",", prefix = "[", postfix = "]") { rowJson(it) }
+            """{"year":${g.year},"allPast":${g.allPast},"rows":$rows}"""
         }
     }
 

@@ -63,5 +63,18 @@ if (!Array.isArray(holidayRows) || holidayRows.length !== 14) {
   console.error('FAIL holidayList expected 14 rows got', holidayRows && holidayRows.length)
   process.exit(1)
 }
+const groups = adapter.holidayGroups('2026-11-06')
+if (!Array.isArray(groups) || groups.length !== 2) {
+  console.error('FAIL holidayGroups expected 2 groups got', groups)
+  process.exit(1)
+}
+if (groups[0].year !== 2027 || groups[0].allPast !== false || groups[0].rows.length !== 7) {
+  console.error('FAIL holidayGroups[0] expected 2027 live 7 rows got', groups[0] && { y: groups[0].year, p: groups[0].allPast, n: groups[0].rows && groups[0].rows.length })
+  process.exit(1)
+}
+if (groups[1].year !== 2026 || groups[1].allPast !== true) {
+  console.error('FAIL holidayGroups[1] expected 2026 allPast got', groups[1] && { y: groups[1].year, p: groups[1].allPast })
+  process.exit(1)
+}
 console.log('smoke ok', displays[0].label, 'dur', dur)
 

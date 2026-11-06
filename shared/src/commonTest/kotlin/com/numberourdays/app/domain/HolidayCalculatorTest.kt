@@ -5,6 +5,7 @@ import com.numberourdays.app.data.LegalHolidays
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -143,5 +144,40 @@ class HolidayCalculatorTest {
         val duanwu = rows.first { it.period.name == "端午节" && it.period.start.year == 2026 }
         assertTrue(duanwu.past)
         assertEquals(95, duanwu.daysPastEnd)
+    }
+
+    @Test
+    fun yearGroups_oneGroupPerYear() {
+        val groups = HolidayCalculator.yearGroups(LegalHolidays.periods(), LocalDate(2026, 9, 24))
+        assertEquals(2, groups.size)
+        assertEquals(listOf(2026, 2027), groups.map { it.year })
+        assertEquals(listOf(7, 7), groups.map { it.rows.size })
+    }
+
+    @Test
+    fun yearGroups_pastYearLastAndFlaggedAllPast() {
+        val groups = HolidayCalculator.yearGroups(LegalHolidays.periods(), LocalDate(2026, 11, 6))
+        assertEquals(listOf(2027, 2026), groups.map { it.year })
+        assertFalse(groups[0].allPast)
+        assertTrue(groups[1].allPast)
+    }
+
+    @Test
+    fun yearGroups_liveYears_nearestLiveBlockFirst() {
+        val groups = HolidayCalculator.yearGroups(LegalHolidays.periods(), LocalDate(2026, 9, 24))
+        assertEquals(listOf(2026, 2027), groups.map { it.year })
+        assertTrue(groups.none { it.allPast })
+        assertEquals("中秋节", groups[0].rows.first { !it.past }.period.name)
+        assertEquals("元旦", groups[1].rows.first { !it.past }.period.name)
+    }
+
+    @Test
+    fun yearGroups_rowsKeepListRowsOrder() {
+        val y2026 = HolidayCalculator.yearGroups(LegalHolidays.periods(), LocalDate(2026, 11, 6))
+            .first { it.year == 2026 }
+        assertEquals("国庆节", y2026.rows.first().period.name)
+        assertEquals(LocalDate(2026, 10, 1), y2026.rows.first().period.start)
+        assertEquals("元旦", y2026.rows.last().period.name)
+        assertEquals(LocalDate(2026, 1, 1), y2026.rows.last().period.start)
     }
 }

@@ -4,6 +4,7 @@
 .idea/
 build/
 app/build/
+iosApp/build-dd/
 local.properties
 captures/
 .externalNativeBuild/

@@ -83,7 +83,7 @@
     <string name="holiday_none_hint">点我查看放假安排</string>
     <string name="holiday_next">下一个 · 法定假日</string>
     <string name="holiday_list_title">法定假日</string>
-    <string name="holiday_year_title">%1$d 年法定节假日</string>
+    <string name="holiday_year_group">%1$d 年</string>
     <string name="holiday_vacation_days">放假 %1$d 天</string>
     <string name="holiday_past">已过</string>
     <string name="holiday_elapsed">已过 %1$d 天</string>

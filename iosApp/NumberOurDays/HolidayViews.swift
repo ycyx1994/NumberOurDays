@@ -59,19 +59,39 @@ struct HolidayEntryCard: View {
 struct HolidayListView: View {
     @Environment(\.dismiss) private var dismiss
 
-    private var rows: [HolidayListRow] {
-        HolidayCalculator.shared.listRows(
+    private let groups: [HolidayYearGroup]
+    /// 已过完的年份默认收起
+    @State private var collapsedYears: Set<Int>
+
+    init() {
+        let groups = HolidayCalculator.shared.yearGroups(
             periods: LegalHolidays.shared.periods(),
             today: DateCalculator.shared.today(),
         )
+        self.groups = groups
+        _collapsedYears = State(initialValue: Set(groups.filter { $0.allPast }.map { Int($0.year) }))
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack(spacing: 8) {
-                    ForEach(rows, id: \.period.name) { row in
-                        HolidayRowView(row: row)
+                    ForEach(groups, id: \.year) { group in
+                        let year = Int(group.year)
+                        let expanded = !collapsedYears.contains(year)
+
+                        YearGroupHeader(year: year, expanded: expanded) {
+                            if expanded {
+                                collapsedYears.insert(year)
+                            } else {
+                                collapsedYears.remove(year)
+                            }
+                        }
+                        if expanded {
+                            ForEach(group.rows, id: \.identity) { row in
+                                HolidayRowView(row: row)
+                            }
+                        }
                     }
                 }
                 .padding(16)
@@ -102,6 +122,35 @@ struct HolidayListView: View {
     }
 }
 
+/// 假日名会跨年重复（2026/2027 各有一套元旦…国庆），identity 必须带上放假首日才唯一。
+private extension HolidayListRow {
+    var identity: String { "\(period.name)@\(period.start)" }
+}
+
+private struct YearGroupHeader: View {
+    let year: Int
+    let expanded: Bool
+    let onToggle: () -> Void
+
+    var body: some View {
+        Button(action: onToggle) {
+            HStack {
+                Text(verbatim: "\(year) 年")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(NodTheme.n500)
+                Spacer()
+                Image(systemName: expanded ? "chevron.down" : "chevron.right")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(NodTheme.n300)
+            }
+            .padding(.horizontal, 4)
+            .padding(.vertical, 8)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 private struct HolidayRowView: View {
     let row: HolidayListRow
 
@@ -111,7 +160,7 @@ private struct HolidayRowView: View {
                 Text(row.period.name)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(NodTheme.n900)
-                Text("\(row.period.start) ~ \(row.period.end) · 放假 \(row.vacationDays) 天")
+                Text(verbatim: "\(row.period.start) ~ \(row.period.end) · 放假 \(row.vacationDays) 天")
                     .font(.system(size: 12))
                     .foregroundStyle(NodTheme.n500)
             }
