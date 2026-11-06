@@ -48,9 +48,15 @@ EOS
 fi
 echo "WeChat shims ready in $OUT/@js-joda and format-util.js"
 
-# Minify for WeChat 2MB source limit
+# Minify for WeChat 2MB source limit (skip already-minified vendored shims)
 if command -v npx >/dev/null 2>&1; then
-  find "$OUT" -name '*.js' ! -name 'format-util.js' -print0 | while IFS= read -r -d '' f; do
+  find "$OUT" -name '*.js' ! -name 'format-util.js' ! -path "$OUT/@js-joda/*" -print0 | while IFS= read -r -d '' f; do
     npx --yes terser "$f" -c -m -o "$f" >/dev/null 2>&1 || true
   done
 fi
+
+# Node smoke and WeChat both resolve './@js-joda/core.js'; rewrite the bare
+# npm specifier after minify (terser would re-quote require strings).
+for f in "$OUT"/*.js; do
+  perl -pi -e 's/require\(["\x27]\@js-joda\/core["\x27]\)/require(".\/\@js-joda\/core.js")/g' "$f"
+done

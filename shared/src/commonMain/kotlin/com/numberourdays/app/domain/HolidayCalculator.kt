@@ -75,6 +75,37 @@ object HolidayCalculator {
             },
         )
     }
+
+    /**
+     * Year-sectioned view of [listRows] for the holiday list screen: one
+     * [HolidayYearGroup] per calendar year, a block belonging to the year it
+     * starts in.
+     *
+     * Group order:
+     * - years still holding a not-yet-ended block first, nearest live block first;
+     * - fully past years at the bottom, most recent year first.
+     *
+     * Rows inside a group keep [listRows] order (ongoing → upcoming → past).
+     * UIs render each group as a year section and collapse
+     * [HolidayYearGroup.allPast] groups by default.
+     */
+    fun yearGroups(
+        periods: List<HolidayPeriod>,
+        today: LocalDate,
+    ): List<HolidayYearGroup> {
+        val groups = listRows(periods, today)
+            .groupBy { it.period.start.year }
+            .map { (year, rows) -> HolidayYearGroup(year, rows, allPast = rows.all { it.past }) }
+
+        fun liveKey(group: HolidayYearGroup): LocalDate =
+            group.rows.first { !it.past }.let { if (it.ongoing) today else it.period.start }
+
+        return groups.sortedWith(
+            compareBy<HolidayYearGroup> { it.allPast }.thenComparator { a, b ->
+                if (a.allPast) b.year.compareTo(a.year) else liveKey(a).compareTo(liveKey(b))
+            },
+        )
+    }
 }
 
 data class HolidayListRow(
@@ -88,3 +119,11 @@ data class HolidayListRow(
     val vacationDays: Int
         get() = DateCalculator.daySpan(period.start, period.end) + 1
 }
+
+/** One calendar year of [HolidayListRow]s, in [HolidayCalculator.listRows] order. */
+data class HolidayYearGroup(
+    val year: Int,
+    val rows: List<HolidayListRow>,
+    /** True when every row has already ended — UIs collapse such groups by default. */
+    val allPast: Boolean,
+)

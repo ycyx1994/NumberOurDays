@@ -61,6 +61,9 @@ module.exports = {
   holidayList(today) {
     return parseJson(WeappDomain.holidayListJson(today || WeappDomain.today()), [])
   },
+  holidayGroups(today) {
+    return parseJson(WeappDomain.holidayGroupsJson(today || WeappDomain.today()), [])
+  },
   merge(local, incoming) {
     const json = WeappDomain.mergeJson(JSON.stringify(local || []), JSON.stringify(incoming || []))
     return parseJson(json, [])

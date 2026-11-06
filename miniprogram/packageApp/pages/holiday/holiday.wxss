@@ -1,4 +1,20 @@
 .page { padding: 24rpx 32rpx 48rpx; }
+
+.group { margin-bottom: 8rpx; }
+.group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 8rpx;
+}
+.group-title { font-size: 26rpx; font-weight: 600; color: #8a8175; }
+.chevron {
+  font-size: 22rpx;
+  color: #b5a99a;
+  transition: transform 0.15s ease;
+}
+.chevron.open { transform: rotate(90deg); }
+
 .row {
   display: flex;
   align-items: center;
