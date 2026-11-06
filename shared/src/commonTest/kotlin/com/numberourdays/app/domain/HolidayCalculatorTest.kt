@@ -49,8 +49,16 @@ class HolidayCalculatorTest {
     }
 
     @Test
-    fun afterAllBundledPeriods_returnsNull() {
+    fun after2026Bundled_rollsOverTo2027NewYear() {
         val r = HolidayCalculator.nextOrOngoing(LegalHolidays.periods(), LocalDate(2026, 10, 8))
+        assertNotNull(r)
+        assertEquals("元旦", r!!.period.name)
+        assertEquals(LocalDate(2027, 1, 1), r.period.start)
+    }
+
+    @Test
+    fun afterAllBundledPeriods_returnsNull() {
+        val r = HolidayCalculator.nextOrOngoing(LegalHolidays.periods(), LocalDate(2027, 10, 8))
         assertNull(r)
     }
 
@@ -63,22 +71,54 @@ class HolidayCalculatorTest {
 
     @Test
     fun springFestival_nineDayBlock() {
-        val spring = LegalHolidays.periods().first { it.name == "春节" }
+        val spring = LegalHolidays.periods().first { it.name == "春节" && it.start.year == 2026 }
         assertEquals(LocalDate(2026, 2, 15), spring.start)
         assertEquals(LocalDate(2026, 2, 23), spring.end)
+    }
+
+    @Test
+    fun springFestival_2027_feb5ToFeb13() {
+        val spring = LegalHolidays.periods().first { it.name == "春节" && it.start.year == 2027 }
+        assertEquals(LocalDate(2027, 2, 5), spring.start)
+        assertEquals(LocalDate(2027, 2, 13), spring.end)
+    }
+
+    @Test
+    fun periods_covers2027() {
+        val y2027 = LegalHolidays.periods().filter { it.start.year == 2027 }
+        assertEquals(7, y2027.size)
+        assertEquals(LocalDate(2027, 1, 1), y2027.first().start)
+        assertEquals(LocalDate(2027, 10, 7), y2027.last().end)
+    }
+
+    @Test
+    fun singleDayHolidays_2027_duanwuAndMidAutumn() {
+        for (name in listOf("端午节", "中秋节")) {
+            val p = LegalHolidays.periods().first { it.name == name && it.start.year == 2027 }
+            assertEquals(p.start, p.end, "$name 2027 should be a single-day holiday")
+        }
     }
 
     @Test
     fun listRows_upcomingNearestFirst_pastGrayedLast() {
         val today = LocalDate(2026, 9, 24)
         val rows = HolidayCalculator.listRows(LegalHolidays.periods(), today)
-        assertEquals(7, rows.size)
+        assertEquals(14, rows.size)
         assertEquals("中秋节", rows[0].period.name)
+        assertEquals(LocalDate(2026, 9, 25), rows[0].period.start)
         assertEquals("国庆节", rows[1].period.name)
-        assertEquals("端午节", rows[2].period.name)
+        assertEquals(LocalDate(2026, 10, 1), rows[1].period.start)
+        // 2026 未完的两段之后接 2027 全部七段按升序。
+        assertEquals("元旦", rows[2].period.name)
+        assertEquals(LocalDate(2027, 1, 1), rows[2].period.start)
+        assertEquals(LocalDate(2027, 10, 1), rows[8].period.start)
+        // 已过段沉底，最近结束的在最前。
+        assertEquals("端午节", rows[9].period.name)
+        assertEquals(LocalDate(2026, 6, 19), rows[9].period.start)
         assertEquals("元旦", rows.last().period.name)
-        assertTrue(rows[0].past.not() && rows[1].past.not())
-        assertTrue(rows.drop(2).all { it.past })
+        assertEquals(LocalDate(2026, 1, 1), rows.last().period.start)
+        assertTrue(rows.take(9).none { it.past })
+        assertTrue(rows.drop(9).all { it.past })
     }
 
     @Test
@@ -91,7 +131,7 @@ class HolidayCalculatorTest {
 
     @Test
     fun listRows_vacationDays_countsInclusive() {
-        val spring = LegalHolidays.periods().first { it.name == "春节" }
+        val spring = LegalHolidays.periods().first { it.name == "春节" && it.start.year == 2026 }
         val row = HolidayCalculator.listRows(listOf(spring), LocalDate(2026, 1, 1)).first()
         assertEquals(9, row.vacationDays)
     }
@@ -100,7 +140,7 @@ class HolidayCalculatorTest {
     fun listRows_past_showsDaysPastEnd() {
         val today = LocalDate(2026, 9, 24)
         val rows = HolidayCalculator.listRows(LegalHolidays.periods(), today)
-        val duanwu = rows.first { it.period.name == "端午节" }
+        val duanwu = rows.first { it.period.name == "端午节" && it.period.start.year == 2026 }
         assertTrue(duanwu.past)
         assertEquals(95, duanwu.daysPastEnd)
     }

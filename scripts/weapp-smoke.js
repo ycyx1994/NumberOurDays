@@ -53,5 +53,15 @@ if (!dur || typeof dur.value !== 'number' || !dur.unitLabel) {
   console.error('FAIL duration', dur)
   process.exit(1)
 }
+const holiday = adapter.holidayCountdown('2026-10-08')
+if (!holiday || holiday.name !== '元旦' || holiday.start !== '2027-01-01') {
+  console.error('FAIL holidayCountdown expected 2027 元旦 got', holiday)
+  process.exit(1)
+}
+const holidayRows = adapter.holidayList('2026-10-08')
+if (!Array.isArray(holidayRows) || holidayRows.length !== 14) {
+  console.error('FAIL holidayList expected 14 rows got', holidayRows && holidayRows.length)
+  process.exit(1)
+}
 console.log('smoke ok', displays[0].label, 'dur', dur)
 
